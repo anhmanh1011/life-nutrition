@@ -1,3 +1,5 @@
+import ipaddress
+
 SESSION_KEY = "attribution"
 
 UTM_PARAMS = ("utm_source", "utm_medium", "utm_campaign")
@@ -35,3 +37,27 @@ class AttributionMiddleware:
 def attribution_for(request):
     """Read the recorded attribution. One place knows the session key."""
     return request.session.get(SESSION_KEY, {})
+
+
+class RealIPMiddleware:
+    """Replace REMOTE_ADDR with the address nginx recorded in X-Real-IP.
+
+    Only X-Real-IP is trusted, and only when it parses as a single address.
+    nginx sets it unconditionally from $remote_addr, so a client-supplied value
+    never survives. X-Forwarded-For is deliberately not consulted: nginx appends
+    to it, so its leftmost entry is whatever the client sent.
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        candidate = request.META.get("HTTP_X_REAL_IP", "").strip()
+        if candidate:
+            try:
+                ipaddress.ip_address(candidate)
+            except ValueError:
+                pass
+            else:
+                request.META["REMOTE_ADDR"] = candidate
+        return self.get_response(request)
