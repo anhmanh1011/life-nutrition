@@ -6572,7 +6572,7 @@ is a note plus `status = Không phù hợp`, not a rewrite.
 **Files:**
 - Create: `apps/leads/admin.py`, `tests/test_admin_leads.py`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `tests/test_admin_leads.py`:
 
@@ -6747,12 +6747,12 @@ def test_dealer_applications_can_be_filtered_by_completeness(admin_client):
 `objects.create()`, which never calls the notifier. It is left in place because the first test
 anyone adds to this file will create a lead through a view, and that test will need it.
 
-- [ ] **Step 2: Run to verify they fail**
+- [x] **Step 2: Run to verify they fail**
 
 Run: `.venv/bin/pytest tests/test_admin_leads.py -v`
 Expected: FAIL — `NoReverseMatch: 'leads_contactmessage_add' is not a valid view function or pattern name`.
 
-- [ ] **Step 3: Write `apps/leads/admin.py`**
+- [x] **Step 3: Write `apps/leads/admin.py`**
 
 ```python
 import csv
@@ -6995,17 +6995,17 @@ The file itself is correct — importing via *Data → From Text/CSV* with the p
 *Text*, or opening it in Google Sheets, shows the full number. Writing `="0987654321"` would fix
 the display and reintroduce exactly the formula injection the previous paragraph removes.
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 Run: `.venv/bin/pytest tests/test_admin_leads.py -v`
 Expected: `10 passed`
 
-- [ ] **Step 5: Run the whole suite**
+- [x] **Step 5: Run the whole suite**
 
 Run: `.venv/bin/pytest -q`
 Expected: all tests pass.
 
-- [ ] **Step 6: Look at the screen with real-shaped data**
+- [x] **Step 6: Look at the screen with real-shaped data**
 
 ```bash
 .venv/bin/python manage.py shell -c "
@@ -7045,7 +7045,7 @@ print(ContactMessage.objects.all().delete(), DealerApplication.objects.all().del
 "
 ```
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add apps/leads/admin.py tests/test_admin_leads.py
