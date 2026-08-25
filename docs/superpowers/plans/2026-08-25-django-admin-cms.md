@@ -12,30 +12,16 @@
 
 ---
 
-## Status — 2026-08-25: this plan is unfinished
+## Status — this plan is complete
 
-**Written and reviewable: Tasks 1–26** (Phases 0–4). Every step in them contains real code, real
-commands and expected output; they can be executed as-is.
+**All 28 tasks are written** across Phases 0–5. Every step contains real code, real commands and
+expected output; they can be executed as-is.
 
-**Not written: Tasks 27–28** (Phase 5). The phase map below still lists them, and the tasks above
-already forward-reference them, so those references currently point at nothing:
-
-- **Task 27 — deploy files.** Dockerfile, `docker-compose.yml`, nginx and gunicorn config, `.env`
-  template, `pg_dump` + `media/` backup. Docker is not installed on this machine, so nothing in
-  this task can be verified locally — it must be reviewed by reading. It also owes two things the
-  earlier tasks promised: **nginx must serve `/media/`** (Task 24 Step 9 says so, and without it
-  every admin thumbnail and every product image 404s in production) and **`setup_groups` must run
-  as a deploy step** (Task 26 creates it but nothing yet invokes it on a fresh server).
-- **Task 28 — documentation.** Rewrite `PROJECT.md`, whose "no build step, no framework" hard
-  constraint and "duplicate nav and footer across 8 files" instruction both become false; refresh
-  `TODO.md`, `PROGRESS.md`, `README.md`; and write Deviations 6 and 7 back into the spec.
-
-**Also not done:** the writing-plans self-review — a spec-coverage sweep, a placeholder scan, and a
-consistency check that names used across tasks match (`telegram_rows`, `attribution_summary`,
-`accepts_step_two`, `count_previous_submissions`, `save_lead`, `is_bot`, `TelInput`, `escape_html`,
-`RATE_LIMITED`, `ATTRIBUTION_FIELDS`, `product_count`, `telegram_state`, `completeness`,
-`export_fields`, `pages:thanks`, `pages:dealer_step_two`). Until that runs, assume a name may be
-inconsistent between an early task that defines it and a later one that calls it.
+One caveat, stated once here so it is not a surprise at the end: **Task 27 was reviewed by reading,
+not by running.** Docker is not installed on the machine this plan was written on. Task 27 marks
+the three checks that *do* execute locally — `manage.py check --deploy`, `sh -n` on both shell
+scripts, and a path cross-check between the Dockerfile, the compose file and the nginx config —
+and treats everything else as a first-deploy checklist to be run on the VPS.
 
 **No implementation has started.** The repository is still the eight static HTML pages. Nothing in
 Phase 0 has been executed — there is no `.venv`, no `manage.py`, no `apps/`.
@@ -61,7 +47,7 @@ The full dependency set was test-installed together and resolves cleanly:
 
 ## Deviations from the spec
 
-Reading the real markup turned up seven things the spec's data model does not cover. Each is listed here so the reviewer sees them in one place rather than discovering them in a diff.
+Reading the real markup turned up nine things the spec's data model does not cover. Each is listed here so the reviewer sees them in one place rather than discovering them in a diff.
 
 1. **`Category` needs two labels, not one.** The filter pill says `Bánh mì & bánh ngọt` but the card kicker says `Bánh`. Adding `Category.short_name` for the kicker; `Category.name` stays the pill label.
 
@@ -101,8 +87,14 @@ Reading the real markup turned up seven things the spec's data model does not co
    Phase 2, so Task 15 compares before/after screenshots rather than trusting `check.mjs`, which
    does not detect crop shifts.
 
-Items 6 and 7 are the only changes that alter the spec's data model rather than extending it. Both
-are written back into the spec by Task 28.
+9. **`SiteSettings` gains `shipping_partner` and drops `facility_area`.** The spec's field list
+   names `facility_area`, but `gioi-thieu.html` quotes the warehouse size twice and two editable
+   fields holding one number will drift apart — `warehouse_area` is the single source. The same page
+   carries a `[tên đơn vị]` placeholder for the shipping partner, which the spec's list omits;
+   that becomes `shipping_partner`.
+
+Items 6, 7 and 9 are the only changes that alter the spec's data model rather than extending it.
+All three are written back into the spec by Task 28.
 
 Additionally: **seeded product images are copied into `MEDIA_ROOT`.** `Product.image` is an `ImageField`, so templates always use `{{ product.image.url }}`. `seed_content` copies each file from `assets/img/` into `media/products/` on first run. Without this the seeded rows and admin-uploaded rows would need two different template branches.
 
@@ -129,7 +121,8 @@ config/
   wsgi.py
 
 apps/
-  common/images.py            resize-on-save helper (Pillow), used by catalog + news
+  common/images.py            upload size validator + resize-on-save helper (Pillow)
+  common/management/commands/setup_groups.py   the two admin roles, idempotent
   siteinfo/models.py          SiteSettings (singleton pk=1)
   siteinfo/context_processors.py   injects site settings into every template
   catalog/models.py           Brand, Category, Product (+ ProductQuerySet)
@@ -138,7 +131,7 @@ apps/
   leads/phone.py              normalize_vn_phone / validate — pure functions, no Django
   leads/models.py             Submission (abstract), ContactMessage, DealerApplication
   leads/telegram.py           notifier: send + edit, never raises into the view
-  leads/middleware.py         captures UTM/referrer into session on first request
+  leads/middleware.py         UTM/referrer into session; real client IP from X-Real-IP
   leads/forms.py              ContactForm, DealerStepOneForm, DealerStepTwoForm
   leads/views.py              the 2 form pages + dealer step two + thank-you
   pages/views.py              the 6 read-only public page views
@@ -154,7 +147,22 @@ assets/                       unchanged on disk; STATIC_URL = /assets/
 media/                        gitignored, admin uploads + seeded product images
 staticfiles/                  gitignored, collectstatic output
 
+Dockerfile                    multi-stage, non-root, collectstatic at build
+.dockerignore                 excludes product_image/ (110 MB), .env, media/
+docker-compose.yml            web + db + nginx (+ certbot behind a profile)
+.gitattributes                forces LF on *.sh — CRLF breaks the entrypoint
+deploy/
+  entrypoint.sh               migrate, createcachetable, setup_groups, collectstatic
+  gunicorn.conf.py            3 workers, trusts the proxy, logs the real client IP
+  healthcheck.py              stdlib only — renders the home page, so it hits Postgres
+  nginx/dalifoods.conf        TLS, /assets/ and /media/, X-Real-IP, X-Forwarded-Proto
+  backup.sh                   nightly pg_dump -Fc + media tar, 14-day retention
+  .env.production.example     production env template, copied to .env on the server
+
 tools/check.mjs               MODIFIED: targets Django, new URLs, PAGES override
+tools/shot.mjs                MODIFIED: same server change; argument is a URL path
+
+PROJECT.md TODO.md README.md PROGRESS.md   MODIFIED: Task 28 rewrites all four
 
 tests/                        pytest suite, mirrors apps/
 ```
@@ -172,7 +180,7 @@ Each phase leaves the tree in a working, committable state.
 | 2 — Templates | 9–17 | All 8 pages render from Postgres, `check.mjs` green after **each** page |
 | 3 — Leads | 18–23 | Both forms persist + notify Telegram; two-step dealer flow |
 | 4 — Admin | 24–26 | Vietnamese admin, two permission groups, CSV export |
-| 5 — Deploy + docs | 27–28 | Compose files written; `PROJECT.md` no longer lies |
+| 5 — Deploy + docs | 27–28 | `docker compose up -d --build` serves the site over TLS; `PROJECT.md` no longer lies |
 
 **Phase 2 is the risk.** The pages carry heavy inline `style=""` attributes that have already caused two mobile bugs. Every page conversion task ends by running `tools/check.mjs` scoped to just that page.
 
@@ -393,6 +401,11 @@ TELEGRAM_TIMEOUT_SECONDS = 5
 # Longest edge, in pixels, for any uploaded image. Holds the ~1.9 MB image
 # budget in PROJECT.md for an audience on mobile data.
 IMAGE_MAX_EDGE = 1000
+
+# Largest file an image field will accept, before anything decodes it. Below
+# nginx's client_max_body_size (12m in Task 27) on purpose: the field raises a
+# Vietnamese validation error, where nginx would return a bare 413.
+IMAGE_MAX_UPLOAD_BYTES = 8 * 1024 * 1024
 
 TINYMCE_DEFAULT_CONFIG = {
     "height": 500,
@@ -807,7 +820,7 @@ git commit -m "Add site settings singleton seeded with the bracket placeholders"
 
 ---
 
-### Task 5: `apps/common` — resize uploads on save
+### Task 5: `apps/common` — bound and resize uploads
 
 Shared by `catalog` and `news`. Holds the ~1.9 MB image budget recorded in `PROJECT.md`.
 
@@ -821,10 +834,12 @@ Shared by `catalog` and `news`. Holds the ~1.9 MB image budget recorded in `PROJ
 ```python
 import io
 
+import pytest
+from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from PIL import Image
 
-from apps.common.images import resize_to_max_edge
+from apps.common.images import resize_to_max_edge, validate_upload_size
 
 
 def _upload(name, size):
@@ -848,6 +863,18 @@ def test_small_image_is_returned_untouched():
     assert resize_to_max_edge(original, max_edge=1000) is original
 
 
+def test_upload_within_the_limit_validates():
+    assert validate_upload_size(_upload("ok.jpg", (400, 300))) is None
+
+
+def test_oversized_upload_is_rejected_with_a_vietnamese_message():
+    fat = _upload("fat.jpg", (100, 100))
+    fat.size = 9 * 1024 * 1024  # cheaper than allocating 9 MB; `size` is a plain attribute
+    with pytest.raises(ValidationError) as caught:
+        validate_upload_size(fat)
+    assert "MB" in caught.value.messages[0]
+
+
 def test_non_image_is_returned_untouched():
     junk = SimpleUploadedFile("notes.jpg", b"not an image", content_type="image/jpeg")
     assert resize_to_max_edge(junk, max_edge=1000) is junk
@@ -864,10 +891,26 @@ Expected: FAIL — `ModuleNotFoundError: No module named 'apps.common.images'`.
 import io
 from pathlib import Path
 
+from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from PIL import Image, UnidentifiedImageError
 
 _JPEG_QUALITY = 82
+
+
+def validate_upload_size(uploaded):
+    """Reject an upload that is too large, before `resize_to_max_edge` decodes it.
+
+    Runs at form-clean time, so staff see it as a field error on the admin page.
+    """
+    limit = settings.IMAGE_MAX_UPLOAD_BYTES
+    if uploaded.size > limit:
+        raise ValidationError(
+            "Ảnh nặng %(got).1f MB, vượt giới hạn %(limit).1f MB. "
+            "Vui lòng thu nhỏ hoặc nén ảnh trước khi tải lên.",
+            params={"got": uploaded.size / 1048576, "limit": limit / 1048576},
+        )
 
 
 def resize_to_max_edge(uploaded, max_edge):
@@ -881,7 +924,12 @@ def resize_to_max_edge(uploaded, max_edge):
         uploaded.seek(0)
         image = Image.open(uploaded)
         image.load()
-    except (UnidentifiedImageError, OSError, ValueError):
+    except (
+        UnidentifiedImageError,
+        Image.DecompressionBombError,
+        OSError,
+        ValueError,
+    ):
         uploaded.seek(0)
         return uploaded
 
@@ -897,16 +945,41 @@ def resize_to_max_edge(uploaded, max_edge):
     return ContentFile(buffer.getvalue(), name=Path(uploaded.name).with_suffix(".jpg").name)
 ```
 
+**Why a validator and a resize, rather than just the resize.** `resize_to_max_edge` runs in
+`save()`, which is after the file has been decoded — so on its own it offers no protection from
+the upload that is expensive to decode. `validate_upload_size` runs at form-clean time and only
+looks at `uploaded.size`, so an 8 MB cap is enforced before Pillow touches the bytes. The spec's
+*Security* section asks for uploads constrained by content type and size: `ImageField` already
+verifies decodability with Pillow, which is the content-type half; this is the size half.
+
+`Image.DecompressionBombError` is in the except tuple because it does **not** subclass `OSError`
+or `ValueError` — it inherits straight from `Exception`. Without it, a small file that expands to
+more than 2× Pillow's `MAX_IMAGE_PIXELS` raises out of `save()` and 500s the admin instead of
+coming back as a field error. Confirm it against the Pillow you actually installed rather than
+taking this on faith — if it ever gains an `OSError` base the extra entry is merely redundant:
+
+```bash
+.venv/bin/python -c "from PIL import Image; print(issubclass(Image.DecompressionBombError, (OSError, ValueError)))"
+```
+
+Expected: `False`.
+
+Two things this deliberately does not do. Validators do not run on programmatic writes, so
+`seed_content` bypasses both — acceptable, since it reads fixed files from `assets/img/` that are
+already within budget. And a PNG under 8 MB can still decode to a few hundred megabytes; Pillow's
+default `MAX_IMAGE_PIXELS` is the backstop there. Uploading is staff-only, behind admin auth and
+the two groups from Task 26.
+
 - [ ] **Step 4: Run the tests to verify they pass**
 
 Run: `.venv/bin/pytest tests/test_images.py -v`
-Expected: `4 passed`
+Expected: `6 passed`
 
 - [ ] **Step 5: Commit**
 
 ```bash
 git add apps/common/images.py tests/test_images.py
-git commit -m "Add a shared resize-on-upload helper to hold the image budget"
+git commit -m "Add shared upload size validation and resize-on-save to hold the image budget"
 ```
 
 ---
@@ -1008,7 +1081,7 @@ Expected: FAIL — `cannot import name 'Brand' from 'apps.catalog.models'`.
 from django.conf import settings
 from django.db import models
 
-from apps.common.images import resize_to_max_edge
+from apps.common.images import resize_to_max_edge, validate_upload_size
 
 _SLUG_WARNING = (
     "Đang được dùng để lọc sản phẩm trên trang. Đổi giá trị này sẽ làm bộ lọc ngừng hoạt động."
@@ -1035,7 +1108,9 @@ class Brand(models.Model):
     )
     name_cn = models.CharField("Tên tiếng Trung", max_length=80, blank=True)
     slug = models.SlugField("Đường dẫn", max_length=100, unique=True)
-    logo = models.ImageField("Logo", upload_to="brands/", blank=True)
+    logo = models.ImageField(
+        "Logo", upload_to="brands/", blank=True, validators=[validate_upload_size]
+    )
     description = models.TextField("Mô tả", blank=True)
     is_active = models.BooleanField(
         "Đang phân phối",
@@ -1099,7 +1174,9 @@ class Product(models.Model):
     category = models.ForeignKey(
         Category, on_delete=models.PROTECT, related_name="products", verbose_name="Ngành hàng"
     )
-    image = models.ImageField("Ảnh sản phẩm", upload_to="products/")
+    image = models.ImageField(
+        "Ảnh sản phẩm", upload_to="products/", validators=[validate_upload_size]
+    )
     image_alt = models.CharField(
         "Mô tả ảnh (alt)",
         max_length=200,
@@ -1247,7 +1324,7 @@ from django.db import models
 from django.utils import timezone
 from tinymce.models import HTMLField
 
-from apps.common.images import resize_to_max_edge
+from apps.common.images import resize_to_max_edge, validate_upload_size
 
 _ALLOWED_TAGS = {
     "p", "br", "strong", "em", "u", "ul", "ol", "li", "a",
@@ -1277,7 +1354,9 @@ class Article(models.Model):
     topic = models.CharField(
         "Chuyên mục", max_length=40, choices=Topic.choices, default=Topic.COMPANY
     )
-    cover = models.ImageField("Ảnh bìa", upload_to="news/", blank=True)
+    cover = models.ImageField(
+        "Ảnh bìa", upload_to="news/", blank=True, validators=[validate_upload_size]
+    )
     cover_alt = models.CharField(
         "Mô tả ảnh bìa (alt)", max_length=200, blank=True,
         help_text="Bắt buộc nếu có ảnh bìa.",
@@ -1356,7 +1435,7 @@ Haochidian 4, Heqizheng 1, Hi-Tiger 1. Getting the seed wrong is caught in Task 
 
 **One judgement call to flag:** six of the seven articles carry a `[ngày]/MM/2026` placeholder —
 the month is known, the day is not. `published_at` is a real `DateTimeField` and cannot hold
-`[ngày]`. The seed uses **day 01 of the known month** as a stand-in, and Task 27 records this in
+`[ngày]`. The seed uses **day 01 of the known month** as a stand-in, and Task 28 records this in
 `TODO.md` so the real dates get confirmed. This is the one place the plan writes a value the client
 has not supplied; it is a publication date on a demo article, not an MST or a hotline.
 
@@ -2347,7 +2426,7 @@ Replace lines 61 and 65 so the argument is a URL path rather than a filename ste
 
 Usage becomes `node tools/shot.mjs 390 844 true /tin-tuc/` → `/tmp/ln-em-tin-tuc-390.png`, and
 `node tools/shot.mjs 390 844 true /` → `/tmp/ln-em-home-390.png`. `PROJECT.md` documents the old
-form; Task 27 updates it.
+form; Task 28 updates it.
 
 - [ ] **Step 7: Prove the status check works**
 
@@ -3654,7 +3733,7 @@ git commit -m "Render the contact and dealer pages, and drop the static HTML ori
 
 ---
 
-## Phase 3 — lead capture
+# Phase 3 — Lead capture
 
 This is the phase the branch exists for. Two forms currently post to `action="#"`, which means
 every dealer signup since launch has been discarded. From here they reach Postgres.
@@ -7268,8 +7347,9 @@ useful work done without a developer in the room. Concretely, all of this is now
 - A lead's submitted fields cannot be edited, so the record of what the visitor typed survives.
 - Two roles exist as code, and an editor cannot reach customer data even by URL.
 
-Run the full suite one more time before moving to deployment, because Phase 5 changes no Python and
-you want a known-clean baseline to compare against:
+Run the full suite one more time before moving to deployment. Phase 5 touches Python only twice —
+two settings values and one middleware, both in Task 27 — so a clean run here is the baseline those
+two changes get compared against:
 
 ```bash
 .venv/bin/pytest -q
@@ -7277,5 +7357,1696 @@ node tools/check.mjs
 ```
 
 Expected: pytest all-pass, `check.mjs` exits 0.
+
+---
+
+# Phase 5 — Deploy and documentation
+
+Phase 5 puts the application on a server and then makes the repository stop describing a site that
+no longer exists. Neither task changes what a visitor sees.
+
+**Docker is not installed on the machine this plan was written on, and is not installed on the
+machine it is being finished on either.** Nothing in Task 27 can be run here. That is stated once,
+here, rather than repeated at every step: where a step says *Run*, it means run it on the VPS during
+the first deploy. The three checks that *do* run locally are called out explicitly — they are Step 2
+(`check --deploy`), Step 10 (`sh -n`) and Step 11 (the path cross-check). Do not skip them on the
+grounds that "Phase 5 is unverifiable"; they are the part that is not.
+
+---
+
+### Task 27: Deploy files
+
+The spec asks for `docker-compose` on a self-managed VPS: nginx terminating TLS and serving
+`/assets/` and `/media/`, gunicorn running Django, Postgres for data, `collectstatic` at image
+build, `media/` on a persistent volume, and backups as a scheduled `pg_dump` plus a `media/`
+archive. This task writes exactly that and nothing more — no CI pipeline, no registry, no
+blue-green. One VPS, one `docker compose up -d`.
+
+It also settles two debts left by earlier phases, both of which are load-bearing:
+
+- **nginx must serve `/media/`.** Task 24 Step 9 says so. `config/urls.py` only serves `MEDIA_URL`
+  while `DEBUG` is true, so without an nginx location every product image and every admin thumbnail
+  404s the moment `DEBUG=False`. The site would launch with seventeen broken product photos.
+- **`setup_groups` must run on deploy.** Task 26 created the command and nothing calls it. A fresh
+  server would come up with zero groups, and the first person to set up an editor account would do
+  it by hand with checkboxes — which is the failure mode Task 26 exists to prevent.
+
+**Files:**
+- Create: `Dockerfile`, `.dockerignore`, `docker-compose.yml`
+- Create: `deploy/entrypoint.sh`, `deploy/gunicorn.conf.py`, `deploy/healthcheck.py`
+- Create: `deploy/nginx/dalifoods.conf`
+- Create: `deploy/backup.sh`, `deploy/.env.production.example`
+- Modify: `config/settings/production.py` (cache backend)
+- Modify: `apps/leads/middleware.py` (real client IP behind the proxy)
+- Modify: `.gitignore`
+- Test: `tests/test_real_ip.py`
+
+---
+
+#### Two corrections this task makes to earlier phases
+
+Both are bugs that only appear behind a reverse proxy, which is why neither showed up in Phases 3
+and 4. Both silently disable a control the spec asked for rather than raising an error, so neither
+would be noticed after launch until it mattered.
+
+**1. `@ratelimit(key="ip")` sees nginx, not the visitor.**
+
+django-ratelimit's `ip` key reads `request.META["REMOTE_ADDR"]`, and behind a proxy that is the
+address of the nginx container — the same value for every visitor on earth. The three decorators
+written in Tasks 22 and 23 would therefore share **one** bucket of 15 requests an hour between all
+traffic. The first fifteen submissions of the hour would go through and everything after them would
+be throttled, which reads as "the form is broken" rather than as "spam control is working".
+
+The fix is four lines of middleware plus one nginx header, and it deliberately keys off `X-Real-IP`
+rather than `X-Forwarded-For`. `X-Forwarded-For` is a list that nginx *appends* to, so its leftmost
+entry is whatever the client sent — trusting it hands any visitor the ability to pick their own
+rate-limit bucket. `X-Real-IP` is overwritten unconditionally by `proxy_set_header X-Real-IP
+$remote_addr`, so a client-supplied value cannot survive.
+
+**2. The rate-limit counter is per gunicorn worker.**
+
+`config/settings/base.py` never sets `CACHES`, so Django falls back to `LocMemCache`, which is
+per-process. With three gunicorn workers the effective limit is 45 an hour, not 15, and which
+bucket a request lands in depends on which worker accepted the connection. `config/settings/test.py`
+sets `LocMemCache` deliberately and correctly — a single test process — but production needs a
+shared counter.
+
+This adds `DatabaseCache` in `config/settings/production.py` and `createcachetable` to the
+entrypoint. Postgres is already running, so the alternative — adding Redis for one counter — buys
+nothing but a fourth container to keep alive. `DatabaseCache.incr()` is a read-then-write rather
+than an atomic operation, so two simultaneous submissions can both read 14 and both write 15. For
+spam control on a marketing form that is not worth a Redis dependency; the honest description of
+this limit is "roughly 15 an hour", and it is written that way rather than pretended otherwise.
+
+**Note for Task 26:** its Step 9 used to close Phase 4 with "Phase 5 changes no Python", which these
+two corrections make false. The sentence has been rewritten to point here. The instruction itself —
+run the full suite before starting Phase 5 — still stands and is still the right advice; a clean
+run there is the baseline these two changes are compared against.
+
+---
+
+- [ ] **Step 1: Real client IP behind the proxy — write the failing test**
+
+`tests/test_real_ip.py`:
+
+```python
+import pytest
+from django.test import RequestFactory
+
+from apps.leads.middleware import RealIPMiddleware
+
+
+def call(**headers):
+    request = RequestFactory().get("/", REMOTE_ADDR="172.18.0.4", **headers)
+    seen = {}
+
+    def get_response(req):
+        seen["remote_addr"] = req.META["REMOTE_ADDR"]
+        return "ok"
+
+    RealIPMiddleware(get_response)(request)
+    return seen["remote_addr"]
+
+
+def test_without_the_header_remote_addr_is_left_alone():
+    assert call() == "172.18.0.4"
+
+
+def test_the_header_replaces_remote_addr():
+    assert call(HTTP_X_REAL_IP="113.161.40.7") == "113.161.40.7"
+
+
+def test_a_forwarded_for_list_is_ignored():
+    # nginx appends to X-Forwarded-For, so its leftmost entry is client-supplied.
+    # Trusting it would let a visitor choose their own rate-limit bucket.
+    assert call(HTTP_X_FORWARDED_FOR="1.2.3.4, 172.18.0.4") == "172.18.0.4"
+
+
+@pytest.mark.parametrize("value", ["", "   ", "not-an-address", "1.2.3.4, 5.6.7.8"])
+def test_a_junk_header_is_ignored(value):
+    assert call(HTTP_X_REAL_IP=value) == "172.18.0.4"
+```
+
+The last case is the one that earns its keep. `X-Real-IP` is trusted, so a malformed value must fall
+back to the socket address rather than become a cache key — otherwise a header of `""` gives every
+request that sends it a shared, empty-keyed bucket, which is the same collapse this middleware
+exists to fix.
+
+- [ ] **Step 2: Run it to verify it fails**
+
+Run: `.venv/bin/pytest tests/test_real_ip.py -v`
+Expected: collection fails with
+`ImportError: cannot import name 'RealIPMiddleware' from 'apps.leads.middleware'`.
+
+- [ ] **Step 3: Add `RealIPMiddleware`**
+
+Append to `apps/leads/middleware.py`, below `AttributionMiddleware`:
+
+```python
+import ipaddress
+
+
+class RealIPMiddleware:
+    """Replace REMOTE_ADDR with the address nginx recorded in X-Real-IP.
+
+    Only X-Real-IP is trusted, and only when it parses as a single address.
+    nginx sets it unconditionally from $remote_addr, so a client-supplied value
+    never survives. X-Forwarded-For is deliberately not consulted: nginx appends
+    to it, so its leftmost entry is whatever the client sent.
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        candidate = request.META.get("HTTP_X_REAL_IP", "").strip()
+        if candidate:
+            try:
+                ipaddress.ip_address(candidate)
+            except ValueError:
+                pass
+            else:
+                request.META["REMOTE_ADDR"] = candidate
+        return self.get_response(request)
+```
+
+Then register it in `config/settings/base.py`, **above** `AttributionMiddleware`:
+
+```python
+    "apps.leads.middleware.RealIPMiddleware",
+    "apps.leads.middleware.AttributionMiddleware",
+```
+
+Order matters and it is not arbitrary: `AttributionMiddleware` records where a visitor came from,
+and anything downstream that reads `REMOTE_ADDR` — including every `@ratelimit` decorator — must see
+the corrected value. Putting it last would leave the rate limiters reading the container address.
+
+`ipaddress.ip_address` accepts IPv6, which is what you want: a Vietnamese mobile network handing out
+IPv6 should still get its own bucket rather than falling back to a shared one.
+
+- [ ] **Step 4: Run it to verify it passes**
+
+Run: `.venv/bin/pytest tests/test_real_ip.py -v`
+Expected: `7 passed`
+
+Then the whole suite, because a new middleware runs on every request in every test:
+
+Run: `.venv/bin/pytest -q`
+Expected: all tests pass, no errors.
+
+- [ ] **Step 5: Give production a shared cache**
+
+Append to `config/settings/production.py`:
+
+```python
+# django-ratelimit counts in the cache. The default LocMemCache is per-process,
+# so with three gunicorn workers a "15/h" limit is really 45/h and which bucket a
+# request lands in depends on which worker accepted it. Postgres is already here;
+# a fourth container just for one counter is not worth keeping alive.
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "django_cache",
+    }
+}
+```
+
+`django_cache` is a table name, not a path. `createcachetable` creates it and the entrypoint runs
+that on every start.
+
+- [ ] **Step 6: Verify the production settings locally**
+
+This one **does** run on this machine, and it is the single most useful check in the task — it reads
+the same settings module gunicorn will import.
+
+```bash
+DJANGO_SETTINGS_MODULE=config.settings.production .venv/bin/python manage.py check --deploy
+```
+
+Expected: `System check identified no issues (0 silenced).`
+
+It passes using the development `.env` because `production.py` hardcodes `DEBUG = False` and the
+security flags, and `DJANGO_ALLOWED_HOSTS` is non-empty there. If you see `security.W020`, your
+`.env` has an empty `DJANGO_ALLOWED_HOSTS`; if you see `security.W009`, the `DJANGO_SECRET_KEY` in
+`.env` is still the `change-me-...` string from `.env.example` and Task 2 Step 9 was skipped.
+
+`check --deploy` does not open a database connection, so it works with Postgres stopped.
+
+- [ ] **Step 7: Commit the two corrections**
+
+They are application behaviour and belong in their own commit, separate from the deploy files.
+
+```bash
+git add apps/leads/middleware.py config/settings/base.py config/settings/production.py \
+  tests/test_real_ip.py
+git commit -m "Make rate limiting see the visitor's IP and share one counter"
+```
+
+- [ ] **Step 8: Write `deploy/gunicorn.conf.py`**
+
+```python
+import os
+
+bind = "0.0.0.0:8000"
+
+# A 1-2 vCPU VPS serving a brochure site. Three workers keeps one free while two
+# wait on Postgres; going wider costs memory and buys nothing at this traffic.
+workers = int(os.environ.get("GUNICORN_WORKERS", "3"))
+threads = 1
+timeout = 30
+graceful_timeout = 30
+keepalive = 5
+
+# Bound any slow leak — the Pillow resize on upload is the only allocation here
+# large enough to matter, and a worker that has handled a thousand requests is
+# cheap to replace.
+max_requests = 1000
+max_requests_jitter = 100
+
+# gunicorn only honours X-Forwarded-* from addresses it trusts, and nginx's
+# address inside the compose network is assigned at container start. This is safe
+# because port 8000 is never published to the host: the only thing that can reach
+# gunicorn is a container on the same network.
+forwarded_allow_ips = "*"
+
+accesslog = "-"
+errorlog = "-"
+loglevel = "info"
+
+# Log the real client, not the nginx container. %({x-real-ip}i)s reads the request
+# header. Deliberately no query string: the attribution middleware puts utm_* into
+# the session, and the spec says submitter contact details never reach the logs.
+access_log_format = '%({x-real-ip}i)s "%(r)s" %(s)s %(b)s %(M)sms'
+```
+
+`forwarded_allow_ips = "*"` is the line a reviewer should stop on. It is what lets
+`SECURE_PROXY_SSL_HEADER` in `production.py` be believed — without it gunicorn strips
+`X-Forwarded-Proto`, Django concludes every request is plain HTTP, and `SECURE_SSL_REDIRECT` sends
+the browser to `https://` which arrives back as the same stripped request. That is an infinite
+redirect loop, and it is the most common way this stack fails on its first deploy. The reason `"*"`
+is acceptable rather than reckless is in the comment: `docker-compose.yml` never publishes port
+8000, so nothing outside the compose network can speak to gunicorn at all.
+
+- [ ] **Step 9: Write `deploy/healthcheck.py`**
+
+```python
+"""Container healthcheck: can Django actually render the home page?
+
+Run by HEALTHCHECK in the Dockerfile. Uses only the standard library, so the
+runtime image does not need curl.
+"""
+
+import sys
+import urllib.error
+import urllib.request
+
+REQUEST = urllib.request.Request(
+    "http://127.0.0.1:8000/",
+    headers={
+        # production.py sets SECURE_SSL_REDIRECT, so without this SecurityMiddleware
+        # answers 301 before the URL resolver runs and the check would pass without
+        # ever proving Django can reach Postgres.
+        "X-Forwarded-Proto": "https",
+        # Reaches ALLOWED_HOSTS, which is why .env.production.example lists 127.0.0.1.
+        "Host": "127.0.0.1",
+    },
+)
+
+try:
+    with urllib.request.urlopen(REQUEST, timeout=4) as response:
+        sys.exit(0 if response.status == 200 else 1)
+except (urllib.error.URLError, OSError) as exc:
+    print(f"healthcheck failed: {exc}", file=sys.stderr)
+    sys.exit(1)
+```
+
+The home page is the right target precisely because it is expensive: it reads `SiteSettings`, the
+product counts and the three most recent articles. A healthcheck against a static `/ping` would stay
+green with Postgres on fire.
+
+- [ ] **Step 10: Write `deploy/entrypoint.sh`**
+
+```sh
+#!/bin/sh
+# Runs before gunicorn on every container start. Every command here is idempotent,
+# because a container restart is a normal event, not a deploy.
+set -eu
+
+echo "==> migrate"
+python manage.py migrate --noinput
+
+echo "==> cache table"
+python manage.py createcachetable
+
+echo "==> permission groups"
+python manage.py setup_groups
+
+# collectstatic already ran at image build. It runs again here because /app/staticfiles
+# is a named volume shared with nginx, and Docker seeds a named volume from the image
+# only while the volume is empty — on the second deploy nginx would keep serving the
+# first deploy's CSS forever. No --clear: a stale orphan wastes disk, a wiped volume
+# serves 404s to real visitors for the length of the copy.
+echo "==> collectstatic"
+python manage.py collectstatic --noinput
+
+exec "$@"
+```
+
+Three notes on what is deliberately absent:
+
+**No wait-for-postgres loop.** `docker-compose.yml` uses `depends_on: condition: service_healthy`,
+so the database is accepting connections before this script starts. A retry loop here would only
+hide a database that is genuinely down.
+
+**No `createsuperuser`.** The first account is created by hand, once, in Step 17. Baking it into the
+entrypoint means either a password in the environment or a known default, and a known default on a
+public admin login page is a matter of time.
+
+**`migrate` runs here rather than as a separate deploy command.** That is safe because this compose
+file runs exactly one `web` container. If a second is ever added, two of them will race on the
+migration lock; move `migrate` out to `docker compose run --rm web python manage.py migrate` at that
+point, and not before.
+
+- [ ] **Step 11: Check both shell scripts parse**
+
+`deploy/backup.sh` does not exist yet, so this runs after Step 14. Doing it now and again later
+costs nothing — this is the second of the three checks that run on **this** machine.
+
+```bash
+chmod +x deploy/entrypoint.sh
+sh -n deploy/entrypoint.sh && echo "entrypoint ok"
+```
+
+Expected: `entrypoint ok`
+
+`sh -n` parses without executing, so it catches an unbalanced quote or a stray `fi` — the class of
+error that otherwise shows up as a container that exits immediately at 2am on the VPS.
+
+On Windows, `git` may have rewritten the line endings. A `#!/bin/sh` script with CRLF endings fails
+inside the container with the famously unhelpful `exec: no such file or directory`. Guard against it
+once, in `.gitattributes`:
+
+```
+*.sh text eol=lf
+deploy/entrypoint.sh text eol=lf
+```
+
+- [ ] **Step 12: Write `Dockerfile`**
+
+```dockerfile
+# The dev machine runs Python 3.14.5; the image pins the same patch so a wheel that
+# resolves locally resolves here. If `docker build` reports "manifest unknown", that
+# patch is not published as an image tag — check hub.docker.com/_/python and take the
+# nearest 3.14.x rather than floating to 3.14-slim.
+FROM python:3.14.5-slim AS builder
+
+ENV PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# psycopg[binary] and pillow both ship manylinux wheels, so no compiler is needed.
+# If pip ever starts building either from source, add build-essential and libpq-dev
+# HERE — the whole point of the split is that they never reach the runtime image.
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+
+FROM python:3.14.5-slim AS runtime
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PATH="/opt/venv/bin:$PATH" \
+    DJANGO_SETTINGS_MODULE=config.settings.production
+
+# manage.py uses os.environ.setdefault, which means the environment wins. Without the
+# line above, every `manage.py` command in the entrypoint would run under
+# config.settings.development — DEBUG=True, ALLOWED_HOSTS=[localhost] — while gunicorn
+# ran under production. That mismatch is silent and would migrate the right database
+# with the wrong settings.
+
+RUN useradd --system --create-home --uid 1001 app
+
+WORKDIR /app
+
+COPY --from=builder /opt/venv /opt/venv
+COPY --chown=app:app . .
+
+# collectstatic imports config.settings.production, which reads DJANGO_SECRET_KEY and
+# DATABASE_URL at module level. There is no .env in the image and there should not be,
+# so both are supplied for the length of this one RUN and never persisted as ENV.
+# Neither is used: collectstatic opens no database connection and signs nothing.
+RUN DJANGO_SECRET_KEY=build-time-only-not-a-secret \
+    DATABASE_URL=postgres://build:build@127.0.0.1:5432/build \
+    DJANGO_ALLOWED_HOSTS=127.0.0.1 \
+    python manage.py collectstatic --noinput \
+ && mkdir -p /app/media \
+ && chown -R app:app /app/staticfiles /app/media
+
+USER app
+
+EXPOSE 8000
+
+HEALTHCHECK --interval=30s --timeout=6s --start-period=45s --retries=3 \
+  CMD ["python", "/app/deploy/healthcheck.py"]
+
+ENTRYPOINT ["/app/deploy/entrypoint.sh"]
+CMD ["gunicorn", "config.wsgi:application", "--config", "deploy/gunicorn.conf.py"]
+```
+
+Two things here fail loudly if you change them without thinking:
+
+**`chown -R app:app /app/media` before `USER app`.** `media/` is a named volume. Docker copies the
+image's ownership onto a fresh named volume the first time it mounts one, so if `/app/media` does
+not exist and is not owned by uid 1001 at build time, the volume comes up owned by root and the
+first admin image upload fails with `PermissionError` — after the form has already been submitted.
+
+**`collectstatic` at build, not only at start.** Building it in means a missing asset breaks the
+build rather than the first request. Step 10 explains why it also runs at start.
+
+- [ ] **Step 13: Write `.dockerignore`**
+
+```
+.git
+.gitignore
+.venv
+__pycache__
+*.pyc
+.pytest_cache
+
+# 110 MB of camera originals, unreferenced by the site. Without this line every
+# build sends them to the daemon and the image is unusable.
+product_image/
+
+# Runtime state, never baked into an image.
+.env
+media/
+staticfiles/
+
+# Documentation and local tooling.
+docs/
+*.md
+tools/
+node_modules/
+
+# Do not copy the deploy definition into the thing it deploys.
+docker-compose.yml
+Dockerfile
+```
+
+`tests/` is deliberately **not** ignored: `docker compose run --rm web pytest -q` against the real
+image is the fastest way to tell whether a failure on the VPS is the code or the environment.
+`assets/` is likewise not ignored, and must not be — it is the input `collectstatic` reads.
+
+- [ ] **Step 14: Write `deploy/nginx/dalifoods.conf`**
+
+```nginx
+upstream django {
+    server web:8000;
+}
+
+# Certbot's http-01 challenge, and the redirect for everything else.
+server {
+    listen 80;
+    listen [::]:80;
+    server_name dalifoods.vn www.dalifoods.vn;
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        return 301 https://dalifoods.vn$request_uri;
+    }
+}
+
+# www -> apex, so there is one canonical origin.
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
+    server_name www.dalifoods.vn;
+
+    ssl_certificate     /etc/letsencrypt/live/dalifoods.vn/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/dalifoods.vn/privkey.pem;
+
+    return 301 https://dalifoods.vn$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
+    server_name dalifoods.vn;
+
+    ssl_certificate     /etc/letsencrypt/live/dalifoods.vn/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/dalifoods.vn/privkey.pem;
+    ssl_protocols       TLSv1.2 TLSv1.3;
+    ssl_session_cache   shared:SSL:10m;
+    ssl_session_timeout 1d;
+
+    server_tokens off;
+
+    # A phone photo straight out of the camera, for the admin's image fields.
+    # Pillow resizes to IMAGE_MAX_EDGE on save, so what is stored stays small; this
+    # limit governs what the browser is allowed to send. nginx's 1m default rejects
+    # an ordinary upload with a bare 413 that never reaches Django.
+    client_max_body_size 12m;
+
+    gzip on;
+    gzip_types text/css text/javascript application/javascript image/svg+xml;
+    gzip_min_length 1024;
+
+    # Product photography under assets/img/ changes when a SKU changes, which is
+    # rarely, and the audience is on mobile data.
+    location /assets/img/ {
+        alias /var/www/assets/img/;
+        expires 30d;
+        add_header Cache-Control "public";
+        access_log off;
+    }
+
+    # styles.css and the two JS files change on every deploy and their names never
+    # do — there is no hashed-filename storage in this project. An hour is therefore
+    # the blast radius of a bad CSS deploy, and it is chosen for that reason rather
+    # than out of caution. ManifestStaticFilesStorage would allow a year, at the cost
+    # of rewriting every url() inside styles.css; Phase 2 spent this project's risk
+    # budget on templates and that trade is not worth making today.
+    location /assets/ {
+        alias /var/www/assets/;
+        expires 1h;
+        add_header Cache-Control "public";
+    }
+
+    # Django's ImageField renames on collision, so a stored media file never changes
+    # content under a fixed name.
+    location /media/ {
+        alias /var/www/media/;
+        expires 30d;
+        add_header Cache-Control "public";
+        access_log off;
+    }
+
+    location / {
+        proxy_pass http://django;
+        proxy_http_version 1.1;
+
+        proxy_set_header Host              $host;
+        # Overwritten unconditionally, which is what makes RealIPMiddleware safe to
+        # trust. Do not "improve" this to $proxy_add_x_forwarded_for.
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        # SECURE_PROXY_SSL_HEADER in production.py reads this. Without it Django
+        # believes every request is plain HTTP and SECURE_SSL_REDIRECT loops.
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_redirect off;
+        proxy_connect_timeout 5s;
+        proxy_read_timeout    30s;
+    }
+}
+```
+
+**No `add_header Strict-Transport-Security` here.** Django already sends it —
+`SECURE_HSTS_SECONDS = 31_536_000` with `preload` — and a header with two sources of truth is one
+somebody will eventually change in the wrong file. HSTS is the worst header to get wrong: a bad
+value is cached by every visitor's browser for a year and cannot be withdrawn.
+
+Note also that `add_header` inside a `location` block **discards** headers inherited from the parent
+— which is exactly why the HSTS header must not live in nginx at all here: the four `expires` blocks
+would each silently drop it while `location /` kept it.
+
+- [ ] **Step 15: Write `docker-compose.yml`**
+
+```yaml
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    # No `ports:`. Postgres is reachable from the web container and from nothing else.
+
+  web:
+    build: .
+    restart: unless-stopped
+    env_file: [.env]
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    volumes:
+      - staticfiles:/app/staticfiles
+      - media:/app/media
+    depends_on:
+      db:
+        condition: service_healthy
+    # No `ports:`. gunicorn is reachable only from nginx, which is what makes
+    # forwarded_allow_ips = "*" in gunicorn.conf.py safe.
+
+  nginx:
+    image: nginx:1.29-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/nginx/dalifoods.conf:/etc/nginx/conf.d/default.conf:ro
+      - staticfiles:/var/www/assets:ro
+      - media:/var/www/media:ro
+      - certbot-webroot:/var/www/certbot
+      - certbot-conf:/etc/letsencrypt:ro
+    depends_on:
+      - web
+
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - certbot-webroot:/var/www/certbot
+      - certbot-conf:/etc/letsencrypt
+    # Started only on demand — see Step 16. Renewal is a host cron entry, not a
+    # long-running container, because a renewal that fails should page a human
+    # rather than restart quietly forever.
+    profiles: ["tools"]
+    entrypoint: ["certbot"]
+
+volumes:
+  pgdata:
+  staticfiles:
+  media:
+  certbot-webroot:
+  certbot-conf:
+```
+
+Four decisions worth defending:
+
+**`${POSTGRES_PASSWORD}` is interpolated from `.env`, and `.env` is also `env_file` for `web`.**
+Compose reads `${...}` from a file named exactly `.env` in the project directory — *not* from
+whatever `env_file:` points at. Using the same `.env` for both means the password exists in one
+place. Naming the production file anything else silently gives you an empty password and a Postgres
+container that refuses to start.
+
+**`$${POSTGRES_USER}` in the healthcheck has two dollars on purpose.** One `$` would make Compose
+substitute the value while writing the config; two escape it so the string reaches the container and
+the shell inside it expands the variable Postgres already set. With one `$` the check still works,
+until someone runs `docker compose config` and wonders why the password is in the output.
+
+**`postgres:17-alpine`, not `postgres:17.11-alpine`.** The app image is pinned to a patch because
+reproducing *our* build matters; the database is pinned to a major because what must never change
+silently is the on-disk format, and that is fixed within 17.x, while patch releases are the security
+fixes you want on restart. Pinning the database to a patch means the day you need a CVE fix you also
+need a change to a file in git.
+
+**`certbot` sits behind a profile.** Without `profiles`, `docker compose up -d` would start it, it
+would exit immediately, and `restart` policies would either loop it or leave a permanently unhealthy
+service in `docker compose ps`. Neither is a useful signal.
+
+- [ ] **Step 16: Write `deploy/.env.production.example`**
+
+Committed as documentation, alongside the development `.env.example` from Task 1. It is copied to
+`.env` **in the repository root** on the server — the same filename development uses, because that
+is the one Compose interpolates from and the one django-environ reads.
+
+```bash
+# Copy to ./.env on the server and fill in. Never commit the result.
+# Generate the key with:
+#   docker compose run --rm web python -c \
+#     "from django.core.management.utils import get_random_secret_key as k; print(k())"
+
+# Django
+DJANGO_SECRET_KEY=
+DJANGO_DEBUG=False
+# 127.0.0.1 is required: deploy/healthcheck.py requests the home page with that
+# Host header. Removing it turns every container healthcheck into a 400.
+DJANGO_ALLOWED_HOSTS=dalifoods.vn,www.dalifoods.vn,127.0.0.1
+
+# Postgres. docker-compose.yml builds DATABASE_URL from these three, so the
+# password is written once. Generate one with: openssl rand -base64 32
+POSTGRES_DB=dalifoods
+POSTGRES_USER=dalifoods
+POSTGRES_PASSWORD=
+
+# Telegram — create a bot with @BotFather, then add it to the channel as admin.
+# TELEGRAM_CHAT_ID for a channel looks like -1001234567890
+TELEGRAM_BOT_TOKEN=
+TELEGRAM_CHAT_ID=
+
+# Optional. Defaults to 3; see deploy/gunicorn.conf.py.
+# GUNICORN_WORKERS=3
+```
+
+`DATABASE_URL` is deliberately **not** in this file. `docker-compose.yml` composes it from the three
+Postgres variables, and a second copy here would be the thing that goes stale after a password
+rotation — with a symptom (`authentication failed`) that points at Postgres rather than at the file
+that is wrong.
+
+- [ ] **Step 17: Write `deploy/backup.sh`**
+
+```sh
+#!/bin/sh
+# Nightly backup: a compressed pg_dump plus a tar of the media volume.
+#
+# Install as a host cron entry (see Step 21):
+#   15 3 * * * /srv/life-nutrition/deploy/backup.sh >> /var/log/dalifoods-backup.log 2>&1
+#
+# RESTORE — read this before you need it:
+#   docker compose stop web
+#   gunzip -c BACKUP_DIR/db-YYYY-MM-DD.sql.gz | \
+#     docker compose exec -T db pg_restore --clean --if-exists -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+#   docker run --rm -v life-nutrition_media:/media -v BACKUP_DIR:/backup alpine \
+#     tar xzf /backup/media-YYYY-MM-DD.tar.gz -C /media
+#   docker compose start web
+set -eu
+
+PROJECT_DIR="$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)"
+BACKUP_DIR="${BACKUP_DIR:-/var/backups/dalifoods}"
+KEEP_DAYS="${KEEP_DAYS:-14}"
+STAMP="$(date +%F)"
+
+cd "$PROJECT_DIR"
+# shellcheck disable=SC1091
+. ./.env
+
+mkdir -p "$BACKUP_DIR"
+
+# -Fc is the custom format: compressed, and pg_restore can be selective about it.
+# Plain SQL would need the whole file replayed to recover one table.
+docker compose exec -T db \
+  pg_dump -Fc -U "$POSTGRES_USER" -d "$POSTGRES_DB" \
+  > "$BACKUP_DIR/db-$STAMP.sql.gz.tmp"
+mv "$BACKUP_DIR/db-$STAMP.sql.gz.tmp" "$BACKUP_DIR/db-$STAMP.sql.gz"
+
+# media/ is a named volume, so it is reachable only through a container.
+docker run --rm \
+  -v "$(basename "$PROJECT_DIR")_media:/media:ro" \
+  -v "$BACKUP_DIR:/backup" \
+  alpine tar czf "/backup/media-$STAMP.tar.gz" -C /media .
+
+find "$BACKUP_DIR" -name 'db-*.sql.gz'    -mtime "+$KEEP_DAYS" -delete
+find "$BACKUP_DIR" -name 'media-*.tar.gz' -mtime "+$KEEP_DAYS" -delete
+
+echo "$(date -Iseconds) ok  $(du -sh "$BACKUP_DIR" | cut -f1) in $BACKUP_DIR"
+```
+
+The `.tmp`-then-`mv` is not decoration. `pg_dump` writing straight to the final name leaves a
+truncated file under a plausible name if the disk fills at 3am, and a truncated dump is worse than
+no dump — it is a backup you believe in. The rename is atomic on the same filesystem, so the final
+name only ever appears on a complete file.
+
+**This backup is on the same disk as the thing it backs up.** That is not a backup, it is a
+snapshot; a failed disk takes both. Copying `$BACKUP_DIR` off the box — `rclone`, `scp`, an object
+store — is the step that makes it real, and it is deliberately not written here because the
+destination is the client's decision. `TODO.md` records it as outstanding in Task 28.
+
+- [ ] **Step 18: Re-run the shell syntax check**
+
+Also on this machine:
+
+```bash
+chmod +x deploy/backup.sh
+sh -n deploy/entrypoint.sh && sh -n deploy/backup.sh && echo "both ok"
+```
+
+Expected: `both ok`
+
+- [ ] **Step 19: Cross-check the paths by hand**
+
+The third and last check that runs here. Every path in this task appears in at least two files, and
+a mismatch between them fails at runtime as a 404 rather than at build time as an error. Read the
+output rather than glancing at it:
+
+```bash
+grep -n "staticfiles\|/app/media\|/var/www" Dockerfile docker-compose.yml \
+  deploy/nginx/dalifoods.conf deploy/entrypoint.sh
+```
+
+Four pairs must line up, and the table is the whole point of the step:
+
+| Written by | Volume | Read by | As |
+|---|---|---|---|
+| `collectstatic` → `STATIC_ROOT` = `/app/staticfiles` | `staticfiles` | nginx | `/var/www/assets` → `location /assets/` |
+| `ImageField` → `MEDIA_ROOT` = `/app/media` | `media` | nginx | `/var/www/media` → `location /media/` |
+
+Then confirm the two settings the left column depends on are still what Task 2 wrote:
+
+```bash
+grep -n "STATIC_ROOT\|STATIC_URL\|MEDIA_ROOT\|MEDIA_URL" config/settings/base.py
+```
+
+Expected: `STATIC_URL = "/assets/"`, `STATIC_ROOT = BASE_DIR / "staticfiles"`,
+`MEDIA_URL = "/media/"`, `MEDIA_ROOT = BASE_DIR / "media"`. If `STATIC_URL` has drifted from
+`/assets/`, the `url()` references inside `styles.css` stop resolving and the nginx `location` block
+is aimed at nothing — that is the constraint Task 2 exists to protect.
+
+- [ ] **Step 20: Extend `.gitignore`**
+
+The production `.env` is already covered by the `.env` line from Task 1. What is not:
+
+```
+# Deploy
+/backups/
+```
+
+- [ ] **Step 21: Commit the deploy files**
+
+```bash
+git add Dockerfile .dockerignore .gitattributes docker-compose.yml deploy .gitignore
+git commit -m "Add the compose deployment: nginx, gunicorn, Postgres, backups"
+```
+
+---
+
+#### First deploy — run on the VPS
+
+Everything below runs on the server, not here. It is written as a checklist because the first deploy
+is the only time the ordering matters: the certificate cannot be issued until nginx answers on port
+80, and nginx will not start with a certificate path that does not exist yet.
+
+- [ ] **Step 22: Verify the three image tags resolve**
+
+Before anything else, because two of the three are pinned to versions chosen to match a development
+machine rather than read off a registry:
+
+```bash
+for tag in python:3.14.5-slim postgres:17-alpine nginx:1.29-alpine; do
+  docker manifest inspect "$tag" >/dev/null 2>&1 && echo "ok   $tag" || echo "MISSING $tag"
+done
+```
+
+Expected: three `ok` lines. A `MISSING` is not a blocker — take the nearest published tag in the
+same series and change it in `Dockerfile` or `docker-compose.yml`. Doing this first turns a
+twenty-minute build that dies at the end into a ten-second answer.
+
+- [ ] **Step 23: Put the code and the environment on the server**
+
+```bash
+git clone https://github.com/anhmanh1011/life-nutrition.git /srv/life-nutrition
+cd /srv/life-nutrition
+git checkout feat/django-admin-cms
+cp deploy/.env.production.example .env
+chmod 600 .env
+$EDITOR .env
+```
+
+Fill in `DJANGO_SECRET_KEY`, `POSTGRES_PASSWORD` and the two Telegram values. `chmod 600` before
+editing, not after — the window between `cp` and `chmod` is when the file is world-readable and it
+is also when you paste the secrets in.
+
+- [ ] **Step 24: Point DNS at the box and confirm it arrived**
+
+`dalifoods.vn` and `www.dalifoods.vn` both `A` to the VPS address.
+
+```bash
+dig +short dalifoods.vn www.dalifoods.vn
+```
+
+Expected: the server's address, twice. Certbot's http-01 challenge resolves the name itself, so
+attempting Step 26 before this returns the right answer burns one of Let's Encrypt's five failed
+validations per hour.
+
+- [ ] **Step 25: Bring up everything except TLS**
+
+nginx cannot start yet — the `ssl_certificate` paths do not exist. Start the other two, then run
+nginx with only the port-80 server block so the challenge can be answered:
+
+```bash
+docker compose up -d --build db web
+docker compose logs -f web
+```
+
+Expected, in order: `==> migrate` with a list of `Applying ... OK`, `==> cache table`,
+`==> permission groups` printing `Quản trị: 44 quyền` and `Biên tập: 14 quyền`, `==> collectstatic`,
+then gunicorn's `Booting worker with pid`. Ctrl-C stops following the log, not the container.
+
+If it stops at `==> migrate` with `connection refused`, the `db` healthcheck has not gone green —
+`docker compose ps` shows why.
+
+- [ ] **Step 26: Issue the certificate**
+
+```bash
+sed -i.bak '/listen 443/,$d' deploy/nginx/dalifoods.conf   # port 80 only, temporarily
+docker compose up -d nginx
+docker compose run --rm certbot certonly --webroot -w /var/www/certbot \
+  -d dalifoods.vn -d www.dalifoods.vn \
+  --email <client email> --agree-tos --no-eff-email
+mv deploy/nginx/dalifoods.conf.bak deploy/nginx/dalifoods.conf
+docker compose restart nginx
+```
+
+Expected: `Successfully received certificate.` and a path under
+`/etc/letsencrypt/live/dalifoods.vn/`.
+
+The `sed`/`mv` pair is ugly and is the honest version of what happens. The alternative — a
+self-signed placeholder certificate so nginx starts with the real config — is more files and more
+ceremony for something done once. The `.bak` restore is the important half: leaving the truncated
+config in place means the site never serves HTTPS and `git status` is the only thing that would
+tell you.
+
+- [ ] **Step 27: Verify TLS, the redirect, and both static roots**
+
+```bash
+curl -sI http://dalifoods.vn/            | head -1     # expect 301
+curl -sI https://dalifoods.vn/           | head -1     # expect 200
+curl -sI https://www.dalifoods.vn/       | head -1     # expect 301
+curl -sI https://dalifoods.vn/assets/css/styles.css | head -1   # expect 200
+curl -s  https://dalifoods.vn/ | grep -c "Strict-Transport" ; \
+curl -sI https://dalifoods.vn/ | grep -i "strict-transport-security"
+```
+
+Expected: `max-age=31536000; includeSubDomains; preload` on the last line. If it is missing, Django
+does not believe the connection is secure — check that nginx sends `X-Forwarded-Proto` and that
+`forwarded_allow_ips` is `"*"`, in that order.
+
+Then the one that is easy to forget, because it is the thing Task 24 Step 9 predicted would break:
+
+```bash
+docker compose exec web python manage.py seed_content
+curl -sI "https://dalifoods.vn/media/products/$(docker compose exec -T web \
+  sh -c 'ls media/products | head -1' | tr -d '\r')" | head -1
+```
+
+Expected: `200`. A `404` means the `media` volume is not reaching nginx; a `403` means it is
+reaching it with the wrong ownership, which is Step 12's `chown`.
+
+- [ ] **Step 28: Create the first account and hand over the admin**
+
+```bash
+docker compose exec web python manage.py createsuperuser
+```
+
+Then log in at `https://dalifoods.vn/admin/`, and confirm the two groups from Task 26 are present
+under *Groups* — the entrypoint created them, so if they are absent, `setup_groups` did not run and
+Step 25's log will say why.
+
+- [ ] **Step 29: Schedule the backup and the renewal**
+
+```bash
+crontab -e
+```
+
+```
+15 3 * * * /srv/life-nutrition/deploy/backup.sh >> /var/log/dalifoods-backup.log 2>&1
+30 4 * * 1 cd /srv/life-nutrition && docker compose run --rm certbot renew --webroot -w /var/www/certbot && docker compose restart nginx
+```
+
+Certificates last 90 days and renew inside 30, so weekly leaves four attempts before anything
+expires. nginx must be restarted afterwards: it reads the certificate at start and will happily
+serve an expired one until told otherwise.
+
+- [ ] **Step 30: Restore the backup you just took**
+
+Do not skip this. A backup script that has never been restored is a script, not a backup, and the
+cheapest moment to find out it does not work is now, on a database whose only contents are seeded
+demo rows.
+
+```bash
+/srv/life-nutrition/deploy/backup.sh
+ls -la /var/backups/dalifoods/
+```
+
+Expected: a `db-<date>.sql.gz` and a `media-<date>.tar.gz`, both non-empty.
+
+Then prove the dump restores, into a throwaway database rather than over the live one:
+
+```bash
+docker compose exec -T db createdb -U "$POSTGRES_USER" restore_test
+gunzip -c /var/backups/dalifoods/db-$(date +%F).sql.gz | \
+  docker compose exec -T db pg_restore -U "$POSTGRES_USER" -d restore_test
+docker compose exec -T db psql -U "$POSTGRES_USER" -d restore_test \
+  -c "select count(*) from catalog_product;"
+docker compose exec -T db dropdb -U "$POSTGRES_USER" restore_test
+```
+
+Expected: `17`. That number is the whole point — it is the seeded SKU count from Task 8, so it says
+the dump contains rows and not just a schema.
+
+- [ ] **Step 31: Close Phase 5's deployment half**
+
+The site is live when all of this is true:
+
+- `https://dalifoods.vn/` serves the home page from Postgres, `http://` redirects to it, and `www.`
+  redirects to the apex.
+- Product images load from `/media/`, CSS and JS from `/assets/`.
+- `/admin/` is reachable, both permission groups exist, and an editor account cannot open
+  `/admin/leads/dealerapplication/`.
+- A dealer submission arrives in Postgres and in the Telegram channel.
+- `deploy/backup.sh` runs nightly and a dump taken from it has been restored once.
+
+Submit the dealer form yourself, from a phone, on mobile data — not from the VPS and not over the
+office wifi. It is the only way to exercise `RealIPMiddleware`, the Telegram notifier and the
+two-step flow against a real network at once, and it is the flow the entire project exists for.
+
+---
+
+### Task 28: Documentation
+
+The spec has a section titled *Documentation to update in this branch*, and its reasoning is worth
+repeating rather than paraphrasing: `PROJECT.md` states as a hard constraint two things that this
+plan makes false, and **"leaving them would send a future session in the wrong direction."** That is
+the entire justification for this task. Documentation that describes a repository which no longer
+exists is worse than no documentation, because it is trusted.
+
+Four files change, one spec gets three corrections, and this plan gets four of its own — including
+two forward references that point at the wrong task.
+
+Nothing here is verifiable by a test suite, which is exactly why Step 7 exists: every factual claim
+in the new documents is checked against the repository with `grep` before the commit, not after.
+
+**Files:**
+- Modify: `PROJECT.md` (rewrite)
+- Modify: `TODO.md` (rewrite)
+- Modify: `README.md` (rewrite)
+- Modify: `PROGRESS.md` (replace the top entry, keep the one below it)
+- Modify: `docs/superpowers/specs/2026-08-25-django-admin-cms-design.md`
+- Modify: `docs/superpowers/plans/2026-08-25-django-admin-cms.md` (this file)
+
+---
+
+- [ ] **Step 1: Rewrite `PROJECT.md`**
+
+Replace the whole file. The status note at the top goes away with it — it existed to say "none of
+this is built yet", and by the time this task runs that is no longer true.
+
+````markdown
+# PROJECT.md — working notes for this repo
+
+Marketing site for **dalifoods.vn**. Life Nutrition is the authorized Vietnam distributor of
+Dali Foods Group (Daliyuan 达利园, Copico 可比克, Haochidian 好吃点, Heqizheng 和其正,
+Hi-Tiger 乐虎, Doubendou 豆本豆). Audience: Vietnamese B2B dealers and B2C retail buyers,
+overwhelmingly on phones.
+
+Django renders eight pages server-side from Postgres. Staff edit everything through a Vietnamese
+admin; both lead forms write to the database and notify a Telegram channel.
+
+> This repository was eight standalone HTML files until 2026-08. If you find a note anywhere
+> claiming "no build step, no framework" or "nav and footer are duplicated across 8 files on
+> purpose", it predates the rewrite. The reasoning behind reversing those two constraints is in
+> `docs/superpowers/specs/2026-08-25-django-admin-cms-design.md`.
+
+## Hard constraints
+
+- **Progressive enhancement, still.** All 17 SKUs render server-side; `filters.js` only toggles
+  `hidden`. Both lead forms are plain `<form method="post">` and complete without JavaScript —
+  including the two-step dealer flow, which is two real page loads, not a wizard. New
+  interactivity goes in a small vanilla-JS file loaded with a plain `<script src>`. There is no
+  bundler and no client framework, and adding one is a decision to be argued, not a default.
+- **`STATIC_URL` is `/assets/`, not `/static/`.** `assets/` kept its name precisely so the `url()`
+  references already inside `styles.css` keep resolving with the file untouched. Renaming it means
+  editing CSS by hand and repointing an nginx `location` block. Don't.
+- **Never invent business data.** Every `[bracket]` placeholder is now the *default value* of a
+  `SiteSettings` field — visible and editable in the admin, waiting on the client. They are not
+  leftovers to tidy up. MST, ĐKKD and hotline numbers are legally meaningful.
+  `test_placeholders_are_the_defaults_and_are_not_invented` is what fails if someone guesses.
+- **The dealer form is two steps on purpose.** Name and phone are committed on the first POST;
+  qualification questions come after, behind a UUID4 token that expires in 24 hours. A visitor who
+  abandons halfway is still a reachable lead — that is the whole point, and it is why the form
+  costs two views, a token and a pile of tests. Do not "simplify" it back into one page.
+- **A Telegram failure must never fail a submission.** The notifier runs after the transaction
+  commits and swallows its own exceptions. The row is the record; the message is a convenience.
+- **Submitter phone, Zalo and email values never go to the logs.** `deploy/gunicorn.conf.py`
+  logs no query string for the same reason.
+
+## Traps
+
+### Inline styles out-specify media queries — this has bitten twice
+
+The templates inherit **heavy inline `style=""` attributes** from the original design mockups.
+An inline style beats any class-based rule, including one inside a media query. Two separate
+mobile bugs traced back to this:
+
+- `.grid-stack` never collapsed on phones (inline `grid-template-columns: 0.9fr 1.1fr` etc.)
+- `<h1>`/`<h2>` kept their 44–58px desktop sizes on phones (inline `font-size`)
+
+Both are fixed with `!important` in the mobile blocks of `styles.css`, each with a comment
+explaining why. **If a responsive rule appears to do nothing, check for an inline style first**
+before assuming the selector or breakpoint is wrong.
+
+### The settings module comes from the environment, and the environment wins
+
+`manage.py` and `config/wsgi.py` both use `os.environ.setdefault`, so `DJANGO_SETTINGS_MODULE`
+overrides them when it is set. Locally it is unset and you get `config.settings.development`; the
+Dockerfile sets it to `config.settings.production` so that `manage.py migrate` in the entrypoint
+does not quietly run under development settings while gunicorn runs under production.
+
+To read production settings on your own machine, set it for the one command:
+
+```bash
+DJANGO_SETTINGS_MODULE=config.settings.production .venv/bin/python manage.py check --deploy
+```
+
+### `assets/` and `media/` are different things and are backed up differently
+
+`assets/` is tracked in git, is the input to `collectstatic`, and is deployed with the image.
+`media/` is uploaded through the admin, lives on a Docker volume, is in `.gitignore`, and only
+exists in `deploy/backup.sh`'s tar. Losing `media/` loses every image staff have ever uploaded and
+nothing in git will bring it back.
+
+### Rate limiting only works because of two non-obvious pieces
+
+`@ratelimit(key="ip", ...)` reads `REMOTE_ADDR`, which behind nginx is the proxy's own address for
+every visitor on earth. `RealIPMiddleware` rewrites it from `X-Real-IP` — a header nginx overwrites
+unconditionally, unlike `X-Forwarded-For`, which it appends to and which a client can therefore
+seed. Separately, production sets `CACHES` to `DatabaseCache`: the default `LocMemCache` is
+per-process, so with three gunicorn workers a `15/h` limit is really 45/h. Change either and spam
+control silently degrades rather than breaking.
+
+## Verification
+
+```bash
+.venv/bin/pytest -q                 # unit and view tests, against real Postgres
+node tools/check.mjs                # headless-Chrome regression suite
+```
+
+`check.mjs` starts `manage.py runserver --noreload` itself if nothing is listening on port 8000, so
+there is nothing to remember before running it. It covers all 8 pages at 1280px and at 390×844 —
+broken images, missing `alt`, horizontal overflow, exactly one `h1`, console errors, **and a
+non-200 status** — plus the 6 product-filter cases and the nav toggle. Run it after any CSS,
+template or URL change.
+
+Scope it while a page is mid-change: `PAGES=/san-pham/ node tools/check.mjs`.
+
+The status check earns its keep: a static server returns a bare `404`, but Django with `DEBUG=True`
+returns a full HTML error page with exactly one `<h1>`, no images and no console errors — which
+sails through every other assertion. Without it, a typo in a URL name reports `ok`.
+
+```bash
+node tools/shot.mjs 390 844 true /tin-tuc/   # → /tmp/ln-em-tin-tuc-390.png
+node tools/shot.mjs 390 844 true /           # → /tmp/ln-em-home-390.png
+```
+
+The argument is a **URL path**, not a filename. Use `tools/shot.mjs` rather than
+`chrome --headless --screenshot --window-size=...`, which silently clips mobile layouts and reports
+bogus overflow. The difference is CDP `Emulation.setDeviceMetricsOverride`.
+
+Both scripts look Chrome up at the macOS default path. Elsewhere, point `CHROME` at the binary:
+
+```bash
+CHROME="/c/Program Files/Google/Chrome/Application/chrome.exe" node tools/check.mjs
+```
+
+Note: the 1DevTool browser MCP could not dispatch synthetic clicks against this site —
+`aria-pressed` and `aria-expanded` never changed. That is a harness limitation, not a site bug.
+Use the CDP scripts above for anything interactive.
+
+## Layout budgets
+
+**Mobile nav (≤640px) must stay one row.** Budget at 360px: logo 148 + gap 10 + CTA 110 +
+gap 10 + toggle 40 = 318 of 320 available. The tagline is hidden below 640px precisely because
+it widens the brand column to 172px and wraps the hamburger onto its own row (which inflated
+the sticky header to 137px). `tools/check.mjs` asserts nav height ≤72px. If you need more room,
+take it from the CTA padding, not the logo.
+
+Breakpoints in `styles.css`: 1080, 860, 640, **420**. The 420px block exists only for the dealer
+form's `.seg` step indicator, which will not fit two segments on a narrow phone otherwise.
+`--gutter` is 20px at ≤640, 32px at ≤1080.
+
+## Images
+
+Uploads are resized on save by `apps/common` — Pillow installs fine in the venv, so the admin does
+not need any system tooling. The `PROJECT.md` note that once said "this machine has neither
+ImageMagick nor Pillow" was about the *system* Python and is no longer relevant to the running app.
+
+For preparing source photography by hand, macOS `sips` still decodes `.heic`:
+
+```bash
+sips -s format jpeg -s formatOptions 62 -Z 1000 <src> --out assets/img/<name>.jpg
+```
+
+Budget: ~1.9 MB across the shipped image set at max 1000px, because the audience is on mobile data.
+Source originals live in `product_image/`, which is **gitignored** (110 MB, unreferenced by the
+site) and exists only on the author's machine.
+
+Gotcha: `sips --cropOffset` measures from the **center**, not the top-left. To isolate a region
+it is usually easier to re-render at a small viewport than to fight the crop offsets.
+
+`assets/img/logo.png` is a tight 500×122 wordmark; `logo-mark.png` is the 256×256 swoosh used
+as the favicon, because a 4.1:1 wordmark is illegible at 16px. The original asset was ~39%
+whitespace — if the logo ever looks small, measure the ink bounding box before changing CSS.
+
+Product photography is cropped with `object-position: 50% 65%` throughout, standardised so that
+labels sit in frame across the whole set rather than tuned per image.
+
+## Do not
+
+- Fetch the design project's binary assets from tokenized `*.claudeusercontent.com` preview
+  URLs — regenerate locally from `product_image/` instead.
+- Commit `product_image/`, `.DS_Store`, `.env`, `media/` or `staticfiles/`.
+- Rename a `Category` or `Brand` slug casually. `filters.js` matches on the rendered `data-cat`
+  and `data-brand` values; the admin `help_text` says so, and a test asserts the attributes.
+- Add a second `web` container without moving `migrate` out of `deploy/entrypoint.sh` — two of
+  them will race on the migration lock.
+````
+
+- [ ] **Step 2: Rewrite `TODO.md`**
+
+The spec predicted this file's change of character: the `[bracket]` inventory "stops being an
+editing checklist and becomes the list of admin fields awaiting client data." Two consequences —
+each row now names where in the admin the value goes, and the "fix these once and apply to all 8
+files" instruction disappears, because that is what the singleton does.
+
+````markdown
+# TODO
+
+Status as of the Django rewrite. Ordered by what blocks launch.
+
+## 1. Blocking launch — real business data
+
+Every `[bracket]` below is a live default sitting in the admin, not a leftover in a template.
+**Do not invent values** — MST, ĐKKD and hotline numbers are legally meaningful. Filling one in
+is a single admin edit that updates every page at once.
+
+### *Thông tin doanh nghiệp* — the singleton, reaches all 8 pages
+
+| Admin field | Current placeholder |
+|---|---|
+| Hotline sỉ / Hotline lẻ | `[số hotline sỉ]` / `[số hotline lẻ]` |
+| Email liên hệ | `[email]` |
+| Tên Zalo OA | `[tên Zalo OA]` |
+| Mã số thuế | `[MST]` |
+| Số / Ngày cấp / Nơi cấp ĐKKD | `[số]` · `[ngày]` · `[nơi cấp]` |
+| Địa chỉ trụ sở | `[địa chỉ trụ sở]` |
+| Địa chỉ kho · Diện tích kho · Địa điểm kho | `[địa chỉ kho]` · `[diện tích]` · `[địa điểm]` |
+| Link Shopee Mall / LazMall / TikTok Shop | `[link]` ×3 |
+| Ghi chú Bộ Công Thương | `[bổ sung sau khi hoàn tất thông báo tại online.gov.vn]` |
+| Năm thành lập · Số điểm bán · Nhân sự | `[năm thành lập]` · `[số điểm bán]` · `[nhân sự]` |
+| Số tỉnh/thành phủ hàng | `[số tỉnh/thành]` — a count; the sentence around it is already written |
+| Đối tác vận chuyển | `[tên đơn vị]` |
+
+### *Thương hiệu* — trim to what is actually distributed
+
+The pages list six Dali Foods brands. Untick **Đang phân phối** on any the company does not
+actually carry; that hides the brand and all of its products from the product page and its filter
+pill. This replaces the old `[giữ lại thương hiệu thực tế]` note.
+
+### *Tin tức* — seven seeded articles carry a stand-in date
+
+Six of the seven articles had a `[ngày]/MM/2026` placeholder in the original markup. `seed_content`
+uses **day 01 of the known month** so `published_at` can be a real `DateTimeField`. The month and
+year are correct; the day is a guess and should be corrected in the admin once the client confirms
+the actual publication dates.
+
+### Photography to replace
+
+Upload through the admin; the old placeholders were image captions, not text fields.
+
+- The authorization letter — currently `[Thay bằng bản scan thật — giữ watermark chống sao chép]`.
+- Real warehouse and team photos — currently product shots standing in.
+
+### Still literal in the templates, deliberately
+
+These are **not** admin fields and that is a decision, recorded here so nobody "finishes the job"
+by adding fields nobody can fill in.
+
+- **Dealer commercial terms** on `hop-tac-dai-ly.html`: `[tỷ lệ]`, `[số thùng/tháng]`,
+  `[giá trị]`, `[số thùng]`, `[số ngày]`, `[số]` (shelf life), `[tỉnh/thành]`. Discount tiers,
+  minimum orders and credit terms are a different kind of content with a different approval path.
+  Eight more `CharField`s holding strings nobody can supply would make the admin worse.
+- **`Số tự công bố: [số hồ sơ]`** on `hang-chinh-hang.html` — a per-SKU registration number that
+  belongs on `Product`, and the block shows one SKU as an example. Modelling self-declaration
+  numbers was out of scope.
+- **`[Mẫu tem chính thức sẽ cập nhật]`** and **`[Kích hoạt khi hệ thống tra cứu sẵn sàng]`** —
+  notices that a feature does not exist yet, not data.
+  `test_authentic_page_keeps_notices_for_features_that_do_not_exist_yet` fails if they are deleted.
+
+## 2. Before going live
+
+- [ ] **Open Graph / Zalo share tags.** Zero `og:` tags. Vietnamese B2B traffic runs through Zalo
+      and Facebook shares; without `og:title` / `og:description` / `og:image` those links render
+      bare. Highest-value SEO item here, and now a single edit to `templates/base.html` rather
+      than eight files.
+- [ ] `rel="canonical"` — same file, same edit.
+- [ ] `sitemap.xml` and `robots.txt` — neither exists. `django.contrib.sitemaps` is in the
+      standard library and the querysets it needs (`Product.objects.active()`,
+      `Article.objects.published()`) already exist.
+- [ ] Analytics (GA4 or similar) — nothing is instrumented.
+- [ ] Complete the online.gov.vn (Bộ Công Thương) notification, then replace the notice text.
+
+Already in place: `lang="vi"`, a unique `<meta name="description">` per page, HTTPS with HSTS,
+and DNS pointed at the VPS (Task 27, Steps 24–27).
+
+## 3. Operations
+
+- [ ] **Copy backups off the box.** `deploy/backup.sh` writes `pg_dump` and a `media/` tar to
+      `/var/backups/dalifoods` on the same disk as the database. That is a snapshot, not a backup —
+      one failed disk takes both. Pick a destination (`rclone` to object storage, `scp` to another
+      host) and add it to the cron line. **This is the single largest remaining risk.**
+- [ ] **Back up `product_image/`.** 110 MB of camera originals, gitignored, still existing only on
+      the author's machine. Git LFS or a storage bucket — not plain git.
+- [ ] Decide the retention window. `deploy/backup.sh` defaults to 14 days via `KEEP_DAYS`.
+
+## 4. Housekeeping
+
+- [ ] Two adjacent `@media (max-width: 640px)` blocks in `styles.css` could be merged; harmless
+      but confusing when editing.
+
+## Done
+
+See [`PROGRESS.md`](PROGRESS.md).
+````
+
+- [ ] **Step 3: Rewrite `README.md`**
+
+`README.md` is the only one of these files a newcomer reads first, so it answers exactly one
+question — how do I run this — and links out for everything else.
+
+````markdown
+# Life Nutrition — dalifoods.vn
+
+Marketing site for **Life Nutrition**, authorized Vietnam distributor of Dali Foods Group
+(Daliyuan, Copico, Haochidian, Heqizheng, Hi-Tiger, Doubendou).
+
+Django 6, server-rendered from PostgreSQL. Eight public pages, a Vietnamese admin, and two lead
+forms that notify a Telegram channel. No client framework and no bundler.
+
+## Run locally
+
+Requires **Python 3.13+** and **PostgreSQL 17**.
+
+```bash
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt
+
+cp .env.example .env
+.venv/bin/python -c \
+  "from django.core.management.utils import get_random_secret_key as k; print(k())"
+# paste the result into DJANGO_SECRET_KEY
+
+createdb dalifoods
+.venv/bin/python manage.py migrate
+.venv/bin/python manage.py seed_content      # 17 SKUs, 7 articles, site settings
+.venv/bin/python manage.py setup_groups      # the two admin roles
+.venv/bin/python manage.py createsuperuser
+.venv/bin/python manage.py runserver
+```
+
+→ `http://127.0.0.1:8000/` · admin at `/admin/`
+
+`.env` is gitignored. `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` may be left blank in
+development; the notifier logs and moves on.
+
+## Tests
+
+```bash
+.venv/bin/pytest -q                 # runs against a real Postgres test database
+node tools/check.mjs                # headless Chrome, all 8 pages, desktop + 390×844
+```
+
+`check.mjs` starts its own `runserver` if port 8000 is free. It needs **Node 18+** and Google
+Chrome — no `npm install`, which is why there is no `package.json`. On Linux or Windows, point
+`CHROME` at your binary:
+
+```bash
+CHROME="/c/Program Files/Google/Chrome/Application/chrome.exe" node tools/check.mjs
+```
+
+## Deploy
+
+```bash
+cp deploy/.env.production.example .env    # fill in, then chmod 600
+docker compose up -d --build
+```
+
+nginx terminates TLS and serves `/assets/` and `/media/`; gunicorn runs Django; Postgres holds the
+data. `deploy/entrypoint.sh` migrates, creates the cache table, creates the two permission groups
+and runs `collectstatic` on every start. Full first-deploy checklist, certificates and backups:
+Task 27 of the plan below.
+
+## Structure
+
+```
+config/              settings (base / development / production / test), urls, wsgi
+apps/
+  catalog/           Brand, Category, Product
+  news/              Article
+  siteinfo/          SiteSettings singleton + context processor
+  leads/             ContactMessage, DealerApplication, Telegram notifier, middleware
+  pages/             views for the 8 public pages
+  common/            shared image resizing, setup_groups
+templates/
+  base.html          nav + footer, once
+  pages/             one template per page
+assets/              css/ js/ img/ — STATIC_URL is /assets/, not /static/
+media/               admin uploads — gitignored, on a Docker volume in production
+deploy/              Dockerfile support: entrypoint, gunicorn, nginx, backup
+tools/check.mjs      headless-Chrome regression suite
+tools/shot.mjs       viewport-accurate screenshots (URL path, e.g. /tin-tuc/)
+product_image/       camera originals — gitignored, 110 MB
+```
+
+## Docs
+
+| File | What it is |
+|---|---|
+| [`PROJECT.md`](PROJECT.md) | Constraints and traps — read before editing CSS or settings |
+| [`TODO.md`](TODO.md) | What blocks launch, chiefly `[bracket]` business data in the admin |
+| [`PROGRESS.md`](PROGRESS.md) | What has been built and decided, newest first |
+| `docs/superpowers/specs/` | Approved designs |
+| `docs/superpowers/plans/` | Implementation plans derived from those designs |
+````
+
+- [ ] **Step 4: Update `PROGRESS.md`**
+
+Replace only the top section — the one headed
+`## 2026-08-25 — Django CMS + lead backend: design and plan (branch feat/django-admin-cms)`. Its
+opening line is "**Nothing is implemented yet.**", which by now is the most wrong sentence in the
+repository. Everything from `## 2026-08-25 — Initial build` down is history and stays untouched.
+
+The two subsections worth preserving from it are *Why the static constraint is being reversed* and
+the paragraph about the phone number being the success condition; carry them across verbatim rather
+than rewriting them, because they explain decisions that the code cannot.
+
+````markdown
+## 2026-08-25 — Django CMS + lead backend (branch `feat/django-admin-cms`)
+
+Eight static HTML files became a Django site rendering from Postgres, with a Vietnamese admin and
+working lead capture. `main` still holds the static version.
+
+### Why the static constraint was reversed
+
+Two problems that have no static answer:
+
+1. Staff cannot change a hotline number or publish an article without editing HTML.
+2. Both forms posted to `action="#"`. Every dealer signup submitted so far was silently discarded.
+
+Fixing (2) requires a server, which removes the main argument for staying static, so (1) got fixed
+in the same move. Django SSR was chosen over Next.js and over a static-export pipeline: one deploy,
+no bundler, no React, and the existing markup survives nearly verbatim.
+
+### What was built
+
+| Phase | Tasks | What it produced |
+|---|---|---|
+| 0 — Foundation | 1–3 | Split settings, `/assets/` as `STATIC_URL`, real Postgres in tests |
+| 1 — Data layer | 4–8 | `SiteSettings`, `Brand`, `Category`, `Product`, `Article`, `seed_content` |
+| 2 — Templates | 9–17 | One `base.html`; all 8 pages converted; `check.mjs` repointed at Django |
+| 3 — Leads | 18–23 | Both forms live, phone normalized, rate-limited, Telegram after commit |
+| 4 — Admin | 24–26 | Vietnamese admin end to end; two permission groups as a command |
+| 5 — Deploy + docs | 27–28 | Compose, nginx, gunicorn, backups; these documents |
+
+The one decision that shaped everything else: **the phone number is the success condition.** The
+dealer form is therefore split in two — name and phone are banked on the first POST, qualification
+questions come after. A visitor who abandons halfway is still a reachable lead. This costs extra
+views, extra tests and a UUID4 completion token; it was chosen deliberately over the cheaper
+one-step form and should not be "simplified" back.
+
+### What reading the real markup changed
+
+Nine gaps between the spec's data model and the actual pages, listed in one block at the top of
+`docs/superpowers/plans/2026-08-25-django-admin-cms.md` and written back into the spec. The
+representative one: `Category` needs two labels, because the filter pill says
+`Bánh mì & bánh ngọt` while the card kicker says `Bánh`.
+
+### Two bugs that only exist behind a proxy
+
+Both were found while writing the deployment task, and both would have silently disabled a control
+the spec asked for rather than raising an error:
+
+- `@ratelimit(key="ip")` reads `REMOTE_ADDR`, which behind nginx is the proxy's address for every
+  visitor. All traffic shared one bucket of 15/hour. Fixed with `RealIPMiddleware`, which trusts
+  `X-Real-IP` (nginx overwrites it) and not `X-Forwarded-For` (nginx appends to it, so a client can
+  seed it).
+- No `CACHES` setting meant the default per-process `LocMemCache`, making the same limit 45/hour
+  across three gunicorn workers. Production now uses `DatabaseCache` on the Postgres already there.
+
+### Environment facts verified before planning
+
+| Fact | Value | Consequence |
+|---|---|---|
+| Python | 3.14.5 (Homebrew) | Django 5.2 does not support 3.14 — pinned **Django 6.0.8** |
+| PostgreSQL | 17.11 (Homebrew) | dev and tests use real Postgres, not SQLite |
+| Node | v22.22.0 | `tools/check.mjs` survives; Task 12 repoints it at Django |
+| Docker | not installed | Phase 5's deploy files were reviewed by reading, not by running |
+| Pillow | installs fine in a venv | the old "no Pillow" note was about *system* Python only |
+
+Tasks 1 and 2 carry macOS-specific commands (`brew services start postgresql@17`, an absolute
+`/Users/...` path in Task 1 Step 1, `.venv/bin/python` throughout). On Windows the venv binaries
+live in `.venv/Scripts/` and Postgres is started by its service, not by `brew`. The pinned versions
+are unaffected — Django 6.0.8 supports 3.13 as well as 3.14.
+````
+
+- [ ] **Step 5: Write the outstanding deviations back into the spec**
+
+Three edits to `docs/superpowers/specs/2026-08-25-django-admin-cms-design.md`. The plan's Deviations
+block says which; these are the ones never carried across.
+
+**5a — delete `siteinfo.Milestone`.** Remove the whole `### siteinfo.Milestone` section (line 128)
+and replace it with:
+
+```markdown
+### `siteinfo.Milestone` — dropped
+
+The spec described three rows for "the roadmap on the home page, currently `[ngày/06/2026]`
+through `[ngày/08/2026]`". Reading the markup, those three placeholders are not a roadmap: they are
+the dates on the three news teaser cards, which `news.Article` already covers. There is no roadmap
+section on any page. A model with no consumer is a migration and an admin entry that exist only to
+confuse the next reader.
+```
+
+Then remove `, Milestone` from the `siteinfo/` line in the *Layout* block (line 64), so it reads:
+
+```
+  siteinfo/        SiteSettings
+```
+
+**The model is named a third time, in *Content migration* (line 313)** — and that sentence also
+undercounts what the seed writes. Replace the paragraph with:
+
+```markdown
+A `seed_content` management command populates: 6 brands (Copico and Doubendou inactive, since
+no SKU exists for them today), 4 categories, the 17 products pointing at the images already in
+`assets/img/`, the 7 news articles behind the teasers on the home and news pages, and
+`SiteSettings` with its `[bracket]` defaults. Re-running it updates rather than duplicates.
+```
+
+Editing only lines 64 and 128 would leave a reader looking in `seed_content.py` for three
+milestone rows Task 8 never writes.
+
+**5b — add `Article.topic`.** In `### news.Article` (line 106), change the field list to:
+
+```markdown
+`title`, `slug` (unique), `topic`, `cover` (optional), `cover_alt`, `excerpt`, `body`,
+`published_at`, `is_published`.
+
+`topic` is the short kicker above each headline on the news cards (`THỊ TRƯỜNG`, `SẢN PHẨM`,
+`ĐỐI TÁC`). It is free text rather than a choice list: the seeded set uses five values and staff
+will want a sixth without a migration.
+```
+
+**5c — correct the `SiteSettings` field list.** In `### siteinfo.SiteSettings` (line 114), replace
+`facility_area` with `shipping_partner` in the enumerated list, and append:
+
+```markdown
+`facility_area` from the original list was dropped: `gioi-thieu.html` quotes the warehouse size
+twice, and two editable fields holding one number drift apart. `warehouse_area` is the single
+source. `shipping_partner` was added for the `[tên đơn vị]` placeholder on the same page, which the
+original list missed.
+```
+
+**5d — record the cache in *Deployment*.** Append to the Deployment section (line 348):
+
+```markdown
+Production sets `CACHES` to `DatabaseCache` on the same Postgres instance, and the container
+entrypoint runs `createcachetable`. django-ratelimit counts in the cache, and Django's default
+`LocMemCache` is per-process — with three gunicorn workers a `15/h` limit is really 45/h. A
+separate Redis for one counter is a fourth container to keep alive for no gain.
+```
+
+**Nothing to do about this plan's own text.** Four sentences in it were made false by later tasks —
+the Deviations heading said "seven things" above nine numbered items, Task 8 and Task 12 Step 6 both
+pointed at Task 27 for documentation work that belongs here, and Task 26 Step 9 closed Phase 4 with
+"Phase 5 changes no Python", which Task 27's two corrections contradict. All four were fixed when
+the plan was finished, and the ninth deviation was added to the block at the top. They are recorded
+here only so a reviewer comparing an older copy of this file knows what moved.
+
+- [ ] **Step 6: Check every factual claim against the repository**
+
+Documentation drifts because nobody checks it. These greps take a minute and catch the specific
+lies these four files are most likely to tell.
+
+```bash
+# PROJECT.md claims STATIC_URL is /assets/ and there are four breakpoints.
+grep -n "STATIC_URL" config/settings/base.py
+grep -c "@media (max-width" assets/css/styles.css
+grep -n "max-width: 420px" assets/css/styles.css
+
+# README.md claims these management commands exist.
+ls apps/*/management/commands/
+
+# TODO.md claims these placeholders are still defaults and nobody has guessed a value.
+grep -n "\[MST\]\|\[số hotline sỉ\]\|\[link\]" apps/siteinfo/models.py
+
+# TODO.md claims the two "feature does not exist yet" notices survive.
+grep -rn "Mẫu tem chính thức\|Kích hoạt khi hệ thống" templates/
+
+# PROJECT.md claims both of the Phase 5 corrections are in place.
+grep -n "RealIPMiddleware" config/settings/base.py apps/leads/middleware.py
+grep -n "DatabaseCache" config/settings/production.py
+
+# Nothing should still claim the site is static.
+grep -rn "no build step\|duplicated per page\|all 8 files" *.md
+```
+
+Expected: `STATIC_URL = "/assets/"`; four `@media (max-width` blocks with one at 420px;
+`seed_content.py` and `setup_groups.py` listed; the bracket defaults present; both notices present;
+both corrections present; and **the last grep silent**. A hit on the last one is a document this
+task missed.
+
+- [ ] **Step 7: Run both suites one final time**
+
+Documentation edits cannot break code, but this is the last checkpoint in the plan and the point of
+a final run is to record a known-good state rather than to discover a surprise.
+
+```bash
+.venv/bin/pytest -q
+node tools/check.mjs
+```
+
+Expected: all tests pass; `check.mjs` exits 0.
+
+- [ ] **Step 8: Commit**
+
+Docs and spec go in separate commits — the spec is a record of an approved design, and mixing its
+corrections into a docs sweep makes them invisible in `git log`.
+
+```bash
+git add docs/superpowers/specs/2026-08-25-django-admin-cms-design.md
+git commit -m "Record the data-model deviations found while reading the markup"
+
+git add PROJECT.md TODO.md README.md PROGRESS.md \
+  docs/superpowers/plans/2026-08-25-django-admin-cms.md
+git commit -m "Rewrite the docs for the Django site"
+```
+
+---
+
+## Phase 5 complete
+
+The plan ends here. What exists that did not before:
+
+- Eight pages rendering from Postgres, with nav and footer written once.
+- An admin a non-technical Vietnamese speaker can operate, in two roles, created by a command.
+- Two lead forms that keep the phone number even when the visitor abandons the second step.
+- A deployment that can be brought up with `docker compose up -d --build`, and a backup that has
+  been restored at least once.
+- Documentation that describes this repository rather than the one it replaced.
+
+What is knowingly outstanding, all of it in `TODO.md`:
+
+- The `[bracket]` business data. The site launches with visible placeholders until the client
+  supplies real values — that was the deliberate choice from the first day of this project and it
+  has not changed.
+- Backups are written to the same disk as the database. Copying them off the box is the largest
+  remaining operational risk and needs a destination the client picks.
+- Open Graph tags, `canonical`, `sitemap.xml` and `robots.txt`. Cheap now that there is one
+  `base.html`, and out of scope for this spec.
 
 ---
