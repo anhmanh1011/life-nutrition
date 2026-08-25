@@ -10,8 +10,6 @@
      .grid-stack rule, so the two-column split lives in a class instead. */
   .contact-layout { grid-template-columns: 1.05fr 0.95fr; gap: 40px; align-items: start; }
   @media (max-width: 900px) { .contact-layout { grid-template-columns: 1fr; gap: 28px; } }
-  /* Narrow phones: let the segmented control wrap instead of overflowing the card. */
-  @media (max-width: 420px) { .seg { max-width: 100%; flex-wrap: wrap; border-radius: var(--radius-md); } }
 </style>
 {% endblock %}
 

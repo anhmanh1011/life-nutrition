@@ -10,8 +10,6 @@
      .grid-stack rule, so the two-column split lives in a class instead. */
   .agent-layout { grid-template-columns: 1.15fr 0.85fr; gap: 44px; align-items: start; }
   @media (max-width: 900px) { .agent-layout { grid-template-columns: 1fr; gap: 32px; } }
-  /* Narrow phones: let the segmented control wrap instead of overflowing the card. */
-  @media (max-width: 420px) { .seg { max-width: 100%; flex-wrap: wrap; border-radius: var(--radius-md); } }
 </style>
 {% endblock %}
 
@@ -123,42 +121,18 @@
   </div>
 
   <aside style="position: sticky; top: 88px;">
-    <!-- Đăng ký đại lý — endpoint chưa có backend; action="#" là placeholder, thay bằng URL xử lý lead khi triển khai. -->
-    <form class="card elev-md" action="#" method="post" style="padding: 28px 28px 26px; display: flex; flex-direction: column; gap: 16px;">
+    <form class="card elev-md" method="post" style="padding: 28px 28px 26px; display: flex; flex-direction: column; gap: 16px;">
+      {% csrf_token %}
+      {{ form.website }}
       <div>
         <h2 style="font-size: 24px; margin: 0 0 6px;">Đăng ký đại lý</h2>
-        <p style="margin: 0; font-size: 13px; color: color-mix(in srgb, var(--color-text) 62%, transparent);">Phản hồi kèm bảng giá sỉ trong 24 giờ làm việc.</p>
+        <p style="margin: 0; font-size: 13px; color: color-mix(in srgb, var(--color-text) 62%, transparent);">Chỉ cần tên và số điện thoại — chúng tôi hỏi thêm ở bước sau. Phản hồi kèm bảng giá sỉ trong 24 giờ làm việc.</p>
       </div>
-      <div class="field"><label for="hoten">Họ và tên *</label><input class="input" id="hoten" name="hoten" type="text" autocomplete="name" placeholder="Nguyễn Văn A" required></div>
-      <div class="field"><label for="donvi">Đơn vị / cửa hàng</label><input class="input" id="donvi" name="donvi" type="text" autocomplete="organization" placeholder="Tạp hóa Minh Anh"></div>
-      <div class="field"><label for="khuvuc">Khu vực kinh doanh *</label>
-        <select class="input" id="khuvuc" name="khuvuc" required>
-          <option value="">— Chọn tỉnh / thành —</option>
-          <option>Hà Nội</option><option>TP. Hồ Chí Minh</option><option>Đà Nẵng</option><option>Cần Thơ</option><option>Hải Phòng</option><option>Tỉnh / thành khác…</option>
-        </select>
-      </div>
-      <div class="field"><label id="lh-label">Loại hình kinh doanh</label>
-        <div style="display: grid; gap: 6px;" role="radiogroup" aria-labelledby="lh-label">
-          <label class="radio" for="loaihinh-daily"><input type="radio" id="loaihinh-daily" name="loaihinh" value="Đại lý / nhà bán buôn" checked><span class="dot"></span>Đại lý / nhà bán buôn</label>
-          <label class="radio" for="loaihinh-sieuthi"><input type="radio" id="loaihinh-sieuthi" name="loaihinh" value="Siêu thị / cửa hàng tiện lợi"><span class="dot"></span>Siêu thị / cửa hàng tiện lợi</label>
-          <label class="radio" for="loaihinh-taphoa"><input type="radio" id="loaihinh-taphoa" name="loaihinh" value="Tạp hóa / cửa hàng lẻ"><span class="dot"></span>Tạp hóa / cửa hàng lẻ</label>
-          <label class="radio" for="loaihinh-horeca"><input type="radio" id="loaihinh-horeca" name="loaihinh" value="HORECA (nhà hàng, café, khách sạn)"><span class="dot"></span>HORECA (nhà hàng, café, khách sạn)</label>
-          <label class="radio" for="loaihinh-online"><input type="radio" id="loaihinh-online" name="loaihinh" value="Bán hàng online / sàn TMĐT"><span class="dot"></span>Bán hàng online / sàn TMĐT</label>
-        </div>
-      </div>
-      <div class="field"><label id="sl-label">Sản lượng dự kiến / tháng</label>
-        <div class="seg" role="radiogroup" aria-labelledby="sl-label">
-          <label class="seg-opt" for="sanluong-duoi-10"><input type="radio" id="sanluong-duoi-10" name="sanluong" value="Dưới 10 thùng" checked>&lt; 10 thùng</label>
-          <label class="seg-opt" for="sanluong-10-50"><input type="radio" id="sanluong-10-50" name="sanluong" value="10–50 thùng">10–50 thùng</label>
-          <label class="seg-opt" for="sanluong-tren-50"><input type="radio" id="sanluong-tren-50" name="sanluong" value="Trên 50 thùng">&gt; 50 thùng</label>
-        </div>
-      </div>
-      <div class="grid grid-2" style="gap: 12px;">
-        <div class="field"><label for="sdt">Số điện thoại *</label><input class="input" id="sdt" name="sdt" type="tel" autocomplete="tel" placeholder="09xx xxx xxx" required></div>
-        <div class="field"><label for="zalo">Zalo</label><input class="input" id="zalo" name="zalo" type="tel" placeholder="Số Zalo"></div>
-      </div>
+      {% if form.non_field_errors %}<p class="form-error">{{ form.non_field_errors.0 }}</p>{% endif %}
+      <div class="field"><label for="hoten">Họ và tên *</label>{{ form.hoten }}{% if form.hoten.errors %}<p class="form-error">{{ form.hoten.errors.0 }}</p>{% endif %}</div>
+      <div class="field"><label for="sdt">Số điện thoại *</label>{{ form.sdt }}{% if form.sdt.errors %}<p class="form-error">{{ form.sdt.errors.0 }}</p>{% endif %}</div>
       <button class="btn btn-primary btn-block" type="submit">Gửi đăng ký</button>
-      <p style="margin: 0; font-size: 11.5px; line-height: 1.55; color: color-mix(in srgb, var(--color-text) 52%, transparent);">Form thật sẽ có reCAPTCHA chống spam. Thông tin chỉ dùng để tư vấn hợp tác — xem <a href="#" style="font-size: 11.5px;">Chính sách bảo mật</a>.</p>
+      <p style="margin: 0; font-size: 11.5px; line-height: 1.55; color: color-mix(in srgb, var(--color-text) 52%, transparent);">Thông tin chỉ dùng để tư vấn hợp tác — xem <a href="#" style="font-size: 11.5px;">Chính sách bảo mật</a>.</p>
     </form>
   </aside>
 </div>

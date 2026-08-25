@@ -54,14 +54,9 @@ def test_contact_page_keeps_its_page_specific_stylesheet(client, seeded):
     assert ".contact-layout" in client.get(reverse("pages:contact")).content.decode()
 
 
-# Deviation from the plan: it authored this as ["contact", "dealer"] in Task 17 and
-# never retires either case, but Task 22 wires the contact form up — which is exactly
-# what the docstring's "until then" anticipated. Contact is now covered by
-# tests/test_contact_form.py; dealer keeps the guard until Task 23 replaces it.
-@pytest.mark.parametrize("name", ["dealer"])
-def test_forms_are_not_wired_up_yet(client, seeded, name):
-    """Phase 3 replaces these forms. Until then they must stay inert rather than
-    look connected — a form with name= attributes and no view drops leads silently."""
-    body = client.get(reverse(f"pages:{name}")).content.decode()
-    assert 'action="#"' in body
-    assert "csrfmiddlewaretoken" not in body
+# Deviation from the plan: Task 17 authored a `test_forms_are_not_wired_up_yet` guard
+# here, parametrized over ["contact", "dealer"], and no later task retires it — but its
+# own docstring said "Phase 3 replaces these forms. Until then...". Task 22 replaced the
+# contact form and Task 23 replaced the dealer one, so the guard has served its purpose
+# and is gone. Both forms are now covered by tests/test_contact_form.py and
+# tests/test_dealer_flow.py, which assert the opposite: that they *are* wired up.

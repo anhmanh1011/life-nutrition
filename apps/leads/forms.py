@@ -1,6 +1,6 @@
 from django import forms
 
-from apps.leads.models import ContactMessage
+from apps.leads.models import ContactMessage, DealerApplication
 from apps.leads.phone import InvalidPhone, normalize
 
 PHONE_ERROR = (
@@ -74,3 +74,79 @@ class ContactForm(LeadForm):
                 }
             ),
         }
+
+
+class DealerStepOneForm(LeadForm):
+    """Name and phone. Nothing else is worth risking the submission over."""
+
+    class Meta:
+        model = DealerApplication
+        fields = ["hoten", "sdt"]
+        widgets = {
+            "hoten": forms.TextInput(
+                attrs={
+                    "class": "input",
+                    "id": "hoten",
+                    "autocomplete": "name",
+                    "placeholder": "Nguyễn Văn A",
+                }
+            ),
+            "sdt": TelInput(
+                attrs={
+                    "class": "input",
+                    "id": "sdt",
+                    "autocomplete": "tel",
+                    "placeholder": "09xx xxx xxx",
+                }
+            ),
+        }
+
+
+class DealerStepTwoForm(forms.ModelForm):
+    """Everything else, asked after the row exists.
+
+    `hoten` and `sdt` are absent from `fields`, so this form has no mechanism to write
+    them. The URL that reaches it is unauthenticated, and the phone number is the asset
+    that URL must not be able to touch.
+    """
+
+    class Meta:
+        model = DealerApplication
+        fields = ["donvi", "khuvuc", "loaihinh", "sanluong", "zalo", "email"]
+        widgets = {
+            "donvi": forms.TextInput(
+                attrs={
+                    "class": "input",
+                    "id": "donvi",
+                    "autocomplete": "organization",
+                    "placeholder": "Tạp hóa Minh Anh",
+                }
+            ),
+            "khuvuc": forms.Select(attrs={"class": "input", "id": "khuvuc"}),
+            "zalo": TelInput(
+                attrs={"class": "input", "id": "zalo", "placeholder": "Số Zalo"}
+            ),
+            "email": forms.EmailInput(
+                attrs={
+                    "class": "input",
+                    "id": "email",
+                    "autocomplete": "email",
+                    "placeholder": "Không bắt buộc",
+                }
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["khuvuc"].choices = [
+            ("", "— Chọn tỉnh / thành —"),
+            *DealerApplication.KHUVUC_CHOICES,
+        ]
+
+    def clean(self):
+        cleaned = super().clean()
+        for field in self.Meta.fields:
+            recorded = getattr(self.instance, field)
+            if recorded:
+                cleaned[field] = recorded
+        return cleaned

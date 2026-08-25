@@ -43,10 +43,6 @@ def products(request):
     )
 
 
-def dealer(request):
-    return render(request, "pages/dealer.html")
-
-
 def authentic(request):
     return render(request, "pages/authentic.html")
 
