@@ -1,7 +1,132 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}Sản phẩm — Dali Foods Việt Nam{% endblock %}
+{% block title %}Sản phẩm Dali Foods — danh mục SKU đang phân phối | Life Nutrition{% endblock %}
+{% block description %}Toàn bộ SKU Dali Foods do Life Nutrition phân phối tại Việt Nam: bánh mì, bánh quy, snack, đồ uống, cháo và sữa hạt — nhập khẩu chính ngạch, có nhãn phụ tiếng Việt.{% endblock %}
+
+{% block extra_head %}
+<style>
+[hidden] { display: none !important; }
+
+.filter-row { display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.filter-row__label {
+  font-size: 12px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-text) 55%, transparent); width: 92px;
+  padding-top: 11px; /* optically align with the first row of pills */
+}
+.filter-pills { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; flex: 1; }
+.pill {
+  cursor: pointer; border: none; border-radius: 999px; padding: 9px 16px;
+  font-family: var(--font-body); font-size: 13.5px; font-weight: 700;
+  transition: background .15s, color .15s;
+}
+.pill:hover { filter: brightness(0.96); }
+.pill--cat { background: var(--color-accent-100); color: var(--color-accent-800); }
+.pill--cat[aria-pressed='true'] { background: var(--color-accent); color: var(--color-neutral-100); }
+.pill--brand { background: var(--color-accent-2-100); color: var(--color-accent-2-800); }
+.pill--brand[aria-pressed='true'] { background: var(--color-accent-2); color: var(--color-neutral-100); }
+
+.sku { padding: 0; overflow: hidden; }
+.sku figure { margin: 0; }
+.sku img { display: block; width: 100%; aspect-ratio: 1 / 1; object-fit: cover; object-position: 50% 74%; }
+.sku__body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 7px; flex: 1; }
+.sku__kicker {
+  font-size: 11.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--color-accent-700);
+}
+.sku__name { margin: 0; font-weight: 700; font-size: 15px; line-height: 1.4; }
+.sku__cn { margin: 0; font-size: 12.5px; color: color-mix(in srgb, var(--color-text) 52%, transparent); }
+.sku__pack { margin: 0; font-size: 12.5px; font-weight: 600; color: color-mix(in srgb, var(--color-text) 62%, transparent); }
+.sku__actions {
+  margin-top: auto; padding-top: 8px; display: flex;
+  align-items: center; justify-content: space-between; gap: 10px;
+}
+.sku__quote { font-size: 13px; font-weight: 700; }
+.sku__retail { font-size: 12.5px; font-weight: 600; color: var(--color-accent-2-700); }
+
+.empty-state {
+  padding: 48px; text-align: center; margin-top: 8px;
+  border: 1.5px dashed var(--color-neutral-300); border-radius: var(--radius-lg);
+}
+
+@media (max-width: 640px) {
+  .filter-row { flex-direction: column; gap: 8px; }
+  .filter-row__label { width: auto; padding-top: 0; }
+  .filter-pills { gap: 8px; }
+  .pill { padding: 8px 13px; font-size: 13px; }
+  .sku__actions { flex-direction: column; align-items: flex-start; gap: 6px; }
+}
+</style>
+{% endblock %}
 
 {% block content %}
-<section class="section"><h1>Sản phẩm</h1></section>
+
+<section class="section" style="padding-block: 52px 8px;">
+  <p class="eyebrow">Danh mục sản phẩm</p>
+  <h1 style="font-size: 44px; line-height: 1.12; margin: 0 0 16px; max-width: 24ch;">Toàn bộ SKU Dali Foods đang phân phối</h1>
+  <p style="margin: 0; font-size: 15.5px; line-height: 1.65; max-width: 62ch; color: color-mix(in srgb, var(--color-text) 75%, transparent);">Hàng nội địa Trung do nhà máy Dali Quảng Tây sản xuất, nhập khẩu chính ngạch — mỗi SKU có nhãn phụ tiếng Việt và bản tự công bố. Bảng giá sỉ theo lốc / thùng gửi khi liên hệ.</p>
+</section>
+
+<section class="section" style="padding-block: 26px 6px;">
+  <div style="display: flex; flex-direction: column; gap: 12px;">
+    <div class="filter-row">
+      <span class="filter-row__label" id="filter-cat">Ngành hàng</span>
+      <div class="filter-pills" role="group" aria-labelledby="filter-cat">
+        <button class="pill pill--cat" type="button" data-filter="cat" data-value="all" aria-pressed="true">Tất cả</button>
+        {% for category in categories %}
+        <button class="pill pill--cat" type="button" data-filter="cat" data-value="{{ category.slug }}" aria-pressed="false">{{ category.name }}</button>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="filter-row">
+      <span class="filter-row__label" id="filter-brand">Thương hiệu</span>
+      <div class="filter-pills" role="group" aria-labelledby="filter-brand">
+        <button class="pill pill--brand" type="button" data-filter="brand" data-value="all" aria-pressed="true">Tất cả</button>
+        {% for brand in brands %}
+        {# data-value is brand.name alone: filters.js compares it against data-brand verbatim. #}
+        <button class="pill pill--brand" type="button" data-filter="brand" data-value="{{ brand.name }}" aria-pressed="false">{{ brand.display_name }}</button>
+        {% endfor %}
+      </div>
+    </div>
+    <p style="margin: 6px 0 0; font-size: 13px; font-weight: 600; color: color-mix(in srgb, var(--color-text) 55%, transparent);" aria-live="polite">Hiển thị <span data-count>{{ products|length }}</span> / {{ products|length }} SKU</p>
+  </div>
+</section>
+
+<section class="section" style="padding-block: 22px 8px;">
+  <div class="grid grid-4" data-product-grid>
+    {% for product in products %}
+    <div class="card sku" data-cat="{{ product.category.slug }}" data-brand="{{ product.brand.name }}">
+      <figure class="washed"><img src="{{ product.image.url }}" alt="{{ product.image_alt }}"></figure>
+      <div class="sku__body">
+        <span class="sku__kicker">{{ product.kicker }}</span>
+        <p class="sku__name">{{ product.name }}</p>
+        <p class="sku__cn">{{ product.description }}</p>
+        <p class="sku__pack">{{ product.packaging }}</p>
+        <div class="sku__actions">
+          <a class="sku__quote" href="{% url 'pages:dealer' %}">Báo giá sỉ →</a>
+          <a class="sku__retail" href="#">Mua lẻ trên sàn</a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="empty-state" data-empty-state hidden>
+    <p style="margin: 0; font-weight: 700; font-size: 16px;">Chưa có SKU nào khớp bộ lọc này</p>
+    <p style="margin: 8px 0 0; font-size: 14px; color: color-mix(in srgb, var(--color-text) 60%, transparent);">Thử chọn ngành hàng hoặc thương hiệu khác.</p>
+  </div>
+</section>
+
+<section class="section" style="padding-block: 44px 0;">
+  <div style="background: var(--color-accent-100); border-radius: calc(2 * var(--radius-lg)); padding: 30px 36px; display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap;">
+    <div style="display: flex; align-items: center; gap: 16px;">
+      <span style="width: 46px; height: 46px; border-radius: 50%; background: var(--color-accent); color: var(--color-neutral-100); display: grid; place-content: center; flex: none;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/></svg></span>
+      <p style="margin: 0; font-size: 15px; line-height: 1.55; font-weight: 600; max-width: 56ch;">Bảng giá sỉ đầy đủ theo lốc / thùng gửi trong ngày qua Zalo — hotline sỉ <strong>{{ site.hotline_wholesale }}</strong> hoặc Zalo OA <strong>{{ site.zalo_oa }}</strong>.</p>
+    </div>
+    <a class="btn btn-primary" href="{% url 'pages:dealer' %}" style="white-space: nowrap;">Yêu cầu báo giá sỉ</a>
+  </div>
+</section>
+
 {% endblock %}
+
+{% block extra_js %}<script src="{% static 'js/filters.js' %}"></script>{% endblock %}
