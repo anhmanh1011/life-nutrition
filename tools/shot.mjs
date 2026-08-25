@@ -1,18 +1,20 @@
 // Screenshot a page at an exact viewport, via CDP device emulation.
-//   node tools/shot.mjs <width> <height> <mobile:true|false> <page...>
-//   node tools/shot.mjs 390 844 true index          → /tmp/ln-em-index-390.png
+//   node tools/shot.mjs <width> <height> <mobile:true|false> <url-path...>
+//   node tools/shot.mjs 390 844 true /tin-tuc/      → <tmpdir>/ln-em-tin-tuc-390.png
+//   node tools/shot.mjs 390 844 true /              → <tmpdir>/ln-em-home-390.png
 //
 // Use this rather than `chrome --headless --screenshot --window-size=...`,
 // which silently clips mobile layouts and reports bogus overflow.
 
 import { spawn } from 'node:child_process';
 import net from 'node:net';
+import os from 'node:os';
 import { writeFileSync } from 'node:fs';
 
 const CHROME = process.env.CHROME
-  ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+  ?? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 const PORT_CDP = 9333;
-const PORT_HTTP = 8765;
+const PORT_HTTP = Number(process.env.PORT_HTTP ?? 8000);
 
 const [width, height, mobileArg, ...pages] = process.argv.slice(2);
 if (!pages.length) {
@@ -35,12 +37,14 @@ const waitPort = (port, ms = 15000) => new Promise((res, rej) => {
 
 let server = null;
 if (!(await portOpen(PORT_HTTP))) {
-  server = spawn('python3', ['-m', 'http.server', String(PORT_HTTP)], { stdio: 'ignore' });
+  server = spawn('.venv/Scripts/python.exe', ['manage.py', 'runserver', String(PORT_HTTP), '--noreload'],
+    { stdio: 'ignore' });
   await waitPort(PORT_HTTP);
 }
 
 const chrome = spawn(CHROME, ['--headless=new', `--remote-debugging-port=${PORT_CDP}`,
-  '--no-first-run', '--user-data-dir=/tmp/ln-chrome-shot', 'about:blank'], { stdio: 'ignore' });
+  // Must be absolute: Chrome exits 21 on a drive-relative path like /tmp/....
+  '--no-first-run', `--user-data-dir=${os.tmpdir()}/ln-chrome-shot`, 'about:blank'], { stdio: 'ignore' });
 await waitPort(PORT_CDP);
 
 const { webSocketDebuggerUrl } = await (await fetch(
@@ -58,11 +62,11 @@ const send = (method, params = {}) => new Promise(r => {
 
 await send('Page.enable');
 for (const page of pages) {
-  const name = page.replace(/\.html$/, '');
+  const name = page.replace(/^\/+|\/+$/g, '').replace(/\//g, '-') || 'home';
   await send('Emulation.setDeviceMetricsOverride', {
     width: Number(width), height: Number(height), deviceScaleFactor: 2, mobile,
   });
-  await send('Page.navigate', { url: `http://127.0.0.1:${PORT_HTTP}/${name}.html` });
+  await send('Page.navigate', { url: `http://127.0.0.1:${PORT_HTTP}${page.startsWith('/') ? page : '/' + page}` });
   await new Promise(r => setTimeout(r, 800));
 
   const over = await send('Runtime.evaluate', {
@@ -70,7 +74,7 @@ for (const page of pages) {
     returnByValue: true,
   });
   const shot = await send('Page.captureScreenshot', { format: 'png' });
-  const out = `/tmp/ln-em-${name}-${width}.png`;
+  const out = `${os.tmpdir()}/ln-em-${name}-${width}.png`;
   writeFileSync(out, Buffer.from(shot.result.data, 'base64'));
   console.log(`${out}  overflow=${over.result.result.value}px`);
 }
