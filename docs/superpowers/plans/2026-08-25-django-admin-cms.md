@@ -4889,7 +4889,7 @@ unchanged, so `base.html` and every test written before now keep working.
 - Modify: `apps/leads/views.py` (the empty stub from Task 3), `apps/pages/views.py`,
   `apps/pages/urls.py`, `templates/pages/contact.html`, `assets/css/styles.css`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `tests/test_contact_form.py`:
 
@@ -5038,12 +5038,12 @@ def test_the_thank_you_page_renders(client, seeded):
     assert "Cảm ơn" in response.content.decode()
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Run: `.venv/bin/pytest tests/test_contact_form.py -v`
 Expected: FAIL — `NoReverseMatch: 'thanks' is not a valid view function or pattern name`.
 
-- [ ] **Step 3: Disable rate limiting in the test settings**
+- [x] **Step 3: Disable rate limiting in the test settings**
 
 Rate limiting is per-IP and every test client shares `127.0.0.1`, so leaving it on would make
 unrelated tests fail once the suite grows. Add to `config/settings/test.py`:
@@ -5054,7 +5054,7 @@ unrelated tests fail once the suite grows. Add to `config/settings/test.py`:
 RATELIMIT_ENABLE = False
 ```
 
-- [ ] **Step 4: Write `apps/leads/forms.py`**
+- [x] **Step 4: Write `apps/leads/forms.py`**
 
 ```python
 from django import forms
@@ -5142,7 +5142,7 @@ twice.
 `chude` gets no widget entry: its three radios stay hand-written in the template so the `.seg`
 styling survives. Django's `RadioSelect` renders a `<ul>` that the existing CSS does not target.
 
-- [ ] **Step 5: Write `apps/leads/views.py`**
+- [x] **Step 5: Write `apps/leads/views.py`**
 
 Replace the whole stub file:
 
@@ -5203,7 +5203,7 @@ than the spam it prevents.
 `telegram.notify(save_lead(...))` reads in the order it executes: the row is committed, then the
 network call is attempted. `notify` records its own failure on the row and never raises.
 
-- [ ] **Step 6: Delete `contact` from `apps/pages/views.py`**
+- [x] **Step 6: Delete `contact` from `apps/pages/views.py`**
 
 Remove these four lines from the bottom of the file:
 
@@ -5212,7 +5212,7 @@ def contact(request):
     return render(request, "pages/contact.html")
 ```
 
-- [ ] **Step 7: Point the URLs at the new view**
+- [x] **Step 7: Point the URLs at the new view**
 
 In `apps/pages/urls.py`, add the import above `from . import views`:
 
@@ -5231,7 +5231,7 @@ Every public URL stays in this one file under the `pages` namespace. The app bou
 where code lives, not about how templates name a link — splitting the namespace would mean
 editing `base.html` and every test written in Phase 2.
 
-- [ ] **Step 8: Add the error style to `assets/css/styles.css`**
+- [x] **Step 8: Add the error style to `assets/css/styles.css`**
 
 Add to the `:root` token block, after `--color-divider`:
 
@@ -5252,7 +5252,7 @@ Then append at the end of the file:
 }
 ```
 
-- [ ] **Step 9: Rewrite the form block in `templates/pages/contact.html`**
+- [x] **Step 9: Rewrite the form block in `templates/pages/contact.html`**
 
 Replace the whole `<form>` element — the one copied verbatim in Task 17, currently opening with
 `<form class="card elev-md" action="#" method="post"` — with:
@@ -5300,7 +5300,7 @@ beside it, so the phone/Zalo pair keeps the layout it already had.
 **The footnote changed.** The old text promised a real form with reCAPTCHA later; the form is
 real now, and the sentence would read as an admission that this one is fake.
 
-- [ ] **Step 10: Write `templates/leads/thanks.html`**
+- [x] **Step 10: Write `templates/leads/thanks.html`**
 
 ```django
 {% extends "base.html" %}
@@ -5329,7 +5329,7 @@ real now, and the sentence would read as an admission that this one is fake.
 `site` comes from the `siteinfo` context processor written in Task 4, so the hotline here is the
 same one the footer shows.
 
-- [ ] **Step 11: Run the tests**
+- [x] **Step 11: Run the tests**
 
 Run: `.venv/bin/pytest tests/test_contact_form.py -v`
 Expected: PASS, 11 tests.
@@ -5337,7 +5337,7 @@ Expected: PASS, 11 tests.
 Run: `.venv/bin/pytest -q`
 Expected: PASS, no failures.
 
-- [ ] **Step 12: Verify in a browser and re-run the harness**
+- [x] **Step 12: Verify in a browser and re-run the harness**
 
 ```bash
 .venv/bin/python manage.py runserver 8000 &
@@ -5370,7 +5370,7 @@ Expected: `POST 302 -> http://127.0.0.1:8000/cam-on/`, then
 That second line is the point of the whole ordering rule: Telegram was not configured, and the
 lead was captured anyway.
 
-- [ ] **Step 13: Commit**
+- [x] **Step 13: Commit**
 
 ```bash
 git add apps/leads/forms.py apps/leads/views.py apps/pages/views.py apps/pages/urls.py \
