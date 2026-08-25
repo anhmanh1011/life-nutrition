@@ -5395,7 +5395,7 @@ A visitor who abandons the second page has still been captured. That is the whol
   `apps/pages/urls.py`, `templates/pages/dealer.html`, `templates/pages/contact.html`,
   `assets/css/styles.css`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `tests/test_dealer_flow.py`:
 
@@ -5600,12 +5600,12 @@ def test_step_two_shows_the_visitor_what_was_already_recorded(client, seeded, tg
     assert "0987654321" in body
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Run: `.venv/bin/pytest tests/test_dealer_flow.py -v`
 Expected: FAIL — `NoReverseMatch: Reverse for 'dealer_step_two' not found`.
 
-- [ ] **Step 3: Add the two dealer forms to `apps/leads/forms.py`**
+- [x] **Step 3: Add the two dealer forms to `apps/leads/forms.py`**
 
 Extend the model import at the top:
 
@@ -5706,7 +5706,7 @@ the `.radio` and `.seg` styling survives. Neither is pre-checked any more. The o
 pre-selected "Đại lý / nhà bán buôn" and "Dưới 10 thùng", which meant every submission carried
 those values whether or not they were true.
 
-- [ ] **Step 4: Add the two views to `apps/leads/views.py`**
+- [x] **Step 4: Add the two views to `apps/leads/views.py`**
 
 Extend the imports:
 
@@ -5768,7 +5768,7 @@ There is no honeypot on step two. A bot cannot reach it without guessing a UUID4
 second hidden field would only create a way to lose a visitor who has already given us what we
 wanted.
 
-- [ ] **Step 5: Delete `dealer` from `apps/pages/views.py`**
+- [x] **Step 5: Delete `dealer` from `apps/pages/views.py`**
 
 Remove these two lines:
 
@@ -5780,7 +5780,7 @@ def dealer(request):
 `apps/pages/views.py` now holds six views. If `render` or a model import is left unused after
 this and Task 22, delete it too.
 
-- [ ] **Step 6: Point the URLs at the new views**
+- [x] **Step 6: Point the URLs at the new views**
 
 In `apps/pages/urls.py`, replace the `hop-tac-dai-ly/` line with:
 
@@ -5796,7 +5796,7 @@ In `apps/pages/urls.py`, replace the `hop-tac-dai-ly/` line with:
 The `<uuid:token>` converter rejects anything that is not a well-formed UUID before the view
 runs, so a probe with `../` or an integer id gets a 404 from the router.
 
-- [ ] **Step 7: Hoist the shared `.seg` rule into `assets/css/styles.css`**
+- [x] **Step 7: Hoist the shared `.seg` rule into `assets/css/styles.css`**
 
 A third template now needs it. Add after the `.seg-opt:has(input:focus-visible)` rule near line
 190:
@@ -5817,7 +5817,7 @@ changed: two copies of a one-line rule was cheaper than a shared home, three is 
 420px is a fourth breakpoint in a file `PROJECT.md` documents as having three — Task 28 updates
 that sentence.
 
-- [ ] **Step 8: Rewrite the form block in `templates/pages/dealer.html`**
+- [x] **Step 8: Rewrite the form block in `templates/pages/dealer.html`**
 
 Replace the whole `<form>` element with:
 
@@ -5845,7 +5845,7 @@ would now be describing a form that no longer exists.
 The privacy-policy `href="#"` stays a dead link — there is no policy page, and inventing a URL
 for one would be worse than an anchor that goes nowhere. It is already in `TODO.md`.
 
-- [ ] **Step 9: Write `templates/leads/dealer_step_two.html`**
+- [x] **Step 9: Write `templates/leads/dealer_step_two.html`**
 
 ```django
 {% extends "base.html" %}
@@ -5906,7 +5906,7 @@ the first submission failed, and the visitor either refills the form or leaves a
 The "Bỏ qua" link is a plain `<a>`, not a second submit button, so it cannot be mistaken for the
 action that saves.
 
-- [ ] **Step 10: Run the tests**
+- [x] **Step 10: Run the tests**
 
 Run: `.venv/bin/pytest tests/test_dealer_flow.py -v`
 Expected: PASS, 15 tests.
@@ -5914,7 +5914,7 @@ Expected: PASS, 15 tests.
 Run: `.venv/bin/pytest -q`
 Expected: PASS, no failures.
 
-- [ ] **Step 11: Verify the layout survived losing five fields**
+- [x] **Step 11: Verify the layout survived losing five fields**
 
 The dealer form was the tall element in a sticky two-column layout and is now two inputs.
 `check.mjs` proves nothing broke; your eyes decide whether it still looks deliberate.
@@ -5933,7 +5933,7 @@ Expected: `check.mjs` green. Then open `/tmp/ln-em-dealer-390.png` and
 column, drop `position: sticky` from the `<aside>` rather than padding the form back out with
 fields — refilling it would undo this task.
 
-- [ ] **Step 12: Walk the whole flow by hand**
+- [x] **Step 12: Walk the whole flow by hand**
 
 ```bash
 .venv/bin/python manage.py runserver 8000 &
@@ -5954,7 +5954,7 @@ showing the normalized number, `False`, and a token that matches the redirect UR
 Stop there and do not complete step two. The row printed by that last command — a real phone
 number captured from a visitor who went no further — is the outcome this whole phase exists for.
 
-- [ ] **Step 13: Commit and close Phase 3**
+- [x] **Step 13: Commit and close Phase 3**
 
 ```bash
 git add apps/leads/forms.py apps/leads/views.py apps/pages/views.py apps/pages/urls.py \
