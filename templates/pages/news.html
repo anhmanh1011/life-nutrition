@@ -1,7 +1,56 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}Tin tức — Dali Foods Việt Nam{% endblock %}
+{% block title %}Tin tức &amp; khuyến mãi — Dali Foods Việt Nam | Life Nutrition{% endblock %}
+{% block description %}Tin công ty, chương trình đại lý và kiến thức sản phẩm mới nhất từ Life Nutrition — nhà phân phối được ủy quyền của Dali Foods tại Việt Nam.{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* Bài nổi bật: ảnh trái / nội dung phải, xuống một cột trên điện thoại. */
+  .news-feature { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 0; }
+  @media (max-width: 640px) { .news-feature { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}
 
 {% block content %}
-<section class="section"><h1>Tin tức</h1></section>
+<section class="section" style="padding-block: 52px 10px;">
+  <p class="eyebrow">Tin tức &amp; khuyến mãi</p>
+  <h1 style="font-size: 46px; line-height: 1.1; margin: 0 0 20px;">Mới từ Dali Foods Việt Nam</h1>
+  <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+    <span style="border-radius: 999px; padding: 8px 16px; background: var(--color-accent); color: var(--color-neutral-100); font-size: 13px; font-weight: 700;">Tất cả</span>
+    {% for value, label in topics %}
+    <a href="#" style="border-radius: 999px; padding: 8px 16px; background: var(--color-accent-100); color: var(--color-accent-800); font-size: 13px; font-weight: 700; text-decoration: none;">{{ label }}</a>
+    {% endfor %}
+  </div>
+</section>
+
+{% if featured %}
+<section class="section" style="padding-block: 26px 8px;">
+  <a href="{{ featured.get_absolute_url }}" class="card elev-md news-feature" style="padding: 0; overflow: hidden; text-decoration: none; color: var(--color-text);">
+    {% if featured.cover %}<figure class="washed" style="margin: 0;"><img src="{{ featured.cover.url }}" alt="{{ featured.cover_alt }}" style="display: block; width: 100%; height: 100%; min-height: 320px; object-fit: cover; object-position: 50% 65%;"></figure>{% endif %}
+    <div style="padding: 36px 40px; display: flex; flex-direction: column; gap: 14px; justify-content: center;">
+      <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-accent{% if featured.topic == 'Chương trình đại lý' %}-2{% endif %}-700);">{{ featured.topic }} · {{ featured.published_at|date:"d/m/Y" }}</span>
+      <p style="margin: 0; font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: 27px; line-height: 1.25;">{{ featured.title }}</p>
+      <p style="margin: 0; font-size: 14.5px; line-height: 1.65; color: color-mix(in srgb, var(--color-text) 70%, transparent);">{{ featured.excerpt }}</p>
+      <span style="display: inline-flex; align-items: center; gap: 7px; font-weight: 700; font-size: 14px; color: var(--color-accent-700);">Đọc tiếp
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </span>
+    </div>
+  </a>
+</section>
+{% endif %}
+
+<section class="section" style="padding-block: 30px 8px;">
+  <div class="grid grid-3">
+    {% for article in articles %}
+    <a href="{{ article.get_absolute_url }}" class="card" style="padding: 0; overflow: hidden; text-decoration: none; color: var(--color-text); display: flex; flex-direction: column;">
+      {% if article.cover %}<figure class="washed" style="margin: 0;"><img src="{{ article.cover.url }}" alt="{{ article.cover_alt }}" style="display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; object-position: 50% 65%;"></figure>{% endif %}
+      <div style="padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 8px; flex: 1;">
+        <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-accent{% if article.topic == 'Chương trình đại lý' %}-2{% endif %}-700);">{{ article.topic }} · {{ article.published_at|date:"d/m/Y" }}</span>
+        <p style="margin: 0; font-weight: 700; font-size: 16px; line-height: 1.45;">{{ article.title }}</p>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
 {% endblock %}

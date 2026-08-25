@@ -1,7 +1,7 @@
 from django.shortcuts import render
 
 from apps.catalog.models import Brand, Category, Product
-from apps.news.models import Article
+from apps.news.models import Article, Topic
 
 
 def home(request):
@@ -45,7 +45,11 @@ def news(request):
     return render(
         request,
         "pages/news.html",
-        {"featured": published[0] if published else None, "articles": published[1:]},
+        {
+            "featured": published[0] if published else None,
+            "articles": published[1:],
+            "topics": Topic.choices,
+        },
     )
 
 

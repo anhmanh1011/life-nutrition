@@ -431,3 +431,11 @@ select.input { appearance: none; cursor: pointer; }
     scroll-behavior: auto !important;
   }
 }
+
+/* Admin-authored article bodies — news/article_detail.html. */
+.prose { font-size: 16px; line-height: 1.75; }
+.prose > * + * { margin-top: 1em; }
+.prose h2 { font-size: 24px; margin-top: 1.6em; }
+.prose h3 { font-size: 19px; margin-top: 1.4em; }
+.prose ul, .prose ol { padding-left: 1.4em; }
+.prose blockquote { margin-left: 0; padding-left: 16px; border-left: 3px solid var(--color-accent-200); }
