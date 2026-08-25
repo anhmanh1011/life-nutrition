@@ -2,3 +2,12 @@
 
 # Camera originals used to generate assets/img/ — 110 MB, not referenced by the site.
 product_image/
+
+# Python / Django
+.venv/
+__pycache__/
+*.pyc
+.env
+media/
+staticfiles/
+.pytest_cache/
