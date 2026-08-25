@@ -2811,7 +2811,7 @@ a commit where every home page teaser 404s.
 - Modify: `templates/pages/news.html`, `apps/pages/views.py`, `config/urls.py`, `assets/css/styles.css`
 - Create: `apps/news/views.py`, `templates/news/article_detail.html`, `tests/test_news_pages.py`
 
-- [ ] **Step 1: Write `apps/news/views.py`**
+- [x] **Step 1: Write `apps/news/views.py`**
 
 ```python
 from django.shortcuts import get_object_or_404, render
@@ -2830,7 +2830,7 @@ def article_detail(request, slug):
 Looking the article up through `Article.objects.published()` rather than `Article.objects.all()`
 is what keeps a draft or a future-dated post from being readable by anyone who guesses the slug.
 
-- [ ] **Step 2: Route it in `config/urls.py`**
+- [x] **Step 2: Route it in `config/urls.py`**
 
 Add the import and the article route **above** the `pages` include:
 
@@ -2848,7 +2848,7 @@ urlpatterns = [
 The name is `news_detail` with no namespace, matching the `reverse("news_detail", …)` inside
 `Article.get_absolute_url` from Task 7.
 
-- [ ] **Step 3: Write `templates/pages/news.html`**
+- [x] **Step 3: Write `templates/pages/news.html`**
 
 ```django
 {% extends "base.html" %}
@@ -2918,7 +2918,7 @@ The three topic pills stay `href="#"`, exactly as they are today. Making them fi
 behaviour the spec does not ask for, and Rule 1 says copy the markup rather than improve it. Task
 27 records them in `TODO.md` alongside the other placeholder links.
 
-- [ ] **Step 4: Pass the topic list to the template**
+- [x] **Step 4: Pass the topic list to the template**
 
 In `apps/pages/views.py`, extend the import and the `news` view:
 
@@ -2940,7 +2940,7 @@ def news(request):
     )
 ```
 
-- [ ] **Step 5: Write `templates/news/article_detail.html`**
+- [x] **Step 5: Write `templates/news/article_detail.html`**
 
 New surface area — there is no original markup to copy, so it reuses the existing classes.
 
@@ -2989,7 +2989,7 @@ before the value reaches the database (Task 7). Do not add `|safe` anywhere else
 widen `_ALLOWED_TAGS` — `<script>`, `<style>`, `<iframe>` and every `on*` attribute are stripped
 there, not here.
 
-- [ ] **Step 6: Add a `.prose` block to `assets/css/styles.css`**
+- [x] **Step 6: Add a `.prose` block to `assets/css/styles.css`**
 
 Append to the end of the file, so admin-authored `<h2>`/`<ul>`/`<blockquote>` get sane spacing:
 
@@ -3006,7 +3006,7 @@ Append to the end of the file, so admin-authored `<h2>`/`<ul>`/`<blockquote>` ge
 This is the only CSS this plan adds. It styles markup that did not exist before, so it cannot
 regress an existing page.
 
-- [ ] **Step 7: Write the test**
+- [x] **Step 7: Write the test**
 
 `tests/test_news_pages.py`:
 
@@ -3080,12 +3080,12 @@ def test_related_articles_exclude_the_current_one(client, seeded):
 `|safe`. If someone later deletes `nh3.clean()` from `Article.save()` as "redundant", this is what
 catches it.
 
-- [ ] **Step 8: Run the tests**
+- [x] **Step 8: Run the tests**
 
 Run: `.venv/bin/pytest tests/test_news_pages.py tests/test_pages_views.py -v`
 Expected: `20 passed`
 
-- [ ] **Step 9: Run the harness**
+- [x] **Step 9: Run the harness**
 
 ```bash
 .venv/bin/python manage.py runserver 8000 --noreload &
@@ -3094,7 +3094,7 @@ sleep 3 && PAGES=/tin-tuc/ node tools/check.mjs; echo "exit=$?"
 
 Expected: `exit=0`.
 
-- [ ] **Step 10: Check the crop change by eye**
+- [x] **Step 10: Check the crop change by eye**
 
 This is the one change in Phase 2 that `check.mjs` cannot see — Deviation 8 standardises nine
 hand-tuned `object-position` values to `50% 65%`.
@@ -3108,7 +3108,7 @@ Open `/tmp/ln-em-tin-tuc-390.png` and look at the seven images: no product label
 should be cut off. If one is visibly worse than before, re-crop that source image in
 `assets/img/` with `sips` rather than reintroducing per-article positioning.
 
-- [ ] **Step 11: Commit**
+- [x] **Step 11: Commit**
 
 ```bash
 git add apps/news/views.py apps/pages/views.py config/urls.py templates/pages/news.html templates/news assets/css/styles.css tests/test_news_pages.py
