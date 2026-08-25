@@ -63,4 +63,4 @@ Validates all 8 pages at desktop and mobile widths: broken images, missing `alt`
 overflow, heading structure, console errors, product filters, and the mobile nav. Exits
 non-zero on failure. Requires Node 18+ and Google Chrome.
 
-See [`CLAUDE.md`](CLAUDE.md) for the constraints and gotchas behind these choices.
+See [`PROJECT.md`](PROJECT.md) for the constraints and gotchas behind these choices.
