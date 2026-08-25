@@ -3,9 +3,12 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
+from apps.news import views as news_views
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("tinymce/", include("tinymce.urls")),
+    path("tin-tuc/<slug:slug>/", news_views.article_detail, name="news_detail"),
     path("", include("apps.pages.urls")),
 ]
 
