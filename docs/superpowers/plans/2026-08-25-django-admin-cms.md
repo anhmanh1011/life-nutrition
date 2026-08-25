@@ -3144,7 +3144,7 @@ written once, by hand, so its hand-tuned `object-position` is copied unchanged u
 - Modify: `templates/pages/about.html`, `templates/pages/brands.html`, `templates/pages/authentic.html`
 - Create: `tests/test_read_pages.py`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `tests/test_read_pages.py`:
 
@@ -3242,13 +3242,13 @@ def test_authentic_page_keeps_notices_for_features_that_do_not_exist_yet(client,
     assert "[Mẫu tem chính thức sẽ cập nhật]" in body
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Run: `.venv/bin/pytest tests/test_read_pages.py -v`
 Expected: FAIL — the three templates are still the Task 11 stubs, so every content assertion
 misses and `response.context["product_count"]` raises `KeyError`.
 
-- [ ] **Step 3: Give `about` and `brands` the context they need**
+- [x] **Step 3: Give `about` and `brands` the context they need**
 
 In `apps/pages/views.py`, add `get_object_or_404` to the existing shortcut import:
 
@@ -3284,7 +3284,7 @@ routine admin edit into a red build.
 `brand.products.active()` works because `ProductQuerySet.as_manager()` is `Product`'s default
 manager, and Django builds related managers from that class.
 
-- [ ] **Step 4: Convert `templates/pages/about.html`**
+- [x] **Step 4: Convert `templates/pages/about.html`**
 
 Replace the stub with:
 
@@ -3349,7 +3349,7 @@ whoever supplies the real assets, not values a staff member types into the admin
 
 They are already tracked in `TODO.md`. Leave them.
 
-- [ ] **Step 5: Convert `templates/pages/brands.html`**
+- [x] **Step 5: Convert `templates/pages/brands.html`**
 
 Replace the stub with:
 
@@ -3403,7 +3403,7 @@ Then replace the pill row — lines 40 through 47, the whole
 The inactive pills keep `href="#"`. There is one brand page and it is this one; giving the other
 five a real URL is Phase 6 work that nobody has asked for.
 
-- [ ] **Step 6: Convert `templates/pages/authentic.html`**
+- [x] **Step 6: Convert `templates/pages/authentic.html`**
 
 Replace the stub with:
 
@@ -3443,7 +3443,7 @@ Three bracketed strings stay literal here:
 The batch-lookup `<input>` and its `type="button"` keep working exactly as before, which is to
 say not at all. It is not a `<form>`, so there is nothing to wire and nothing to break.
 
-- [ ] **Step 7: Run the tests**
+- [x] **Step 7: Run the tests**
 
 Run: `.venv/bin/pytest tests/test_read_pages.py -v`
 Expected: PASS, 13 tests (the placeholder parametrize contributes 7).
@@ -3452,7 +3452,7 @@ If `test_about_page_leaves_no_business_placeholder_behind[[số]]` is the only f
 three `[số]` occurrences was missed — grep the template for `[số]` and check it against the
 label on the line below it.
 
-- [ ] **Step 8: Run `check.mjs` against the three pages**
+- [x] **Step 8: Run `check.mjs` against the three pages**
 
 ```bash
 .venv/bin/python manage.py runserver 8000 --noreload &
@@ -3467,7 +3467,7 @@ A `BROKEN_IMG` here means a `{% static %}` conversion was missed — the browser
 failure Rule 2 exists to prevent, and it is why every asset reference is converted even though
 the site currently sits at the URL root.
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add apps/pages/views.py templates/pages/about.html templates/pages/brands.html templates/pages/authentic.html tests/test_read_pages.py
