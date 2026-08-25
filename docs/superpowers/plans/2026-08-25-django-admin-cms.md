@@ -3755,7 +3755,7 @@ duplicate detection works, the index is useful, and staff can dial what they rea
 - Create: `apps/leads/phone.py`
 - Create: `tests/test_phone.py`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `tests/test_phone.py`. No database, no Django — this module is pure string handling and its
 test should stay that fast.
@@ -3833,12 +3833,12 @@ def test_normalize_is_idempotent():
     assert normalize(normalize("+84 98 765 4321")) == "0987654321"
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Run: `.venv/bin/pytest tests/test_phone.py -v`
 Expected: FAIL — `ModuleNotFoundError: No module named 'apps.leads.phone'`.
 
-- [ ] **Step 3: Write `apps/leads/phone.py`**
+- [x] **Step 3: Write `apps/leads/phone.py`**
 
 ```python
 import re
@@ -3875,12 +3875,12 @@ def normalize(raw: str) -> str:
 `InvalidPhone` carries `raw`, not `digits`: when this surfaces in a log or an admin error the
 useful thing is what the visitor typed, not what the function made of it.
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `.venv/bin/pytest tests/test_phone.py -v`
 Expected: PASS, 34 tests.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add apps/leads/phone.py tests/test_phone.py
@@ -3903,7 +3903,7 @@ record the site's best-performing campaign as producing zero leads.
 - Modify: `apps/leads/middleware.py`
 - Create: `tests/test_attribution.py`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `tests/test_attribution.py`:
 
@@ -3963,13 +3963,13 @@ def test_overlong_values_are_truncated_to_fit_the_columns(client, seeded):
     assert len(recorded["referrer"]) == 500
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Run: `.venv/bin/pytest tests/test_attribution.py -v`
 Expected: FAIL — `KeyError: 'attribution'`, because the Task 3 stub passes the request straight
 through.
 
-- [ ] **Step 3: Write `apps/leads/middleware.py`**
+- [x] **Step 3: Write `apps/leads/middleware.py`**
 
 Replace the whole stub file:
 
@@ -4018,12 +4018,12 @@ columns record which campaign, and `landing_page` records the exact URL that was
 what someone debugging a campaign actually wants to see. That is why the two tests above expect
 `"/?utm_source=zalo&..."` rather than a bare `"/"`.
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `.venv/bin/pytest tests/test_attribution.py -v`
 Expected: PASS, 6 tests.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add apps/leads/middleware.py tests/test_attribution.py
