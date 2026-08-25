@@ -65,27 +65,30 @@
   </div>
 
   <aside style="position: sticky; top: 88px;">
-    <!-- Gửi lời nhắn — endpoint chưa có backend; action="#" là placeholder, thay bằng URL xử lý lead khi triển khai. -->
-    <form class="card elev-md" action="#" method="post" style="padding: 28px 28px 26px; display: flex; flex-direction: column; gap: 16px;">
+    <form class="card elev-md" method="post" style="padding: 28px 28px 26px; display: flex; flex-direction: column; gap: 16px;">
+      {% csrf_token %}
+      {{ form.website }}
       <div>
         <h2 style="font-size: 24px; margin: 0 0 6px;">Gửi lời nhắn</h2>
         <p style="margin: 0; font-size: 13px; color: color-mix(in srgb, var(--color-text) 62%, transparent);">Chúng tôi phản hồi qua điện thoại / Zalo trong 24 giờ làm việc.</p>
       </div>
+      {% if form.non_field_errors %}<p class="form-error">{{ form.non_field_errors.0 }}</p>{% endif %}
       <div class="field"><label id="cd-label">Bạn cần hỗ trợ về</label>
         <div class="seg" role="radiogroup" aria-labelledby="cd-label">
-          <label class="seg-opt" for="chude-baogia"><input type="radio" id="chude-baogia" name="chude" value="Báo giá sỉ" checked>Báo giá sỉ</label>
-          <label class="seg-opt" for="chude-chinhhang"><input type="radio" id="chude-chinhhang" name="chude" value="Hàng chính hãng">Hàng chính hãng</label>
-          <label class="seg-opt" for="chude-khac"><input type="radio" id="chude-khac" name="chude" value="Khác">Khác</label>
+          <label class="seg-opt" for="chude-baogia"><input type="radio" id="chude-baogia" name="chude" value="Báo giá sỉ"{% if form.chude.value == "Báo giá sỉ" %} checked{% endif %}>Báo giá sỉ</label>
+          <label class="seg-opt" for="chude-chinhhang"><input type="radio" id="chude-chinhhang" name="chude" value="Hàng chính hãng"{% if form.chude.value == "Hàng chính hãng" %} checked{% endif %}>Hàng chính hãng</label>
+          <label class="seg-opt" for="chude-khac"><input type="radio" id="chude-khac" name="chude" value="Khác"{% if form.chude.value == "Khác" %} checked{% endif %}>Khác</label>
         </div>
       </div>
-      <div class="field"><label for="lh-ten">Họ và tên *</label><input class="input" id="lh-ten" name="hoten" type="text" autocomplete="name" placeholder="Nguyễn Văn A" required></div>
+      <div class="field"><label for="lh-ten">Họ và tên *</label>{{ form.hoten }}{% if form.hoten.errors %}<p class="form-error">{{ form.hoten.errors.0 }}</p>{% endif %}</div>
       <div class="grid grid-2" style="gap: 12px;">
-        <div class="field"><label for="lh-sdt">Số điện thoại *</label><input class="input" id="lh-sdt" name="sdt" type="tel" autocomplete="tel" placeholder="09xx xxx xxx" required></div>
-        <div class="field"><label for="lh-zalo">Zalo</label><input class="input" id="lh-zalo" name="zalo" type="tel" placeholder="Số Zalo"></div>
+        <div class="field"><label for="lh-sdt">Số điện thoại *</label>{{ form.sdt }}{% if form.sdt.errors %}<p class="form-error">{{ form.sdt.errors.0 }}</p>{% endif %}</div>
+        <div class="field"><label for="lh-zalo">Zalo</label>{{ form.zalo }}</div>
       </div>
-      <div class="field"><label for="lh-msg">Nội dung</label><textarea class="input" id="lh-msg" name="noidung" rows="4" placeholder="VD: Cần bảng giá sỉ thùng trà trái cây Daliyuan giao về Cần Thơ…"></textarea></div>
+      <div class="field"><label for="lh-email">Email</label>{{ form.email }}{% if form.email.errors %}<p class="form-error">{{ form.email.errors.0 }}</p>{% endif %}</div>
+      <div class="field"><label for="lh-msg">Nội dung</label>{{ form.noidung }}</div>
       <button class="btn btn-primary btn-block" type="submit">Gửi lời nhắn</button>
-      <p style="margin: 0; font-size: 11.5px; line-height: 1.55; color: color-mix(in srgb, var(--color-text) 52%, transparent);">Form thật sẽ có reCAPTCHA chống spam và thông báo lead qua email + Zalo.</p>
+      <p style="margin: 0; font-size: 11.5px; line-height: 1.55; color: color-mix(in srgb, var(--color-text) 52%, transparent);">Thông tin chỉ dùng để tư vấn — chúng tôi không chia sẻ cho bên thứ ba.</p>
     </form>
   </aside>
 </div>

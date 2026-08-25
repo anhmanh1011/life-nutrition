@@ -1,5 +1,7 @@
 from django.urls import path
 
+from apps.leads import views as lead_views
+
 from . import views
 
 app_name = "pages"
@@ -12,5 +14,6 @@ urlpatterns = [
     path("hop-tac-dai-ly/", views.dealer, name="dealer"),
     path("hang-chinh-hang/", views.authentic, name="authentic"),
     path("tin-tuc/", views.news, name="news"),
-    path("lien-he/", views.contact, name="contact"),
+    path("lien-he/", lead_views.contact, name="contact"),
+    path("cam-on/", lead_views.thanks, name="thanks"),
 ]

@@ -9,6 +9,7 @@
   --color-accent: #c67139;
   --color-accent-2: #7a8a5e;
   --color-divider: color-mix(in srgb, #201e1d 16%, transparent);
+  --color-danger: #b3261e;
 
   --color-neutral-100: #f9f4ed;
   --color-neutral-200: #eee7db;
@@ -439,3 +440,12 @@ select.input { appearance: none; cursor: pointer; }
 .prose h3 { font-size: 19px; margin-top: 1.4em; }
 .prose ul, .prose ol { padding-left: 1.4em; }
 .prose blockquote { margin-left: 0; padding-left: 16px; border-left: 3px solid var(--color-accent-200); }
+
+/* Lead form validation messages — rendered by templates/pages/contact.html
+   and templates/pages/dealer.html. */
+.form-error {
+  margin: 6px 0 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--color-danger);
+}

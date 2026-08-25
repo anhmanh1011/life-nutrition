@@ -13,3 +13,7 @@ CACHES = {
 
 TELEGRAM_BOT_TOKEN = "test-token"
 TELEGRAM_CHAT_ID = "-1000000000000"
+
+# Off by default so ordinary tests are not throttled by each other. The one test that
+# cares turns it back on with the `settings` fixture.
+RATELIMIT_ENABLE = False

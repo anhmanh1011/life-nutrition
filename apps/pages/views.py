@@ -62,7 +62,3 @@ def news(request):
             "topics": Topic.choices,
         },
     )
-
-
-def contact(request):
-    return render(request, "pages/contact.html")
