@@ -1,5 +1,85 @@
 # Progress
 
+## 2026-08-25 — Django CMS + lead backend: design and plan (branch `feat/django-admin-cms`)
+
+**Nothing is implemented yet.** This branch contains two documents and no code. The site on `main`
+is unchanged — still eight static HTML pages.
+
+### Why the static constraint is being reversed
+
+Two problems that have no static answer:
+
+1. Staff cannot change a hotline number or publish an article without editing HTML.
+2. Both forms post to `action="#"`. Every dealer signup submitted so far was silently discarded.
+
+Fixing (2) requires a server, which removes the main argument for staying static, so (1) gets
+fixed in the same move. Django SSR was chosen over Next.js and over a static-export pipeline:
+one deploy, no bundler, no React, and the existing markup survives nearly verbatim.
+
+### What was decided
+
+`docs/superpowers/specs/2026-08-25-django-admin-cms-design.md` (committed, `f3c7c59` + `6a1ce86`)
+is authoritative. In short:
+
+- Eight pages render from Postgres through Django templates. `assets/` keeps its name and becomes
+  `STATIC_URL`, so `url()` references inside `styles.css` keep resolving untouched.
+- Nav and footer collapse into one `base.html` — the "duplicate across 8 files" rule dies here.
+- Content models: `SiteSettings` (singleton), `Brand`, `Category`, `Product` (17 SKUs), `Article`.
+- Every `[bracket]` placeholder becomes a `SiteSettings` field rather than disappearing.
+- Two lead tables, both notifying a Telegram channel after the row is committed.
+- Admin is Vietnamese end to end and treated as a product surface, since staff are non-technical.
+  Two roles: **Quản trị** (full) and **Biên tập** (content only, no customer data).
+
+The one decision that shaped everything else: **the phone number is the success condition.** The
+dealer form is therefore split in two — name and phone are banked on the first POST, qualification
+questions come after. A visitor who abandons halfway is still a reachable lead. This costs extra
+views, extra tests and a UUID4 completion token; it was chosen deliberately over the cheaper
+one-step form and should not be "simplified" back.
+
+### What was written
+
+`docs/superpowers/plans/2026-08-25-django-admin-cms.md` — **Tasks 1–26 of 28**, about 7,300 lines,
+TDD throughout with real code and expected command output in every step.
+
+| Phase | Tasks | Written? |
+|---|---|---|
+| 0 — Foundation | 1–3 | yes |
+| 1 — Data layer | 4–8 | yes |
+| 2 — Templates | 9–17 | yes |
+| 3 — Leads | 18–23 | yes |
+| 4 — Admin | 24–26 | yes |
+| 5 — Deploy + docs | 27–28 | **no** |
+
+Reading the real markup turned up seven data-model gaps the spec did not cover (for example
+`Category` needs two labels — the filter pill says `Bánh mì & bánh ngọt`, the card kicker says
+`Bánh`). All seven are listed in one block at the top of the plan. Two of them are not yet written
+back into the spec.
+
+### Where it stopped
+
+Work was halted during Task 27. Outstanding, in order:
+
+- **Task 27** — Dockerfile, compose, nginx, gunicorn, `.env` template, backups. Docker is not
+  installed on this machine, so this task is unverifiable locally by construction. It also owes
+  two things earlier tasks already promised: nginx serving `/media/` (without it every product
+  image 404s in production) and running `setup_groups` on deploy.
+- **Task 28** — rewrite `PROJECT.md`, refresh `TODO.md` / `README.md`, push the two deviations
+  back into the spec.
+- **The plan's self-review** — spec coverage, placeholder scan, and a check that identifier names
+  match between the task that defines them and the task that calls them.
+
+Details are in the *Status* block at the top of the plan file.
+
+### Environment facts verified before planning
+
+| Fact | Value | Consequence |
+|---|---|---|
+| Python | 3.14.5 (Homebrew) | Django 5.2 does not support 3.14 — plan pins **Django 6.0.8** |
+| PostgreSQL | 17.11 (Homebrew) | dev and tests use real Postgres, not SQLite |
+| Node | v22.22.0 | `tools/check.mjs` survives; Task 12 repoints it at Django |
+| Docker | not installed | Phase 5 cannot be verified here |
+| Pillow | installs fine in a venv | `PROJECT.md`'s "no Pillow" note is about *system* Python only |
+
 ## 2026-08-25 — Initial build
 
 ### Conversion from Claude Design

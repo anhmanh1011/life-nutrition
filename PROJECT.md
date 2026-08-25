@@ -5,6 +5,17 @@ Dali Foods Group (Daliyuan 达利园, Copico 可比克, Haochidian 好吃点, He
 Hi-Tiger 乐虎, Doubendou 豆本豆). Audience: Vietnamese B2B dealers and B2C retail buyers,
 overwhelmingly on phones.
 
+> **Status note (2026-08-25, branch `feat/django-admin-cms`).** The first two hard constraints
+> below are being deliberately reversed. The approved design at
+> `docs/superpowers/specs/2026-08-25-django-admin-cms-design.md` turns this into a Django site
+> rendering from Postgres, with one shared `base.html` — so "no framework" and "duplicate nav and
+> footer across 8 files" will both become false. **No code has been written yet**, so everything
+> here still describes the repository as it actually is. This file gets rewritten by Task 28 of
+> `docs/superpowers/plans/2026-08-25-django-admin-cms.md`, which is not done.
+>
+> Unaffected by any of that, and still true: the inline-`style` specificity trap, the image budget
+> and `sips` recipe, the mobile nav layout budgets, and the note about the 1DevTool browser MCP.
+
 ## Hard constraints
 
 - **No build step, no framework, no bundler, no template runtime.** Eight standalone HTML pages

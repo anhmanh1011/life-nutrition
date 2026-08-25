@@ -61,6 +61,33 @@ node tools/check.mjs
 
 Validates all 8 pages at desktop and mobile widths: broken images, missing `alt`, horizontal
 overflow, heading structure, console errors, product filters, and the mobile nav. Exits
-non-zero on failure. Requires Node 18+ and Google Chrome.
+non-zero on failure.
 
-See [`PROJECT.md`](PROJECT.md) for the constraints and gotchas behind these choices.
+Requirements: **Node 18+** and **Google Chrome**. No `npm install` — both scripts use only Node
+builtins, which is why there is no `package.json`.
+
+Chrome is looked up at the macOS default path. On Linux or Windows, point `CHROME` at your
+binary:
+
+```bash
+CHROME=/usr/bin/google-chrome node tools/check.mjs        # Linux
+CHROME="/c/Program Files/Google/Chrome/Application/chrome.exe" node tools/check.mjs
+```
+
+`tools/shot.mjs` reads the same variable.
+
+## Docs
+
+| File | What it is |
+|---|---|
+| [`PROJECT.md`](PROJECT.md) | Constraints and gotchas behind these choices — read before editing CSS |
+| [`TODO.md`](TODO.md) | What blocks launch, chiefly the `[bracket]` business data |
+| [`PROGRESS.md`](PROGRESS.md) | What has been built and decided, newest first |
+| `docs/superpowers/specs/` | Approved designs |
+| `docs/superpowers/plans/` | Implementation plans derived from those designs |
+
+**In progress on branch `feat/django-admin-cms`:** a Django rewrite that renders these eight pages
+from Postgres, adds a Vietnamese admin, and captures form submissions to a Telegram channel. The
+design is approved and the plan is 26 of 28 tasks written; **no code exists yet**. See the *Status*
+block at the top of `docs/superpowers/plans/2026-08-25-django-admin-cms.md`. Until that lands, the
+instructions on this page are complete and correct — there is still nothing to install.
