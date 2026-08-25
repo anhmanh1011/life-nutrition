@@ -8433,7 +8433,7 @@ in the new documents is checked against the repository with `grep` before the co
 
 ---
 
-- [ ] **Step 1: Rewrite `PROJECT.md`**
+- [x] **Step 1: Rewrite `PROJECT.md`**
 
 Replace the whole file. The status note at the top goes away with it — it existed to say "none of
 this is built yet", and by the time this task runs that is no longer true.
@@ -8613,7 +8613,7 @@ labels sit in frame across the whole set rather than tuned per image.
   them will race on the migration lock.
 ````
 
-- [ ] **Step 2: Rewrite `TODO.md`**
+- [x] **Step 2: Rewrite `TODO.md`**
 
 The spec predicted this file's change of character: the `[bracket]` inventory "stops being an
 editing checklist and becomes the list of admin fields awaiting client data." Two consequences —
@@ -8723,7 +8723,7 @@ Already in place: `lang="vi"` and a unique `<meta name="description">` per page.
 See [`PROGRESS.md`](PROGRESS.md).
 ````
 
-- [ ] **Step 3: Rewrite `README.md`**
+- [x] **Step 3: Rewrite `README.md`**
 
 `README.md` is the only one of these files a newcomer reads first, so it answers exactly one
 question — how do I run this — and links out for everything else.
@@ -8824,7 +8824,7 @@ product_image/       camera originals — gitignored, 110 MB
 | `docs/superpowers/plans/` | Implementation plans derived from those designs |
 ````
 
-- [ ] **Step 4: Update `PROGRESS.md`**
+- [x] **Step 4: Update `PROGRESS.md`**
 
 Replace only the top section — the one headed
 `## 2026-08-25 — Django CMS + lead backend: design and plan (branch feat/django-admin-cms)`. Its
@@ -8904,7 +8904,7 @@ live in `.venv/Scripts/` and Postgres is started by its service, not by `brew`. 
 are unaffected — Django 6.0.8 supports 3.13 as well as 3.14.
 ````
 
-- [ ] **Step 5: Write the outstanding deviations back into the spec**
+- [x] **Step 5: Write the outstanding deviations back into the spec**
 
 Three edits to `docs/superpowers/specs/2026-08-25-django-admin-cms-design.md`. The plan's Deviations
 block says which; these are the ones never carried across.
@@ -8994,7 +8994,7 @@ here:
    portable PostgreSQL 17, which is why the venv binaries are under `.venv/Scripts/` and the
    Dockerfile pins `python:3.13.14-slim` rather than the 3.14.5 this plan's snippet carried.
 
-- [ ] **Step 6: Check every factual claim against the repository**
+- [x] **Step 6: Check every factual claim against the repository**
 
 Documentation drifts because nobody checks it. These greps take a minute and catch the specific
 lies these four files are most likely to tell.
@@ -9029,7 +9029,7 @@ present; and the last grep returning **exactly one hit, `PROJECT.md:12`** — th
 quotes `"no build step, no framework"` in order to mark it stale. Any other hit is a document this
 task missed.
 
-- [ ] **Step 7: Run both suites one final time**
+- [x] **Step 7: Run both suites one final time**
 
 Documentation edits cannot break code, but this is the last checkpoint in the plan and the point of
 a final run is to record a known-good state rather than to discover a surprise.
@@ -9041,7 +9041,7 @@ node tools/check.mjs
 
 Expected: all tests pass; `check.mjs` exits 0.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 Docs and spec go in separate commits — the spec is a record of an approved design, and mixing its
 corrections into a docs sweep makes them invisible in `git log`.
