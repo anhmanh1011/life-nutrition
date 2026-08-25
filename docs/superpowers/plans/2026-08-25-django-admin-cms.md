@@ -5990,7 +5990,7 @@ reader has no way to evaluate.
 - Create: `apps/siteinfo/admin.py`, `apps/catalog/admin.py`, `apps/news/admin.py`, `tests/test_admin_content.py`
 - Modify: `config/urls.py`, `apps/siteinfo/apps.py`, `apps/catalog/apps.py`, `apps/news/apps.py`, `apps/leads/apps.py`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `tests/test_admin_content.py`:
 
@@ -6153,12 +6153,12 @@ def test_a_cover_image_with_alt_text_is_accepted():
 `admin_client` is a pytest-django fixture: a `Client` already logged in as a superuser. It is
 what makes these tests short enough to be worth having.
 
-- [ ] **Step 2: Run to verify they fail**
+- [x] **Step 2: Run to verify they fail**
 
 Run: `.venv/bin/pytest tests/test_admin_content.py -v`
 Expected: FAIL at import — `ModuleNotFoundError: No module named 'apps.catalog.admin'`.
 
-- [ ] **Step 3: Write `apps/siteinfo/admin.py`**
+- [x] **Step 3: Write `apps/siteinfo/admin.py`**
 
 ```python
 from django.contrib import admin
@@ -6244,7 +6244,7 @@ The `delete()` override written in Task 4 already refuses at the model level. `h
 is the other half: without it the admin still renders a *Xoá* button that appears to work and then
 silently does nothing, which is worse than not offering it.
 
-- [ ] **Step 4: Write `apps/catalog/admin.py`**
+- [x] **Step 4: Write `apps/catalog/admin.py`**
 
 ```python
 from django.contrib import admin
@@ -6363,7 +6363,7 @@ in `ProductAdmin` the first column is `thumbnail`, which is not a link at all.
 the default, and that is the point: the empty dict plus its comment is what stops a later reader
 from "fixing" the inconsistency with the other two admins. The test in Step 1 guards it.
 
-- [ ] **Step 5: Write `apps/news/admin.py`**
+- [x] **Step 5: Write `apps/news/admin.py`**
 
 ```python
 from django import forms
@@ -6435,7 +6435,7 @@ editor uploading one cover in a hurry turns the regression harness red on a page
 `Article.get_absolute_url()` already exists from Task 7, so Django adds a *Xem trên trang* link to
 the change form for free. No `view_on_site` configuration is needed.
 
-- [ ] **Step 6: Name the admin in `config/urls.py`**
+- [x] **Step 6: Name the admin in `config/urls.py`**
 
 The default header reads *Django administration*. Add three lines below the imports:
 
@@ -6504,7 +6504,7 @@ class LeadsConfig(AppConfig):
 The leads heading stays invisible until Task 25 registers its admins — set it now anyway, so that
 task only has to add `admin.py` and the whole index is already in Vietnamese when it lands.
 
-- [ ] **Step 7: Run the tests to verify they pass**
+- [x] **Step 7: Run the tests to verify they pass**
 
 Run: `.venv/bin/pytest tests/test_admin_content.py -v`
 Expected: `11 passed`
@@ -6514,14 +6514,14 @@ before touching anything: it is telling you either that a field was added to the
 home in the admin, or that a field name in `fieldsets` is misspelled. Both are real bugs, and the
 second one would otherwise surface as a 500 the first time a staff member opens the page.
 
-- [ ] **Step 8: Run the whole suite**
+- [x] **Step 8: Run the whole suite**
 
 Nothing here changes runtime behaviour of the public site, so this should be clean.
 
 Run: `.venv/bin/pytest -q`
 Expected: all tests pass, no errors.
 
-- [ ] **Step 9: Look at the screens**
+- [x] **Step 9: Look at the screens**
 
 Structural tests do not tell you whether a screen is usable, which is the entire point of this
 phase. Open them.
@@ -6547,7 +6547,7 @@ broken in production unless nginx serves `/media/` — Task 27 covers that.
 
 Stop the server with Ctrl-C.
 
-- [ ] **Step 10: Commit**
+- [x] **Step 10: Commit**
 
 ```bash
 git add apps/siteinfo/admin.py apps/catalog/admin.py apps/news/admin.py \
