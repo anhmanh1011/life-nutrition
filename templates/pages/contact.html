@@ -1,7 +1,92 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}Liên hệ — Dali Foods Việt Nam{% endblock %}
+{% block title %}Liên hệ — Life Nutrition, nhà phân phối Dali Foods Việt Nam{% endblock %}
+{% block description %}Liên hệ Life Nutrition: hotline sỉ dành cho đại lý, hotline lẻ và Zalo OA cho khách mua lẻ sản phẩm Dali Foods chính hãng. Phản hồi trong 24 giờ làm việc.{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* Page-local: an inline grid-template-columns would out-specify the shared
+     .grid-stack rule, so the two-column split lives in a class instead. */
+  .contact-layout { grid-template-columns: 1.05fr 0.95fr; gap: 40px; align-items: start; }
+  @media (max-width: 900px) { .contact-layout { grid-template-columns: 1fr; gap: 28px; } }
+  /* Narrow phones: let the segmented control wrap instead of overflowing the card. */
+  @media (max-width: 420px) { .seg { max-width: 100%; flex-wrap: wrap; border-radius: var(--radius-md); } }
+</style>
+{% endblock %}
 
 {% block content %}
-<section class="section"><h1>Liên hệ</h1></section>
+<section class="section" style="padding-block: 52px 12px;">
+  <p class="eyebrow">Liên hệ</p>
+  <h1 style="font-size: 46px; line-height: 1.1; margin: 0 0 16px;">Nói chuyện với Life Nutrition</h1>
+  <p style="margin: 0; font-size: 15.5px; line-height: 1.65; max-width: 60ch; color: color-mix(in srgb, var(--color-text) 75%, transparent);">Đại lý gọi hotline sỉ để nhận bảng giá trong ngày; khách lẻ hỏi điểm bán và hàng chính hãng qua hotline lẻ hoặc Zalo OA.</p>
+</section>
+
+<div class="section grid grid-stack contact-layout" style="padding-block: 24px 0;">
+  <div style="display: flex; flex-direction: column; gap: 20px;">
+    <div class="grid grid-2 grid-stack" style="gap: 20px;">
+      <div class="card" style="display: flex; flex-direction: column; gap: 8px;">
+        <span style="width: 42px; height: 42px; border-radius: 50%; background: var(--color-accent-100); color: var(--color-accent-700); display: grid; place-content: center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/></svg></span>
+        <p style="margin: 0; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: color-mix(in srgb, var(--color-text) 55%, transparent);">Hotline sỉ / đại lý</p>
+        <p style="margin: 0; font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: 21px; color: var(--color-accent-700);">{{ site.hotline_wholesale }}</p>
+      </div>
+      <div class="card" style="display: flex; flex-direction: column; gap: 8px;">
+        <span style="width: 42px; height: 42px; border-radius: 50%; background: var(--color-accent-2-100); color: var(--color-accent-2-700); display: grid; place-content: center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/></svg></span>
+        <p style="margin: 0; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: color-mix(in srgb, var(--color-text) 55%, transparent);">Hotline khách lẻ</p>
+        <p style="margin: 0; font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: 21px; color: var(--color-accent-2-700);">{{ site.hotline_retail }}</p>
+      </div>
+      <div class="card" style="display: flex; flex-direction: column; gap: 8px;">
+        <span style="width: 42px; height: 42px; border-radius: 50%; background: var(--color-accent-100); color: var(--color-accent-700); display: grid; place-content: center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></span>
+        <p style="margin: 0; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: color-mix(in srgb, var(--color-text) 55%, transparent);">Email</p>
+        <p style="margin: 0; font-weight: 700; font-size: 15.5px;">{{ site.email }}</p>
+      </div>
+      <div class="card" style="display: flex; flex-direction: column; gap: 8px;">
+        <span style="width: 42px; height: 42px; border-radius: 50%; background: var(--color-accent-2-100); color: var(--color-accent-2-700); display: grid; place-content: center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/><path d="M8 12h.01"/><path d="M12 12h.01"/><path d="M16 12h.01"/></svg></span>
+        <p style="margin: 0; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: color-mix(in srgb, var(--color-text) 55%, transparent);">Zalo OA</p>
+        <p style="margin: 0; font-weight: 700; font-size: 15.5px;">{{ site.zalo_oa }} — phản hồi trong giờ làm việc</p>
+      </div>
+    </div>
+    <div style="background: var(--color-accent-2-100); border-radius: calc(2 * var(--radius-lg)); min-height: 300px; display: grid; place-content: center; text-align: center; padding: 32px;">
+      <span style="width: 54px; height: 54px; border-radius: 50%; background: var(--color-accent-2); color: var(--color-neutral-100); display: grid; place-content: center; margin: 0 auto 14px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg></span>
+      <p style="margin: 0 0 6px; font-weight: 800; font-size: 16px;">Bản đồ Google Maps</p>
+      <p style="margin: 0; font-size: 13.5px; line-height: 1.6; color: color-mix(in srgb, var(--color-text) 65%, transparent); max-width: 40ch;">[Nhúng bản đồ trụ sở &amp; kho hàng — địa chỉ: {{ site.head_office_address }}]</p>
+    </div>
+    <div class="card" style="display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap;">
+      <div>
+        <p style="margin: 0 0 4px; font-weight: 800; font-size: 15px;">Giờ làm việc</p>
+        <p style="margin: 0; font-size: 13.5px; color: color-mix(in srgb, var(--color-text) 65%, transparent);">Thứ 2 – Thứ 7 · 8:00 – 17:30 (nghỉ CN &amp; lễ)</p>
+      </div>
+      <div style="display: flex; gap: 14px; font-size: 13.5px; font-weight: 700;">
+        <a href="#">Shopee Mall</a>
+        <a href="#">LazMall</a>
+        <a href="#">TikTok Shop</a>
+      </div>
+    </div>
+  </div>
+
+  <aside style="position: sticky; top: 88px;">
+    <!-- Gửi lời nhắn — endpoint chưa có backend; action="#" là placeholder, thay bằng URL xử lý lead khi triển khai. -->
+    <form class="card elev-md" action="#" method="post" style="padding: 28px 28px 26px; display: flex; flex-direction: column; gap: 16px;">
+      <div>
+        <h2 style="font-size: 24px; margin: 0 0 6px;">Gửi lời nhắn</h2>
+        <p style="margin: 0; font-size: 13px; color: color-mix(in srgb, var(--color-text) 62%, transparent);">Chúng tôi phản hồi qua điện thoại / Zalo trong 24 giờ làm việc.</p>
+      </div>
+      <div class="field"><label id="cd-label">Bạn cần hỗ trợ về</label>
+        <div class="seg" role="radiogroup" aria-labelledby="cd-label">
+          <label class="seg-opt" for="chude-baogia"><input type="radio" id="chude-baogia" name="chude" value="Báo giá sỉ" checked>Báo giá sỉ</label>
+          <label class="seg-opt" for="chude-chinhhang"><input type="radio" id="chude-chinhhang" name="chude" value="Hàng chính hãng">Hàng chính hãng</label>
+          <label class="seg-opt" for="chude-khac"><input type="radio" id="chude-khac" name="chude" value="Khác">Khác</label>
+        </div>
+      </div>
+      <div class="field"><label for="lh-ten">Họ và tên *</label><input class="input" id="lh-ten" name="hoten" type="text" autocomplete="name" placeholder="Nguyễn Văn A" required></div>
+      <div class="grid grid-2" style="gap: 12px;">
+        <div class="field"><label for="lh-sdt">Số điện thoại *</label><input class="input" id="lh-sdt" name="sdt" type="tel" autocomplete="tel" placeholder="09xx xxx xxx" required></div>
+        <div class="field"><label for="lh-zalo">Zalo</label><input class="input" id="lh-zalo" name="zalo" type="tel" placeholder="Số Zalo"></div>
+      </div>
+      <div class="field"><label for="lh-msg">Nội dung</label><textarea class="input" id="lh-msg" name="noidung" rows="4" placeholder="VD: Cần bảng giá sỉ thùng trà trái cây Daliyuan giao về Cần Thơ…"></textarea></div>
+      <button class="btn btn-primary btn-block" type="submit">Gửi lời nhắn</button>
+      <p style="margin: 0; font-size: 11.5px; line-height: 1.55; color: color-mix(in srgb, var(--color-text) 52%, transparent);">Form thật sẽ có reCAPTCHA chống spam và thông báo lead qua email + Zalo.</p>
+    </form>
+  </aside>
+</div>
 {% endblock %}
