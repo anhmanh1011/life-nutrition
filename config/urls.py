@@ -5,6 +5,10 @@ from django.urls import include, path
 
 from apps.news import views as news_views
 
+admin.site.site_header = "Dali Foods Việt Nam"
+admin.site.site_title = "Quản trị dalifoods.vn"
+admin.site.index_title = "Chọn phần nội dung cần sửa"
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("tinymce/", include("tinymce.urls")),
