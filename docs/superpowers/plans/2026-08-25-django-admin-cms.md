@@ -7447,7 +7447,7 @@ run there is the baseline these two changes are compared against.
 
 ---
 
-- [ ] **Step 1: Real client IP behind the proxy — write the failing test**
+- [x] **Step 1: Real client IP behind the proxy — write the failing test**
 
 `tests/test_real_ip.py`:
 
@@ -7494,13 +7494,13 @@ back to the socket address rather than become a cache key — otherwise a header
 request that sends it a shared, empty-keyed bucket, which is the same collapse this middleware
 exists to fix.
 
-- [ ] **Step 2: Run it to verify it fails**
+- [x] **Step 2: Run it to verify it fails**
 
 Run: `.venv/bin/pytest tests/test_real_ip.py -v`
 Expected: collection fails with
 `ImportError: cannot import name 'RealIPMiddleware' from 'apps.leads.middleware'`.
 
-- [ ] **Step 3: Add `RealIPMiddleware`**
+- [x] **Step 3: Add `RealIPMiddleware`**
 
 Append to `apps/leads/middleware.py`, below `AttributionMiddleware`:
 
@@ -7546,7 +7546,7 @@ the corrected value. Putting it last would leave the rate limiters reading the c
 `ipaddress.ip_address` accepts IPv6, which is what you want: a Vietnamese mobile network handing out
 IPv6 should still get its own bucket rather than falling back to a shared one.
 
-- [ ] **Step 4: Run it to verify it passes**
+- [x] **Step 4: Run it to verify it passes**
 
 Run: `.venv/bin/pytest tests/test_real_ip.py -v`
 Expected: `7 passed`
@@ -7556,7 +7556,7 @@ Then the whole suite, because a new middleware runs on every request in every te
 Run: `.venv/bin/pytest -q`
 Expected: all tests pass, no errors.
 
-- [ ] **Step 5: Give production a shared cache**
+- [x] **Step 5: Give production a shared cache**
 
 Append to `config/settings/production.py`:
 
@@ -7576,7 +7576,7 @@ CACHES = {
 `django_cache` is a table name, not a path. `createcachetable` creates it and the entrypoint runs
 that on every start.
 
-- [ ] **Step 6: Verify the production settings locally**
+- [x] **Step 6: Verify the production settings locally**
 
 This one **does** run on this machine, and it is the single most useful check in the task — it reads
 the same settings module gunicorn will import.
@@ -7594,7 +7594,7 @@ security flags, and `DJANGO_ALLOWED_HOSTS` is non-empty there. If you see `secur
 
 `check --deploy` does not open a database connection, so it works with Postgres stopped.
 
-- [ ] **Step 7: Commit the two corrections**
+- [x] **Step 7: Commit the two corrections**
 
 They are application behaviour and belong in their own commit, separate from the deploy files.
 
@@ -7604,7 +7604,7 @@ git add apps/leads/middleware.py config/settings/base.py config/settings/product
 git commit -m "Make rate limiting see the visitor's IP and share one counter"
 ```
 
-- [ ] **Step 8: Write `deploy/gunicorn.conf.py`**
+- [x] **Step 8: Write `deploy/gunicorn.conf.py`**
 
 ```python
 import os
@@ -7649,7 +7649,7 @@ redirect loop, and it is the most common way this stack fails on its first deplo
 is acceptable rather than reckless is in the comment: `docker-compose.yml` never publishes port
 8000, so nothing outside the compose network can speak to gunicorn at all.
 
-- [ ] **Step 9: Write `deploy/healthcheck.py`**
+- [x] **Step 9: Write `deploy/healthcheck.py`**
 
 ```python
 """Container healthcheck: can Django actually render the home page?
@@ -7686,7 +7686,7 @@ The home page is the right target precisely because it is expensive: it reads `S
 product counts and the three most recent articles. A healthcheck against a static `/ping` would stay
 green with Postgres on fire.
 
-- [ ] **Step 10: Write `deploy/entrypoint.sh`**
+- [x] **Step 10: Write `deploy/entrypoint.sh`**
 
 ```sh
 #!/bin/sh
@@ -7729,7 +7729,7 @@ file runs exactly one `web` container. If a second is ever added, two of them wi
 migration lock; move `migrate` out to `docker compose run --rm web python manage.py migrate` at that
 point, and not before.
 
-- [ ] **Step 11: Check both shell scripts parse**
+- [x] **Step 11: Check both shell scripts parse**
 
 `deploy/backup.sh` does not exist yet, so this runs after Step 14. Doing it now and again later
 costs nothing — this is the second of the three checks that run on **this** machine.
@@ -7753,14 +7753,14 @@ once, in `.gitattributes`:
 deploy/entrypoint.sh text eol=lf
 ```
 
-- [ ] **Step 12: Write `Dockerfile`**
+- [x] **Step 12: Write `Dockerfile`**
 
 ```dockerfile
-# The dev machine runs Python 3.14.5; the image pins the same patch so a wheel that
+# The dev machine runs Python 3.13.14; the image pins the same patch so a wheel that
 # resolves locally resolves here. If `docker build` reports "manifest unknown", that
 # patch is not published as an image tag — check hub.docker.com/_/python and take the
-# nearest 3.14.x rather than floating to 3.14-slim.
-FROM python:3.14.5-slim AS builder
+# nearest 3.13.x rather than floating to 3.13-slim.
+FROM python:3.13.14-slim AS builder
 
 ENV PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1
@@ -7775,7 +7775,7 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 
-FROM python:3.14.5-slim AS runtime
+FROM python:3.13.14-slim AS runtime
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
@@ -7827,7 +7827,7 @@ first admin image upload fails with `PermissionError` — after the form has alr
 **`collectstatic` at build, not only at start.** Building it in means a missing asset breaks the
 build rather than the first request. Step 10 explains why it also runs at start.
 
-- [ ] **Step 13: Write `.dockerignore`**
+- [x] **Step 13: Write `.dockerignore`**
 
 ```
 .git
@@ -7861,7 +7861,7 @@ Dockerfile
 image is the fastest way to tell whether a failure on the VPS is the code or the environment.
 `assets/` is likewise not ignored, and must not be — it is the input `collectstatic` reads.
 
-- [ ] **Step 14: Write `deploy/nginx/dalifoods.conf`**
+- [x] **Step 14: Write `deploy/nginx/dalifoods.conf`**
 
 ```nginx
 upstream django {
@@ -7979,7 +7979,7 @@ Note also that `add_header` inside a `location` block **discards** headers inher
 — which is exactly why the HSTS header must not live in nginx at all here: the four `expires` blocks
 would each silently drop it while `location /` kept it.
 
-- [ ] **Step 15: Write `docker-compose.yml`**
+- [x] **Step 15: Write `docker-compose.yml`**
 
 ```yaml
 services:
@@ -8072,7 +8072,7 @@ need a change to a file in git.
 would exit immediately, and `restart` policies would either loop it or leave a permanently unhealthy
 service in `docker compose ps`. Neither is a useful signal.
 
-- [ ] **Step 16: Write `deploy/.env.production.example`**
+- [x] **Step 16: Write `deploy/.env.production.example`**
 
 Committed as documentation, alongside the development `.env.example` from Task 1. It is copied to
 `.env` **in the repository root** on the server — the same filename development uses, because that
@@ -8111,7 +8111,7 @@ Postgres variables, and a second copy here would be the thing that goes stale af
 rotation — with a symptom (`authentication failed`) that points at Postgres rather than at the file
 that is wrong.
 
-- [ ] **Step 17: Write `deploy/backup.sh`**
+- [x] **Step 17: Write `deploy/backup.sh`**
 
 ```sh
 #!/bin/sh
@@ -8169,7 +8169,7 @@ snapshot; a failed disk takes both. Copying `$BACKUP_DIR` off the box — `rclon
 store — is the step that makes it real, and it is deliberately not written here because the
 destination is the client's decision. `TODO.md` records it as outstanding in Task 28.
 
-- [ ] **Step 18: Re-run the shell syntax check**
+- [x] **Step 18: Re-run the shell syntax check**
 
 Also on this machine:
 
@@ -8180,7 +8180,7 @@ sh -n deploy/entrypoint.sh && sh -n deploy/backup.sh && echo "both ok"
 
 Expected: `both ok`
 
-- [ ] **Step 19: Cross-check the paths by hand**
+- [x] **Step 19: Cross-check the paths by hand**
 
 The third and last check that runs here. Every path in this task appears in at least two files, and
 a mismatch between them fails at runtime as a 404 rather than at build time as an error. Read the
@@ -8209,7 +8209,7 @@ Expected: `STATIC_URL = "/assets/"`, `STATIC_ROOT = BASE_DIR / "staticfiles"`,
 `/assets/`, the `url()` references inside `styles.css` stop resolving and the nginx `location` block
 is aimed at nothing — that is the constraint Task 2 exists to protect.
 
-- [ ] **Step 20: Extend `.gitignore`**
+- [x] **Step 20: Extend `.gitignore`**
 
 The production `.env` is already covered by the `.env` line from Task 1. What is not:
 
@@ -8218,7 +8218,7 @@ The production `.env` is already covered by the `.env` line from Task 1. What is
 /backups/
 ```
 
-- [ ] **Step 21: Commit the deploy files**
+- [x] **Step 21: Commit the deploy files**
 
 ```bash
 git add Dockerfile .dockerignore .gitattributes docker-compose.yml deploy .gitignore
@@ -8239,7 +8239,7 @@ Before anything else, because two of the three are pinned to versions chosen to 
 machine rather than read off a registry:
 
 ```bash
-for tag in python:3.14.5-slim postgres:17-alpine nginx:1.29-alpine; do
+for tag in python:3.13.14-slim postgres:17-alpine nginx:1.29-alpine; do
   docker manifest inspect "$tag" >/dev/null 2>&1 && echo "ok   $tag" || echo "MISSING $tag"
 done
 ```
