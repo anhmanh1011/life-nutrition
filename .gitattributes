@@ -1,0 +1,4 @@
+# A #!/bin/sh script with CRLF endings fails inside the container with the famously
+# unhelpful "exec: no such file or directory".
+*.sh text eol=lf
+deploy/entrypoint.sh text eol=lf
