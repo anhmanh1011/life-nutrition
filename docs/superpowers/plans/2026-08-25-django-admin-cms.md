@@ -194,7 +194,7 @@ Each phase leaves the tree in a working, committable state.
 - Create: `requirements.txt`, `requirements-dev.txt`, `.env.example`
 - Modify: `.gitignore`
 
-- [ ] **Step 1: Create the virtualenv and install**
+- [x] **Step 1: Create the virtualenv and install**
 
 ```bash
 cd /Users/talk_to_hand/Documents/workspace/life-nutrition
@@ -207,7 +207,7 @@ python3 -m venv .venv
 
 Expected: `Successfully installed Django-6.0.8 ...` with no resolver errors.
 
-- [ ] **Step 2: Write `requirements.txt`**
+- [x] **Step 2: Write `requirements.txt`**
 
 ```
 Django==6.0.8
@@ -220,7 +220,7 @@ gunicorn==26.2.0
 django-tinymce==5.0.0
 ```
 
-- [ ] **Step 3: Write `requirements-dev.txt`**
+- [x] **Step 3: Write `requirements-dev.txt`**
 
 ```
 -r requirements.txt
@@ -228,7 +228,7 @@ pytest==9.1.1
 pytest-django==4.14.0
 ```
 
-- [ ] **Step 4: Write `.env.example`**
+- [x] **Step 4: Write `.env.example`**
 
 Committed as documentation. Never contains real values.
 
@@ -247,7 +247,7 @@ TELEGRAM_BOT_TOKEN=
 TELEGRAM_CHAT_ID=
 ```
 
-- [ ] **Step 5: Extend `.gitignore`**
+- [x] **Step 5: Extend `.gitignore`**
 
 Append to the existing file — do not rewrite it, it already ignores `.DS_Store` and `product_image/`.
 
@@ -262,12 +262,12 @@ staticfiles/
 .pytest_cache/
 ```
 
-- [ ] **Step 6: Verify the venv Django is importable**
+- [x] **Step 6: Verify the venv Django is importable**
 
 Run: `.venv/bin/python -c "import django; print(django.get_version())"`
 Expected: `6.0.8`
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add requirements.txt requirements-dev.txt .env.example .gitignore
@@ -282,7 +282,7 @@ git commit -m "Pin the Django dependency set and document required env vars"
 - Create: `manage.py`, `config/__init__.py`, `config/settings/{__init__,base,development,production,test}.py`, `config/urls.py`, `config/wsgi.py`, `apps/__init__.py`
 - Create: `.env` (gitignored)
 
-- [ ] **Step 1: Scaffold the project**
+- [x] **Step 1: Scaffold the project**
 
 `startproject` writes a single `settings.py`; it gets replaced by the package in step 3.
 
@@ -293,7 +293,7 @@ rm config/settings.py config/asgi.py
 mkdir -p config/settings && touch config/settings/__init__.py
 ```
 
-- [ ] **Step 2: Create the local database**
+- [x] **Step 2: Create the local database**
 
 ```bash
 brew services start postgresql@17
@@ -303,7 +303,7 @@ psql -d dalifoods -c "select version();"
 
 Expected: a `PostgreSQL 17.11 ...` row. If `createdb` reports the database already exists, that is fine.
 
-- [ ] **Step 3: Write `config/settings/base.py`**
+- [x] **Step 3: Write `config/settings/base.py`**
 
 ```python
 from pathlib import Path
@@ -423,7 +423,7 @@ LOGGING = {
 }
 ```
 
-- [ ] **Step 4: Write `config/settings/development.py`**
+- [x] **Step 4: Write `config/settings/development.py`**
 
 ```python
 from .base import *  # noqa: F403
@@ -432,7 +432,7 @@ DEBUG = True
 ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 ```
 
-- [ ] **Step 5: Write `config/settings/production.py`**
+- [x] **Step 5: Write `config/settings/production.py`**
 
 ```python
 from .base import *  # noqa: F403
@@ -451,7 +451,7 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 CSRF_TRUSTED_ORIGINS = ["https://dalifoods.vn", "https://www.dalifoods.vn"]
 ```
 
-- [ ] **Step 6: Write `config/settings/test.py`**
+- [x] **Step 6: Write `config/settings/test.py`**
 
 ```python
 from .development import *  # noqa: F403
@@ -471,7 +471,7 @@ TELEGRAM_BOT_TOKEN = "test-token"
 TELEGRAM_CHAT_ID = "-1000000000000"
 ```
 
-- [ ] **Step 7: Point `manage.py` and `config/wsgi.py` at development settings**
+- [x] **Step 7: Point `manage.py` and `config/wsgi.py` at development settings**
 
 In `manage.py`, replace the `os.environ.setdefault` line with:
 
@@ -485,7 +485,7 @@ In `config/wsgi.py`, replace the equivalent line with:
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.production")
 ```
 
-- [ ] **Step 8: Write `config/urls.py`**
+- [x] **Step 8: Write `config/urls.py`**
 
 Only `/admin/` for now; page routes arrive in Phase 2.
 
@@ -503,7 +503,7 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 ```
 
-- [ ] **Step 9: Write the real `.env`**
+- [x] **Step 9: Write the real `.env`**
 
 Generate a key rather than inventing one:
 
@@ -514,7 +514,7 @@ cp .env.example .env
 
 Paste the printed line over the `DJANGO_SECRET_KEY=` line in `.env`. Leave the Telegram values empty for now — Task 21 covers them, and every task before it runs against the test settings, which supply their own.
 
-- [ ] **Step 10: Create the app packages so `INSTALLED_APPS` resolves**
+- [x] **Step 10: Create the app packages so `INSTALLED_APPS` resolves**
 
 ```bash
 for a in common siteinfo catalog news leads pages; do
@@ -534,7 +534,7 @@ class CatalogConfig(AppConfig):
     name = "apps.catalog"
 ```
 
-- [ ] **Step 11: Create the three modules `base.py` imports before they exist**
+- [x] **Step 11: Create the three modules `base.py` imports before they exist**
 
 `apps/siteinfo/context_processors.py`:
 
@@ -556,7 +556,7 @@ class AttributionMiddleware:
 
 Both are filled in later — the context processor in Task 4, the middleware in Task 19. They exist now only so `manage.py check` passes.
 
-- [ ] **Step 12: Verify the project boots**
+- [x] **Step 12: Verify the project boots**
 
 Run: `.venv/bin/python manage.py check`
 Expected: `System check identified no issues (0 silenced).`
@@ -564,7 +564,7 @@ Expected: `System check identified no issues (0 silenced).`
 Run: `.venv/bin/python manage.py migrate`
 Expected: a list of `Applying ...  OK` lines ending with `django.contrib.sessions`.
 
-- [ ] **Step 13: Verify `/admin/` serves**
+- [x] **Step 13: Verify `/admin/` serves**
 
 ```bash
 .venv/bin/python manage.py createsuperuser --username admin --email admin@example.com --noinput
@@ -575,7 +575,7 @@ kill %1
 
 Expected: `200`
 
-- [ ] **Step 14: Commit**
+- [x] **Step 14: Commit**
 
 ```bash
 git add manage.py config apps .env.example
@@ -589,7 +589,7 @@ git commit -m "Scaffold the Django project with split settings"
 **Files:**
 - Create: `pytest.ini`, `tests/__init__.py`, `tests/conftest.py`, `tests/test_smoke.py`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `tests/test_smoke.py`:
 
@@ -604,12 +604,12 @@ def test_admin_login_page_renders(client):
     assert response.status_code == 200
 ```
 
-- [ ] **Step 2: Run it to verify it fails**
+- [x] **Step 2: Run it to verify it fails**
 
 Run: `.venv/bin/pytest tests/test_smoke.py -v`
 Expected: FAIL — `error: could not find a pytest.ini` / `DJANGO_SETTINGS_MODULE` not configured.
 
-- [ ] **Step 3: Write `pytest.ini`**
+- [x] **Step 3: Write `pytest.ini`**
 
 ```ini
 [pytest]
@@ -619,7 +619,7 @@ testpaths = tests
 addopts = --strict-markers -q
 ```
 
-- [ ] **Step 4: Write `tests/conftest.py`**
+- [x] **Step 4: Write `tests/conftest.py`**
 
 `clear_ratelimit_cache` is autouse because django-ratelimit counts in the cache, and a
 counter surviving between tests makes unrelated tests fail once the suite grows.
@@ -638,12 +638,12 @@ def clear_ratelimit_cache():
 
 Create the package marker: `touch tests/__init__.py`
 
-- [ ] **Step 5: Run the test to verify it passes**
+- [x] **Step 5: Run the test to verify it passes**
 
 Run: `.venv/bin/pytest tests/test_smoke.py -v`
 Expected: `1 passed`. pytest-django creates and drops `test_dalifoods` automatically.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add pytest.ini tests requirements-dev.txt
