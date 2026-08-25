@@ -1833,7 +1833,7 @@ context processor from Task 4 already injects as `site`.
 - Create: `templates/base.html`, `templates/pages/_nav.html`, `templates/pages/_footer.html`
 - Create: `tests/test_base_template.py`
 
-- [ ] **Step 1: Write `templates/base.html`**
+- [x] **Step 1: Write `templates/base.html`**
 
 ```django
 {% load static %}<!DOCTYPE html>
@@ -1872,7 +1872,7 @@ context processor from Task 4 already injects as `site`.
 `site.js` stays a plain `<script src>` with no `defer` and no module type — `PROJECT.md`'s
 progressive-enhancement constraint survives the framework change untouched.
 
-- [ ] **Step 2: Write `templates/pages/_nav.html`**
+- [x] **Step 2: Write `templates/pages/_nav.html`**
 
 `aria-current="page"` moves from being hard-coded per file to being derived from
 `request.resolver_match.url_name`, which the `request` context processor makes available.
@@ -1907,7 +1907,7 @@ The `{% load static %}` at the top of `base.html` covers included templates, bec
 without `only` inherits the parent context — but `{% load %}` does **not** propagate into includes.
 Add `{% load static %}` as the first line of `_nav.html` and `_footer.html` too.
 
-- [ ] **Step 3: Write `templates/pages/_footer.html`**
+- [x] **Step 3: Write `templates/pages/_footer.html`**
 
 Every `[bracket]` becomes a `SiteSettings` read. The defaults from Task 4 are the same bracket
 strings, so an unedited database renders byte-identical text to today's markup.
@@ -1957,7 +1957,7 @@ The four policy links and the three marketplace `href`s stay `href="#"`. `TODO.m
 waiting on the client; the URL text is now editable in the admin, but inventing a target would be
 inventing business data.
 
-- [ ] **Step 4: Write the test**
+- [x] **Step 4: Write the test**
 
 This test cannot run until Task 10 defines the views and Task 11 wires the URLs. Write it now,
 watch it fail, and let Tasks 10–11 turn it green — that is the point of the ordering.
@@ -2007,12 +2007,12 @@ def test_current_page_is_marked_for_screen_readers(client):
     assert '<a href="/san-pham/" aria-current="page">Sản phẩm</a>' in body
 ```
 
-- [ ] **Step 5: Run to verify it fails**
+- [x] **Step 5: Run to verify it fails**
 
 Run: `.venv/bin/pytest tests/test_base_template.py -v`
 Expected: FAIL — `NoReverseMatch: 'pages' is not a registered namespace`.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add templates/base.html templates/pages/_nav.html templates/pages/_footer.html tests/test_base_template.py
@@ -2029,7 +2029,7 @@ one with real query logic, because its filter pills must not offer a brand that 
 **Files:**
 - Create: `apps/pages/views.py`, `tests/test_pages_views.py`
 
-- [ ] **Step 1: Write `apps/pages/views.py`**
+- [x] **Step 1: Write `apps/pages/views.py`**
 
 ```python
 from django.shortcuts import render
@@ -2097,7 +2097,7 @@ nothing written before then has to be touched.
 Task 6. Do not add `select_related` here or chain `.active()` in front of
 `with_active_products()`; that is a second identical filter, not a safety net.
 
-- [ ] **Step 2: Write the test**
+- [x] **Step 2: Write the test**
 
 `tests/test_pages_views.py`:
 
@@ -2156,12 +2156,12 @@ def test_draft_articles_stay_off_the_news_page(client, seeded):
     assert article not in context["articles"]
 ```
 
-- [ ] **Step 3: Run to verify it fails**
+- [x] **Step 3: Run to verify it fails**
 
 Run: `.venv/bin/pytest tests/test_pages_views.py -v`
 Expected: FAIL — `NoReverseMatch`. The URLs arrive in Task 11.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add apps/pages/views.py tests/test_pages_views.py
@@ -2179,7 +2179,7 @@ near-empty stubs that only extend `base.html`; Tasks 13–17 fill them in one at
 - Create: `apps/pages/urls.py`, `templates/pages/{home,about,brands,products,dealer,authentic,news,contact}.html`
 - Modify: `config/urls.py`
 
-- [ ] **Step 1: Write `apps/pages/urls.py`**
+- [x] **Step 1: Write `apps/pages/urls.py`**
 
 ```python
 from django.urls import path
@@ -2200,7 +2200,7 @@ urlpatterns = [
 ]
 ```
 
-- [ ] **Step 2: Modify `config/urls.py`**
+- [x] **Step 2: Modify `config/urls.py`**
 
 Replace the file written in Task 2 Step 8 with:
 
@@ -2223,7 +2223,7 @@ if settings.DEBUG:
 `apps.pages.urls` is included **last** because its first pattern is `""`, which would otherwise
 be reached before `/admin/`. Article detail is added in Task 15 and the lead endpoints in Tasks 22 and 23.
 
-- [ ] **Step 3: Create the eight stub templates**
+- [x] **Step 3: Create the eight stub templates**
 
 Each of the eight files gets exactly this, with `{{ NAME }}` replaced by the page's Vietnamese
 title from the table below:
@@ -2252,12 +2252,12 @@ title from the table below:
 These are deliberately ugly. They exist so that routing, the base template and the views can be
 verified independently of the 200-line page bodies that replace them in Tasks 13–17.
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 Run: `.venv/bin/pytest tests/test_base_template.py tests/test_pages_views.py -v`
 Expected: `17 passed`
 
-- [ ] **Step 5: Verify the site actually serves**
+- [x] **Step 5: Verify the site actually serves**
 
 ```bash
 .venv/bin/python manage.py seed_content
@@ -2273,7 +2273,7 @@ kill %1
 Expected: eight `200` lines, then `styles.css 200`. A `404` on `styles.css` means
 `STATICFILES_DIRS` is wrong — fix it here, not in Task 12.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add apps/pages/urls.py config/urls.py templates/pages
@@ -2296,7 +2296,7 @@ typo in a URL name would report `ok`.
 **Files:**
 - Modify: `tools/check.mjs`
 
-- [ ] **Step 1: Replace the header comment and constants (lines 1–28)**
+- [x] **Step 1: Replace the header comment and constants (lines 1–28)**
 
 ```js
 // Headless-Chrome regression suite for the Django site.
@@ -2339,7 +2339,7 @@ The six `FILTER_CASES` numbers are unchanged on purpose. They encode the seed da
 `quy` is 5 SKUs, `quy ∩ Daliyuan` is 1, `uong ∩ Daliyuan` is 2, 17 in total. If `seed_content`
 ever drifts from the original markup, this block is what catches it.
 
-- [ ] **Step 2: Replace the server spawn (lines 46–50)**
+- [x] **Step 2: Replace the server spawn (lines 46–50)**
 
 ```js
 let server = null;
@@ -2353,7 +2353,7 @@ if (!(await portOpen(PORT_HTTP))) {
 `--noreload` matters: without it `runserver` forks a reloader child that survives `server.kill()`
 and leaves port 8000 held, so the next run silently tests a stale process.
 
-- [ ] **Step 3: Make `goto` fail loudly on a non-200 (replace lines 91–95)**
+- [x] **Step 3: Make `goto` fail loudly on a non-200 (replace lines 91–95)**
 
 ```js
 const goto = async (path) => {
@@ -2365,7 +2365,7 @@ const goto = async (path) => {
 };
 ```
 
-- [ ] **Step 4: Gate the filter block on `san-pham` being in scope (replace lines 148–149)**
+- [x] **Step 4: Gate the filter block on `san-pham` being in scope (replace lines 148–149)**
 
 ```js
 if (PAGES.includes('/san-pham/')) {
@@ -2376,7 +2376,7 @@ await goto('/san-pham/');
 and close the block by adding a `}` on its own line immediately after the loop's closing brace
 (after line 163's `}`).
 
-- [ ] **Step 5: Gate the nav toggle on the home page being in scope (replace lines 165–173)**
+- [x] **Step 5: Gate the nav toggle on the home page being in scope (replace lines 165–173)**
 
 ```js
 if (PAGES.includes('/')) {
@@ -2392,7 +2392,7 @@ console.log(`closed=${closed} -> open=${opened.d} aria-expanded=${opened.a} ${na
 }
 ```
 
-- [ ] **Step 6: Give `tools/shot.mjs` the same treatment**
+- [x] **Step 6: Give `tools/shot.mjs` the same treatment**
 
 It carries the same hardcoded static server and the same `.html` assumption, and Task 15 uses it
 to eyeball the crop change. Three edits:
@@ -2428,7 +2428,7 @@ Usage becomes `node tools/shot.mjs 390 844 true /tin-tuc/` → `/tmp/ln-em-tin-t
 `node tools/shot.mjs 390 844 true /` → `/tmp/ln-em-home-390.png`. `PROJECT.md` documents the old
 form; Task 28 updates it.
 
-- [ ] **Step 7: Prove the status check works**
+- [x] **Step 7: Prove the status check works**
 
 Deliberately break it before trusting it:
 
@@ -2440,7 +2440,7 @@ PAGES=/khong-ton-tai/ node tools/check.mjs; echo "exit=$?"
 
 Expected: a line containing `HTTP_404 /khong-ton-tai/` and `exit=1`.
 
-- [ ] **Step 8: Run the real thing**
+- [x] **Step 8: Run the real thing**
 
 ```bash
 PAGES=/ node tools/check.mjs; echo "exit=$?"
@@ -2454,7 +2454,7 @@ right now.
 The other seven pages are still stubs too; a full `node tools/check.mjs` will fail on
 `san-pham filters` until Task 14. Do not run the unscoped command yet.
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add tools/check.mjs tools/shot.mjs
