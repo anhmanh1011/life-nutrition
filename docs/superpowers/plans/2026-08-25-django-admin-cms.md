@@ -1443,7 +1443,7 @@ has not supplied; it is a publication date on a demo article, not an MST or a ho
 - Create: `apps/catalog/management/__init__.py`, `apps/catalog/management/commands/__init__.py`, `apps/catalog/management/commands/seed_content.py`
 - Create: `tests/test_seed_content.py`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `tests/test_seed_content.py`:
 
@@ -1536,19 +1536,19 @@ def test_seed_does_not_overwrite_staff_edits_to_site_settings(seeded):
     assert SiteSettings.load().tax_code == "0101234567"
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Run: `.venv/bin/pytest tests/test_seed_content.py -v`
 Expected: FAIL — `CommandError: Unknown command: 'seed_content'`.
 
-- [ ] **Step 3: Create the command package**
+- [x] **Step 3: Create the command package**
 
 ```bash
 mkdir -p apps/catalog/management/commands
 touch apps/catalog/management/__init__.py apps/catalog/management/commands/__init__.py
 ```
 
-- [ ] **Step 4: Write `apps/catalog/management/commands/seed_content.py`**
+- [x] **Step 4: Write `apps/catalog/management/commands/seed_content.py`**
 
 ```python
 import shutil
@@ -1759,12 +1759,12 @@ class Command(BaseCommand):
         )
 ```
 
-- [ ] **Step 5: Run the tests to verify they pass**
+- [x] **Step 5: Run the tests to verify they pass**
 
 Run: `.venv/bin/pytest tests/test_seed_content.py -v`
 Expected: `18 passed` (the two parametrized tests contribute 4 cases each).
 
-- [ ] **Step 6: Seed the development database and eyeball the counts**
+- [x] **Step 6: Seed the development database and eyeball the counts**
 
 ```bash
 .venv/bin/python manage.py seed_content
@@ -1772,7 +1772,7 @@ Expected: `18 passed` (the two parametrized tests contribute 4 cases each).
 
 Expected: `Seeded 6 brands, 4 categories, 17 products, 7 articles.`
 
-- [ ] **Step 7: Confirm re-running is idempotent**
+- [x] **Step 7: Confirm re-running is idempotent**
 
 ```bash
 .venv/bin/python manage.py seed_content
@@ -1780,7 +1780,7 @@ Expected: `Seeded 6 brands, 4 categories, 17 products, 7 articles.`
 
 Expected: the identical line. Not `12 brands`, not `34 products`.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add apps/catalog/management tests/test_seed_content.py
