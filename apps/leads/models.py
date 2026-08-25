@@ -5,6 +5,7 @@ from django.db import models
 from django.utils import timezone
 
 from apps.leads.phone import InvalidPhone, normalize
+from apps.leads.telegram import escape_html
 
 
 class Status(models.TextChoices):
@@ -52,6 +53,34 @@ class Submission(models.Model):
     def __str__(self):
         return f"{self.hoten} — {self.sdt}"
 
+    TELEGRAM_TITLE = ""
+
+    def telegram_text(self):
+        lines = [f"<b>{escape_html(self.TELEGRAM_TITLE)}</b>"]
+        if self.previous_count:
+            lines.insert(
+                0, f"<b>KHÁCH GỬI LẠI — đã gửi {self.previous_count} lần trước</b>"
+            )
+        rows = [
+            ("Họ tên", self.hoten),
+            ("Điện thoại", self.sdt),
+            ("Zalo", self.zalo),
+            ("Email", self.email),
+            *self.telegram_rows(),
+            ("Nguồn", self.attribution_summary()),
+        ]
+        lines += [f"{label}: {escape_html(value)}" for label, value in rows if value]
+        return "\n".join(lines)
+
+    def telegram_rows(self):
+        return []
+
+    def attribution_summary(self):
+        campaign = " / ".join(
+            p for p in (self.utm_source, self.utm_medium, self.utm_campaign) if p
+        )
+        return campaign or self.referrer
+
     def save(self, *args, **kwargs):
         self.sdt = normalize(self.sdt)
         if self.zalo:
@@ -79,6 +108,11 @@ class ContactMessage(Submission):
     class Meta(Submission.Meta):
         verbose_name = "Lời nhắn liên hệ"
         verbose_name_plural = "Lời nhắn liên hệ"
+
+    TELEGRAM_TITLE = "Lời nhắn liên hệ mới"
+
+    def telegram_rows(self):
+        return [("Chủ đề", self.chude), ("Nội dung", self.noidung)]
 
 
 class DealerApplication(Submission):
@@ -124,6 +158,19 @@ class DealerApplication(Submission):
     class Meta(Submission.Meta):
         verbose_name = "Đăng ký đại lý"
         verbose_name_plural = "Đăng ký đại lý"
+
+    TELEGRAM_TITLE = "Đăng ký đại lý mới"
+
+    def telegram_rows(self):
+        rows = [
+            ("Đơn vị", self.donvi),
+            ("Khu vực", self.khuvuc),
+            ("Loại hình", self.loaihinh),
+            ("Sản lượng", self.sanluong),
+        ]
+        if not self.is_complete:
+            rows.append(("Ghi chú", "Mới xong bước 1 — có thể còn bổ sung"))
+        return rows
 
     def accepts_step_two(self):
         """Step two is an unauthenticated URL that writes to an existing row, so it has
