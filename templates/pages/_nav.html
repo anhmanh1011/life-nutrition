@@ -1,0 +1,24 @@
+{% load static %}
+<nav class="site-nav" data-open="false">
+  <a class="site-nav__brand" href="{% url 'pages:home' %}">
+    <img src="{% static 'img/logo.png' %}" alt="Life Nutrition">
+    <span class="site-nav__tagline">Phân phối Dali Foods Việt Nam</span>
+  </a>
+  <span class="site-nav__spacer"></span>
+  <div class="site-nav__links">
+    {% with current=request.resolver_match.url_name %}
+    <a href="{% url 'pages:home' %}"{% if current == 'home' %} aria-current="page"{% endif %}>Trang chủ</a>
+    <a href="{% url 'pages:about' %}"{% if current == 'about' %} aria-current="page"{% endif %}>Giới thiệu</a>
+    <a href="{% url 'pages:brands' %}"{% if current == 'brands' %} aria-current="page"{% endif %}>Thương hiệu</a>
+    <a href="{% url 'pages:products' %}"{% if current == 'products' %} aria-current="page"{% endif %}>Sản phẩm</a>
+    <a href="{% url 'pages:dealer' %}"{% if current == 'dealer' %} aria-current="page"{% endif %}>Đại lý</a>
+    <a href="{% url 'pages:authentic' %}"{% if current == 'authentic' %} aria-current="page"{% endif %}>Hàng chính hãng</a>
+    <a href="{% url 'pages:news' %}"{% if current == 'news' %} aria-current="page"{% endif %}>Tin tức</a>
+    <a href="{% url 'pages:contact' %}"{% if current == 'contact' %} aria-current="page"{% endif %}>Liên hệ</a>
+    {% endwith %}
+  </div>
+  <a class="btn btn-primary btn-inline site-nav__cta" href="{% url 'pages:dealer' %}">Đăng ký đại lý</a>
+  <button class="site-nav__toggle" type="button" aria-expanded="false" aria-label="Mở menu">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg>
+  </button>
+</nav>
