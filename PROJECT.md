@@ -51,6 +51,21 @@ Both are fixed with `!important` in the mobile blocks of `styles.css`, each with
 explaining why. **If a responsive rule appears to do nothing, check for an inline style first**
 before assuming the selector or breakpoint is wrong.
 
+### The admin theme layers over Django's CSS, and Django fights back in two ways
+
+`assets/css/admin.css` restyles the admin without editing or replacing a single Django
+stylesheet. Two things bite anyone changing it, both of which fail silently:
+
+- **Django declares its palette on `html[data-theme="light"], :root`.** Override `:root` alone
+  and it is discarded the moment Django's own ☀ toggle sets the attribute — (0,1,1) beats
+  (0,1,0) — and the entire admin reverts to blue. Declare both selectors.
+- **Django reserves width for layout the theme replaces with grid**, in four places, each of
+  which quietly narrows a region instead of erroring.
+
+The link belongs in `{% block responsive %}` after `{{ block.super }}`; that is the only hook
+that lands after `responsive.css`. Details, palette and the full trap list:
+[`docs/admin-theme.md`](docs/admin-theme.md).
+
 ### The settings module comes from the environment, and the environment wins
 
 `manage.py` and `config/wsgi.py` both use `os.environ.setdefault`, so `DJANGO_SETTINGS_MODULE`
@@ -63,6 +78,11 @@ To read production settings on your own machine, set it for the one command:
 ```bash
 DJANGO_SETTINGS_MODULE=config.settings.production .venv/bin/python manage.py check --deploy
 ```
+
+The same lever breaks the test suite. `pytest.ini` already sets
+`DJANGO_SETTINGS_MODULE = config.settings.test`, so **run `pytest` with nothing prefixed**.
+Exporting `config.settings.development` for it — the value `manage.py` wants — empties
+`TELEGRAM_BOT_TOKEN` and fails 13 telegram and admin tests that have nothing wrong with them.
 
 ### `assets/` and `media/` are different things and are backed up differently
 

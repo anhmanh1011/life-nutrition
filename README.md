@@ -77,6 +77,7 @@ apps/
 templates/
   base.html          nav + footer, once
   pages/             one template per page
+  admin/             base_site.html only — loads the admin theme, rebrands the header
 assets/              css/ js/ img/ — STATIC_URL is /assets/, not /static/
 media/               admin uploads — gitignored, on a Docker volume in production
 deploy/              Dockerfile support: entrypoint, gunicorn, nginx, backup
@@ -92,5 +93,6 @@ product_image/       camera originals — gitignored, 110 MB
 | [`PROJECT.md`](PROJECT.md) | Constraints and traps — read before editing CSS or settings |
 | [`TODO.md`](TODO.md) | What blocks launch, chiefly `[bracket]` business data in the admin |
 | [`PROGRESS.md`](PROGRESS.md) | What has been built and decided, newest first |
+| [`docs/admin-theme.md`](docs/admin-theme.md) | The admin's cream-and-brown theme: palette, density budget, Django CSS traps |
 | `docs/superpowers/specs/` | Approved designs |
 | `docs/superpowers/plans/` | Implementation plans derived from those designs |

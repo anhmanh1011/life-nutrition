@@ -1,5 +1,35 @@
 # Progress
 
+## 2026-08-25 — Admin theme (branch `feat/admin-theme`)
+
+The Django admin now renders in the site's own warm cream and brown rather than Django's
+blue-grey, and the dealer changelist shows 15 rows per screen instead of 10. One new stylesheet
+(`assets/css/admin.css`), one template override (`templates/admin/base_site.html`), and two
+columns in `apps/leads/admin.py` switched from an inline `style=` to themeable classes. No
+Django CSS is edited or replaced — the theme layers on top. Full record, palette and traps:
+[`docs/admin-theme.md`](docs/admin-theme.md).
+
+Source was Claude Design project `2c862d7c-ef95-4218-ab87-0fcccdb67112`. Its `admin/index.html`
+is a preview harness — screen-switcher buttons around an `<iframe>` — so it has no Django
+counterpart and was not implemented; the stylesheet is what transferred.
+
+Three findings worth keeping:
+
+- **Django declares its palette on `html[data-theme="light"], :root`.** Overriding `:root`
+  alone is discarded the instant its own ☀ toggle sets the attribute, and the whole admin
+  snaps back to blue. Both selectors have to be declared.
+- **Django reserves width for layout the theme replaces with grid** — four separate
+  reservations (270px, 299px, a 600px `#content`, a 300px `.colMS` gutter), each of which
+  silently narrows a region rather than erroring. All four are zeroed with a comment.
+- **A variable Django sets in `@media (prefers-color-scheme: dark)` survives if the theme
+  doesn't redeclare it**, even while the page renders light. `--message-info-bg` was missed
+  that way, and `message_user()` defaults to `INFO`, so the "Gửi lại thông báo Telegram"
+  banner came out Django blue.
+
+221 tests pass. The changelist still needs 1131px in an 829px column at 1366px, so two columns
+sit off-screen at that width — the tradeoff and the reason it was not closed are in
+[`TODO.md`](TODO.md).
+
 ## 2026-08-25 — Django CMS + lead backend (branch `feat/django-admin-cms`)
 
 Eight static HTML files became a Django site rendering from Postgres, with a Vietnamese admin and

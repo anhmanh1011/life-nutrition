@@ -105,6 +105,15 @@ Already in place: `lang="vi"` and a unique `<meta name="description">` per page.
 
 - [ ] Two adjacent `@media (max-width: 640px)` blocks in `styles.css` could be merged; harmless
       but confusing when editing.
+- [ ] **The dealer changelist needs 1131px and gets 829px on a 1366px screen**, so *Trạng thái*
+      and *Telegram* — the two columns sales actually triages on — sit off-screen until you
+      collapse Django's `‹` sidebar (1053px) or use a wider monitor (~1660px fits it all).
+      The only real lever is the 230px *Mức độ đầy đủ* column, sized by the `nowrap` sentence
+      "Mới có tên + SĐT — gọi được ngay". Shortening it is a **copy decision, not a CSS one**:
+      the sentence tells a salesperson the lead is callable right now, and
+      `tests/test_admin_leads.py:152` asserts it. Confirm the wording with whoever owns the
+      copy before touching the width. Measurements in
+      [`docs/admin-theme.md`](docs/admin-theme.md).
 - [ ] `tools/check.mjs` and `tools/shot.mjs` spawn `.venv/Scripts/python.exe` literally. They only
       run on Windows until that is read from an environment variable the way `CHROME` is.
 
