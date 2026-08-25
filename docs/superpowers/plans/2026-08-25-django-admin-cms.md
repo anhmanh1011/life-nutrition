@@ -3500,7 +3500,7 @@ other.
 - Modify: `templates/pages/contact.html`, `templates/pages/dealer.html`
 - Create: `tests/test_form_pages.py`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `tests/test_form_pages.py`:
 
@@ -3570,12 +3570,12 @@ def test_forms_are_not_wired_up_yet(client, seeded, name):
     assert "csrfmiddlewaretoken" not in body
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Run: `.venv/bin/pytest tests/test_form_pages.py -v`
 Expected: FAIL — both templates are still Task 11 stubs.
 
-- [ ] **Step 3: Convert `templates/pages/contact.html`**
+- [x] **Step 3: Convert `templates/pages/contact.html`**
 
 Replace the stub with:
 
@@ -3620,7 +3620,7 @@ sentence is the notice saying so.
 Leave the `<form>` on lines 96–116 completely untouched, including the comment above it on
 line 95 that says the endpoint does not exist. Phase 3 deletes both.
 
-- [ ] **Step 4: Convert `templates/pages/dealer.html`**
+- [x] **Step 4: Convert `templates/pages/dealer.html`**
 
 Replace the stub with:
 
@@ -3674,19 +3674,19 @@ strings nobody can fill in would make the admin worse, not better. They stay tra
 Note line 138 wants a *list* of provinces while `SiteSettings.coverage` holds a *count* for
 `gioi-thieu.html` ("ghép chuyến giao 38 tỉnh/thành"). Different values — do not reuse the field.
 
-- [ ] **Step 5: Run the tests**
+- [x] **Step 5: Run the tests**
 
 Run: `.venv/bin/pytest tests/test_form_pages.py -v`
 Expected: PASS, 7 tests.
 
-- [ ] **Step 6: Run the full suite**
+- [x] **Step 6: Run the full suite**
 
 Run: `.venv/bin/pytest -q`
 Expected: PASS. This is the first run where every Phase 0–2 test executes together; a failure
 here that did not appear in a per-task run is almost always shared state, and the usual culprit
 is a test that edited `SiteSettings` without the `filled` fixture's `save()`.
 
-- [ ] **Step 7: Run `check.mjs` unscoped — the Phase 2 gate**
+- [x] **Step 7: Run `check.mjs` unscoped — the Phase 2 gate**
 
 ```bash
 .venv/bin/python manage.py runserver 8000 --noreload &
@@ -3701,7 +3701,7 @@ This is the assertion that Phase 2 is actually finished. Eight pages now render 
 and the harness that guarded the static site still passes unchanged in what it checks — only in
 where it points.
 
-- [ ] **Step 8: Delete the eight static HTML files**
+- [x] **Step 8: Delete the eight static HTML files**
 
 ```bash
 git rm index.html gioi-thieu.html thuong-hieu.html san-pham.html hop-tac-dai-ly.html hang-chinh-hang.html tin-tuc.html lien-he.html
@@ -3714,7 +3714,7 @@ root is a trap for the next person who greps for a string.
 `assets/` is **not** deleted — `STATICFILES_DIRS` points at it and every `{% static %}` call
 resolves through it.
 
-- [ ] **Step 9: Confirm nothing still points at the deleted files**
+- [x] **Step 9: Confirm nothing still points at the deleted files**
 
 ```bash
 grep -rn '\.html"' templates/ | grep -v '{% extends\|{% include'; echo "exit=$?"
@@ -3724,7 +3724,7 @@ Expected: `exit=1` — grep found nothing. A hit means a `href="…​.html"` su
 will 404 in production even though `check.mjs` passed, because `check.mjs` checks the status of
 the pages it visits, not of every link on them.
 
-- [ ] **Step 10: Commit**
+- [x] **Step 10: Commit**
 
 ```bash
 git add templates/pages/contact.html templates/pages/dealer.html tests/test_form_pages.py
