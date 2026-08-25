@@ -20,6 +20,8 @@ The site is eight standalone HTML files. Three things are painful:
 
 - Non-technical marketing/sales staff can edit products, news and company information.
 - Form submissions are persisted and pushed to a Telegram channel immediately.
+- Capturing a usable phone number is treated as the primary success condition of both forms.
+  Everything else is secondary and may be abandoned without losing the lead.
 - The browser keeps receiving plain server-rendered HTML — no client-side JS framework,
   no bundler.
 - The existing responsive/visual regression harness keeps working.
@@ -133,9 +135,40 @@ page, currently `[ngày/06/2026]` through `[ngày/08/2026]`.
 The two existing forms share only three fields. Folding them into a single table would leave
 half the columns null on every row, so an abstract base carries the common part:
 
-`leads.Submission` (abstract): `hoten` (required), `sdt` (required), `zalo` (optional),
-`status` (choices: new / contacted / won / rejected), `internal_note`, `created_at`,
-`telegram_sent`, `telegram_error`.
+`leads.Submission` (abstract):
+
+- `hoten` — required
+- `sdt` — required, stored normalized, indexed
+- `email` — optional. Does not exist in the markup today and is added to both forms.
+- `zalo` — optional
+- `previous_count` — how many earlier submissions shared this phone number, counted across
+  both models at insert time
+- `utm_source`, `utm_medium`, `utm_campaign`, `referrer`, `landing_page`
+- `status` — new / contacted / won / rejected
+- `internal_note`, `created_at`
+- `telegram_sent`, `telegram_error`, `telegram_message_id`
+
+The phone number is the most important field on the form, so it gets the most attention:
+
+**Normalization.** Spaces, dots, dashes and parentheses are stripped; `+84…` and `84…` are
+rewritten to a leading `0`. `sdt` stores that one canonical national form, which is also what
+staff read and dial. Deduplication and the index work because every row is written the same
+way regardless of how the visitor typed it.
+
+**Validation.** Accepted: Vietnamese mobile numbers (`03`, `05`, `07`, `08`, `09` prefix, 10
+digits) and landlines (`02` prefix, 10–11 digits). Everything else is rejected. Landlines are
+allowed deliberately — a small shop giving a landline is a real customer, and rejecting them
+to keep the rule tidy would cost leads.
+
+**Repeat detection.** `previous_count` is computed on insert by matching `sdt` across both
+models. The admin list shows it and the Telegram message leads with it. Someone submitting a
+second time is usually impatient rather than confused, and two sales people calling the same
+person is worse than either calling once.
+
+**Attribution.** UTM parameters and the referrer are captured into the session on the
+visitor's first request, not read off the form's own URL. A dealer who arrives on the home
+page from a Zalo campaign and only later reaches the signup form would otherwise be recorded
+as having come from nowhere.
 
 `leads.ContactMessage`, from `lien-he.html`, adds:
 
@@ -151,13 +184,20 @@ half the columns null on every row, so an abstract base carries the common part:
   `Tạp hóa / cửa hàng lẻ`, `HORECA (nhà hàng, café, khách sạn)`,
   `Bán hàng online / sàn TMĐT`
 - `sanluong` — choices `Dưới 10 thùng`, `10–50 thùng`, `Trên 50 thùng`
+- `completion_token` — UUID4, and `is_complete` — both used by the two-step flow below
 
-Field names keep the existing Vietnamese `name` attributes so the markup does not have to
-change. Choice values are copied verbatim from the current HTML; only `hoten` and `sdt` carry
-`required` today, and the server-side rules match that.
+`donvi`, `khuvuc`, `loaihinh` and `sanluong` are all collected in step two and are therefore
+nullable. Step one writes `hoten`, `sdt` and the attribution and Telegram bookkeeping fields
+only; `zalo` and `email` are asked in step two alongside the four above.
 
-Neither form collects an email address. Zalo is the second contact channel, which matches how
-this audience actually communicates.
+Field names keep the existing Vietnamese `name` attributes, and choice values are copied
+verbatim from the current HTML, so nothing silently changes meaning during the port. The
+markup itself does change in two deliberate ways: an `email` input is added to both forms,
+and the dealer form is split across two pages.
+
+Email is optional on both forms and phone stays required. For this audience Zalo and a phone
+call are the channels that actually get answered, so email is worth having but never worth
+blocking a submission over.
 
 The `khuvuc` list covers five cities plus a catch-all, so any dealer outside them lands in
 `Tỉnh / thành khác…` with no way to say where. That is a pre-existing limitation of the form
@@ -174,6 +214,7 @@ and is carried over unchanged rather than redesigned here.
 | `/tin-tuc/` | `tin-tuc.html` |
 | `/tin-tuc/<slug>/` | new — article detail |
 | `/hop-tac-dai-ly/` | `hop-tac-dai-ly.html` |
+| `/hop-tac-dai-ly/bo-sung/<token>/` | new — dealer form, step two |
 | `/hang-chinh-hang/` | `hang-chinh-hang.html` |
 | `/lien-he/` | `lien-he.html` |
 | `/cam-on/` | new — post-submit thank you |
@@ -186,19 +227,50 @@ Article detail pages are new surface area, implied by making news editable.
 
 ## Lead submission flow
 
+Common to both forms:
+
 1. Visitor submits. Same origin, so Django's own CSRF token applies.
-2. Server-side validation: required fields, Vietnamese phone format.
+2. Server-side validation: required fields, phone normalized and range-checked.
 3. Spam controls: a hidden honeypot field, plus per-IP rate limiting via `django-ratelimit`.
-4. **The submission row is written to Postgres first**, as its own committed step.
-5. Telegram notification is sent inside `try/except` with a short timeout. On failure the
-   error is recorded in `telegram_error` and logged; the submission is already safe. Both
-   admin lists carry a "resend" action.
-6. Redirect to `/cam-on/`, so refreshing does not resubmit.
+4. **The row is written to Postgres first**, as its own committed step.
+5. Telegram is notified inside `try/except` with a short timeout. On failure the error is
+   recorded in `telegram_error` and logged; the row is already safe. Both admin lists carry
+   a "resend" action.
+6. Redirect, so refreshing does not resubmit.
 
 The ordering is the point: a Telegram outage must never lose a dealer signup.
 
-Each model formats its own Telegram message, so a dealer application arrives with its
-`loaihinh` and `sanluong` visible rather than as a generic blob.
+`ContactMessage` is a single step and ends at `/cam-on/`.
+
+### The dealer form is split in two
+
+`DealerApplication` asks for a name and phone number first, and everything else afterwards.
+
+- `POST /hop-tac-dai-ly/` — validates `hoten` and `sdt` only, creates the row, sends Telegram,
+  redirects to the step-two URL.
+- `GET|POST /hop-tac-dai-ly/bo-sung/<completion_token>/` — collects `donvi`, `khuvuc`,
+  `loaihinh`, `sanluong`, `zalo`, `email`; updates the same row; sets `is_complete`; then
+  redirects to `/cam-on/`.
+
+**A visitor who abandons step two has already been captured.** The row exists and the channel
+has already been notified. This is the whole reason for the split: the phone number is the
+field that matters, so it is banked before anything else is asked.
+
+Both steps are ordinary form posts. No JavaScript is involved, so the flow still works with
+scripting disabled — the existing progressive-enhancement rule holds.
+
+Step two also carries a visible "bỏ qua" link straight to `/cam-on/`, so the visitor is never
+trapped and never feels the form is longer than they agreed to.
+
+### Telegram messages
+
+Step one sends immediately and stores the returned `telegram_message_id`. Step two **edits
+that same message** rather than sending a second one, so the channel shows one entry per
+dealer that fills in as more is known. If the edit call fails, a new message is sent instead.
+
+Each model formats its own text, so a dealer application arrives with `loaihinh` and
+`sanluong` visible rather than as a generic blob, and `previous_count` is stated up front when
+it is above zero.
 
 ## Security
 
@@ -206,7 +278,14 @@ Each model formats its own Telegram message, so a dealer application arrives wit
 - `DJANGO_SECRET_KEY`, `DJANGO_DEBUG`, `DJANGO_ALLOWED_HOSTS`, `DATABASE_URL` likewise.
 - Production settings: `DEBUG=False`, `SECURE_SSL_REDIRECT`, `SECURE_HSTS_SECONDS`,
   `SESSION_COOKIE_SECURE`, `CSRF_COOKIE_SECURE`, `X_FRAME_OPTIONS=DENY`.
-- Submitter phone and Zalo numbers are never written to application logs.
+- Submitter phone, Zalo and email values are never written to application logs.
+- The step-two URL is an unauthenticated endpoint that writes to an existing row, so
+  `completion_token` is a UUID4 rather than the primary key, it stops working once
+  `is_complete` is set, it expires 24 hours after `created_at`, and step two is rate limited
+  like step one. Without those four rules the URL would be an open invitation to enumerate
+  and overwrite other people's applications.
+- Step two can only fill in fields that are still empty and can never change `hoten` or
+  `sdt`. The phone number is the asset being protected here.
 - Article HTML is sanitized with `nh3` before storage.
 - Uploads are constrained by content type and size; `ImageField` validates decodability.
 
@@ -221,7 +300,11 @@ Staff are non-technical, so the admin is treated as a product surface, not a deb
   delete, no access to users, groups or submissions).
 - Uploaded images are resized to a 1000px longest edge on save, holding the ~1.9 MB total
   image budget recorded in `PROJECT.md` for an audience on mobile data.
-- Both submission lists filter by status and date and export CSV.
+- Both submission lists filter by status and date, show `previous_count` and the attribution
+  columns, and export CSV.
+- Dealer applications can be filtered by `is_complete`. Incomplete ones are not failures —
+  they are a name and a phone number waiting for a call, and the admin should present them
+  that way rather than hiding them.
 
 ## Content migration
 
@@ -239,10 +322,20 @@ by category banh 5, quy 5, uong 4, chao 3.
 
 - Model behaviour: slug uniqueness, `SiteSettings` singleton enforcement, active/published
   filtering.
-- Both submission forms: reject malformed phone numbers, reject a filled honeypot, enforce
-  the rate limit, and accept only the choice values present in the current markup.
+- Both submission forms: reject a filled honeypot, enforce the rate limit, and accept only
+  the choice values present in the current markup.
+- **Phone normalization is table-driven.** `0912 345 678`, `+84912345678`, `84.912.345.678`
+  and `0912345678` must all persist as the same string. Landlines are accepted, and
+  too-short, too-long and invalid-prefix numbers are rejected.
+- `previous_count` increments across both models — a phone that used the contact form and
+  then the dealer form is recognised as a repeat.
 - **The submission persists when Telegram fails.** The notifier is mocked to raise; the row
   must still exist and `telegram_error` must be populated.
+- **Abandoning step two still leaves a usable lead.** Post step one, never post step two, and
+  assert the row exists with a valid phone and `is_complete` false.
+- Step-two token rules: a wrong token 404s, a token whose row is already complete 404s, and a
+  token older than 24 hours 404s. Step two cannot overwrite `hoten` or `sdt`.
+- UTM captured on an earlier page survives to a lead created later in the same session.
 - Each public view returns 200 and renders values sourced from the database.
 - Product page renders all active SKUs with correct `data-cat` and `data-brand` attributes.
 
