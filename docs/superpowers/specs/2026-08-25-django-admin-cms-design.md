@@ -61,7 +61,7 @@ config/            settings (base/dev/prod), urls, wsgi
 apps/
   catalog/         Brand, Category, Product
   news/            Article
-  siteinfo/        SiteSettings, Milestone
+  siteinfo/        SiteSettings
   leads/           ContactMessage, DealerApplication, Telegram notifier
   pages/           views for the 8 public pages
 templates/
@@ -105,8 +105,12 @@ missing `alt`.
 
 ### `news.Article`
 
-`title`, `slug` (unique), `cover` (optional), `cover_alt`, `excerpt`, `body`, `published_at`,
-`is_published`.
+`title`, `slug` (unique), `topic`, `cover` (optional), `cover_alt`, `excerpt`, `body`,
+`published_at`, `is_published`.
+
+`topic` is the short kicker above each headline on the news cards (`THỊ TRƯỜNG`, `SẢN PHẨM`,
+`ĐỐI TÁC`). It is free text rather than a choice list: the seeded set uses five values and staff
+will want a sixth without a migration.
 
 `body` is edited with TinyMCE and sanitized with `nh3` on save. Staff are semi-trusted, and
 a WYSIWYG field rendered with `|safe` is a stored-XSS hole otherwise.
@@ -119,16 +123,24 @@ Singleton, enforced at `pk=1`. Covers the shared footer placeholders inventoried
 `business_license_date`, `business_license_issuer`, `head_office_address`, `warehouse_address`,
 `warehouse_area`, `shopee_url`, `lazada_url`, `tiktok_url`, `moit_notice`,
 plus the index/about figures `founded_year`, `retail_points`, `coverage`, `staff_count`,
-`facility_area`, `facility_location`.
+`shipping_partner`, `facility_location`.
 
 **Every field defaults to its current `[bracket]` string.** No invented MST, hotline or
 address — those are legally meaningful and are still waiting on the client. Staff replace
 them one at a time and all 8 pages update at once.
 
-### `siteinfo.Milestone`
+`facility_area` from the original list was dropped: `gioi-thieu.html` quotes the warehouse size
+twice, and two editable fields holding one number drift apart. `warehouse_area` is the single
+source. `shipping_partner` was added for the `[tên đơn vị]` placeholder on the same page, which the
+original list missed.
 
-`date_label`, `title`, `description`, `sort_order`. Three rows for the roadmap on the home
-page, currently `[ngày/06/2026]` through `[ngày/08/2026]`.
+### `siteinfo.Milestone` — dropped
+
+The spec described three rows for "the roadmap on the home page, currently `[ngày/06/2026]`
+through `[ngày/08/2026]`". Reading the markup, those three placeholders are not a roadmap: they are
+the dates on the three news teaser cards, which `news.Article` already covers. There is no roadmap
+section on any page. A model with no consumer is a migration and an admin entry that exist only to
+confuse the next reader.
 
 ### `leads` — two models, not one
 
@@ -310,8 +322,8 @@ Staff are non-technical, so the admin is treated as a product surface, not a deb
 
 A `seed_content` management command populates: 6 brands (Copico and Doubendou inactive, since
 no SKU exists for them today), 4 categories, the 17 products pointing at the images already in
-`assets/img/`, the three roadmap milestones, and `SiteSettings` with its `[bracket]` defaults.
-Re-running it updates rather than duplicates.
+`assets/img/`, the 7 news articles behind the teasers on the home and news pages, and
+`SiteSettings` with its `[bracket]` defaults. Re-running it updates rather than duplicates.
 
 Product counts to reproduce exactly: Daliyuan 11, Haochidian 4, Heqizheng 1, Hi-Tiger 1, and
 by category banh 5, quy 5, uong 4, chao 3.
@@ -359,6 +371,11 @@ are the regression net for the template conversion. `tools/shot.mjs` is unchange
 Local development needs `Pillow`, which Django's `ImageField` requires. `PROJECT.md` notes
 this machine has neither ImageMagick nor Pillow; inside the Docker image or a virtualenv this
 is just a pip dependency, but running Django directly on the host will hit it first.
+
+Production sets `CACHES` to `DatabaseCache` on the same Postgres instance, and the container
+entrypoint runs `createcachetable`. django-ratelimit counts in the cache, and Django's default
+`LocMemCache` is per-process — with three gunicorn workers a `15/h` limit is really 45/h. A
+separate Redis for one counter is a fourth container to keep alive for no gain.
 
 ## Documentation to update in this branch
 
