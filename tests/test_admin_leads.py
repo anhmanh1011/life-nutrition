@@ -161,7 +161,7 @@ def test_a_lead_telegram_refused_is_flagged_on_the_list(admin_client):
         reverse("admin:leads_dealerapplication_changelist")
     ).content.decode()
 
-    assert '<span style="color:#b3261e">Lỗi</span>' in body
+    assert '<span class="da-tg-error">Lỗi</span>' in body
 
 
 def test_dealer_applications_can_be_filtered_by_completeness(admin_client):

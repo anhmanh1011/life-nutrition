@@ -94,12 +94,12 @@ class SubmissionAdmin(admin.ModelAdmin):
     @admin.display(description="Telegram")
     def telegram_state(self, obj):
         if obj.telegram_sent:
-            return "Đã báo"
+            return format_html('<span class="da-tg-sent">{}</span>', "Đã báo")
         if obj.telegram_error:
             # The label goes through the placeholder because format_html refuses a
             # bare format string — it is how Django stops mark_safe creeping back in.
-            return format_html('<span style="color:#b3261e">{}</span>', "Lỗi")
-        return "Chưa báo"
+            return format_html('<span class="da-tg-error">{}</span>', "Lỗi")
+        return format_html('<span class="da-tg-wait">{}</span>', "Chưa báo")
 
     @admin.action(description="Tải về file CSV các dòng đã chọn")
     def export_csv(self, request, queryset):
@@ -208,5 +208,7 @@ class DealerApplicationAdmin(SubmissionAdmin):
     @admin.display(description="Mức độ đầy đủ", ordering="is_complete")
     def completeness(self, obj):
         if obj.is_complete:
-            return "Đã điền đủ"
-        return "Mới có tên + SĐT — gọi được ngay"
+            return format_html('<span class="da-fill-full">{}</span>', "Đã điền đủ")
+        return format_html(
+            '<span class="da-fill-min">{}</span>', "Mới có tên + SĐT — gọi được ngay"
+        )
