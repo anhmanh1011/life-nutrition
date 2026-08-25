@@ -8541,18 +8541,22 @@ returns a full HTML error page with exactly one `<h1>`, no images and no console
 sails through every other assertion. Without it, a typo in a URL name reports `ok`.
 
 ```bash
-node tools/shot.mjs 390 844 true /tin-tuc/   # → /tmp/ln-em-tin-tuc-390.png
-node tools/shot.mjs 390 844 true /           # → /tmp/ln-em-home-390.png
+node tools/shot.mjs 390 844 true /tin-tuc/   # → <tmpdir>/ln-em-tin-tuc-390.png
+node tools/shot.mjs 390 844 true /           # → <tmpdir>/ln-em-home-390.png
 ```
 
 The argument is a **URL path**, not a filename. Use `tools/shot.mjs` rather than
 `chrome --headless --screenshot --window-size=...`, which silently clips mobile layouts and reports
 bogus overflow. The difference is CDP `Emulation.setDeviceMetricsOverride`.
 
-Both scripts look Chrome up at the macOS default path. Elsewhere, point `CHROME` at the binary:
+Both scripts were last run on Windows and carry two hard-coded paths from it: Chrome defaults to
+`C:\Program Files\Google\Chrome\Application\chrome.exe`, and the `runserver` they spawn is
+`.venv/Scripts/python.exe`. Chrome is overridable, the interpreter is not — on macOS or Linux the
+`spawn` line in each script needs `.venv/bin/python`.
 
 ```bash
-CHROME="/c/Program Files/Google/Chrome/Application/chrome.exe" node tools/check.mjs
+CHROME=/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome node tools/check.mjs
+CHROME=/usr/bin/google-chrome node tools/check.mjs
 ```
 
 Note: the 1DevTool browser MCP could not dispatch synthetic clicks against this site —
@@ -8567,9 +8571,10 @@ it widens the brand column to 172px and wraps the hamburger onto its own row (wh
 the sticky header to 137px). `tools/check.mjs` asserts nav height ≤72px. If you need more room,
 take it from the CTA padding, not the logo.
 
-Breakpoints in `styles.css`: 1080, 860, 640, **420**. The 420px block exists only for the dealer
-form's `.seg` step indicator, which will not fit two segments on a narrow phone otherwise.
-`--gutter` is 20px at ≤640, 32px at ≤1080.
+Breakpoints in `styles.css`: 1080, 860, 640, **420** — five `@media` blocks, because 640 is
+written twice (see `TODO.md`). The 420px block exists only for the dealer form's `.seg` step
+indicator, which will not fit two segments on a narrow phone otherwise. `--gutter` is 20px at
+≤640, 32px at ≤1080.
 
 ## Images
 
@@ -8691,9 +8696,12 @@ by adding fields nobody can fill in.
       `Article.objects.published()`) already exist.
 - [ ] Analytics (GA4 or similar) — nothing is instrumented.
 - [ ] Complete the online.gov.vn (Bộ Công Thương) notification, then replace the notice text.
+- [ ] Point DNS at the VPS and issue the certificate. The site is not deployed yet: HTTPS, HSTS
+      and the apex/`www` redirect are configured in `deploy/nginx/dalifoods.conf` and
+      `config/settings/production.py`, but Steps 24–27 of Task 27 run on the server and have not
+      been run.
 
-Already in place: `lang="vi"`, a unique `<meta name="description">` per page, HTTPS with HSTS,
-and DNS pointed at the VPS (Task 27, Steps 24–27).
+Already in place: `lang="vi"` and a unique `<meta name="description">` per page.
 
 ## 3. Operations
 
@@ -8735,7 +8743,7 @@ Requires **Python 3.13+** and **PostgreSQL 17**.
 
 ```bash
 python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt
+.venv/bin/pip install -r requirements-dev.txt   # requirements.txt + pytest
 
 cp .env.example .env
 .venv/bin/python -c \
@@ -8763,11 +8771,12 @@ node tools/check.mjs                # headless Chrome, all 8 pages, desktop + 39
 ```
 
 `check.mjs` starts its own `runserver` if port 8000 is free. It needs **Node 18+** and Google
-Chrome — no `npm install`, which is why there is no `package.json`. On Linux or Windows, point
-`CHROME` at your binary:
+Chrome — no `npm install`, which is why there is no `package.json`. Chrome defaults to the Windows
+install path; elsewhere point `CHROME` at your binary:
 
 ```bash
-CHROME="/c/Program Files/Google/Chrome/Application/chrome.exe" node tools/check.mjs
+CHROME=/usr/bin/google-chrome node tools/check.mjs                                    # Linux
+CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" node tools/check.mjs
 ```
 
 ## Deploy
@@ -8969,6 +8978,22 @@ pointed at Task 27 for documentation work that belongs here, and Task 26 Step 9 
 the plan was finished, and the ninth deviation was added to the block at the top. They are recorded
 here only so a reviewer comparing an older copy of this file knows what moved.
 
+**Where the documents as written depart from the text above.** Five claims in the prescribed bodies
+turned out to be false against the repository, and the documents say the true thing instead. The
+snippets in Steps 1–3 have been corrected in place; these three are structural and are recorded
+here:
+
+1. `TODO.md` gains a checkbox under section 1: `templates/pages/home.html` still prints literal
+   `[diện tích]`, `[địa điểm]` and `[số]` at lines 117, 130, 134, 138 and 145. Everywhere else
+   those come from `{{ site.* }}`, so "filling one in is a single admin edit that updates every
+   page at once" is true of every field *except* on that one block. Point it at `warehouse_area`,
+   `facility_location`, `coverage` and `retail_points`.
+2. `TODO.md` section 2 lists DNS and the certificate as a **checkbox**, not as already in place.
+   Task 27's Steps 24–27 run on the server and have not been run; nothing is deployed.
+3. `PROGRESS.md` records that Phases 0–5 were implemented on Windows with Python 3.13.14 and a
+   portable PostgreSQL 17, which is why the venv binaries are under `.venv/Scripts/` and the
+   Dockerfile pins `python:3.13.14-slim` rather than the 3.14.5 this plan's snippet carried.
+
 - [ ] **Step 6: Check every factual claim against the repository**
 
 Documentation drifts because nobody checks it. These greps take a minute and catch the specific
@@ -8997,9 +9022,11 @@ grep -n "DatabaseCache" config/settings/production.py
 grep -rn "no build step\|duplicated per page\|all 8 files" *.md
 ```
 
-Expected: `STATIC_URL = "/assets/"`; four `@media (max-width` blocks with one at 420px;
-`seed_content.py` and `setup_groups.py` listed; the bracket defaults present; both notices present;
-both corrections present; and **the last grep silent**. A hit on the last one is a document this
+Expected: `STATIC_URL = "/assets/"`; **five** `@media (max-width` blocks across four breakpoints,
+one of them at 420px (640 is written twice — see `TODO.md`, section 4); `seed_content.py` and
+`setup_groups.py` listed; the bracket defaults present; both notices present; both corrections
+present; and the last grep returning **exactly one hit, `PROJECT.md:12`** — the blockquote that
+quotes `"no build step, no framework"` in order to mark it stale. Any other hit is a document this
 task missed.
 
 - [ ] **Step 7: Run both suites one final time**

@@ -1,34 +1,35 @@
 # Progress
 
-## 2026-08-25 — Django CMS + lead backend: design and plan (branch `feat/django-admin-cms`)
+## 2026-08-25 — Django CMS + lead backend (branch `feat/django-admin-cms`)
 
-**Nothing is implemented yet.** This branch contains two documents and no code. The site on `main`
-is unchanged — still eight static HTML pages.
+Eight static HTML files became a Django site rendering from Postgres, with a Vietnamese admin and
+working lead capture. `main` still holds the static version.
 
-### Why the static constraint is being reversed
+### Why the static constraint was reversed
 
 Two problems that have no static answer:
 
 1. Staff cannot change a hotline number or publish an article without editing HTML.
-2. Both forms post to `action="#"`. Every dealer signup submitted so far was silently discarded.
+2. Both forms posted to `action="#"`. Every dealer signup submitted so far was silently discarded.
 
-Fixing (2) requires a server, which removes the main argument for staying static, so (1) gets
-fixed in the same move. Django SSR was chosen over Next.js and over a static-export pipeline:
-one deploy, no bundler, no React, and the existing markup survives nearly verbatim.
+Fixing (2) requires a server, which removes the main argument for staying static, so (1) got fixed
+in the same move. Django SSR was chosen over Next.js and over a static-export pipeline: one deploy,
+no bundler, no React, and the existing markup survives nearly verbatim.
 
-### What was decided
+### What was built
 
-`docs/superpowers/specs/2026-08-25-django-admin-cms-design.md` (committed, `f3c7c59` + `6a1ce86`)
-is authoritative. In short:
+| Phase | Tasks | What it produced |
+|---|---|---|
+| 0 — Foundation | 1–3 | Split settings, `/assets/` as `STATIC_URL`, real Postgres in tests |
+| 1 — Data layer | 4–8 | `SiteSettings`, `Brand`, `Category`, `Product`, `Article`, `seed_content` |
+| 2 — Templates | 9–17 | One `base.html`; all 8 pages converted; `check.mjs` repointed at Django |
+| 3 — Leads | 18–23 | Both forms live, phone normalized, rate-limited, Telegram after commit |
+| 4 — Admin | 24–26 | Vietnamese admin end to end; two permission groups as a command |
+| 5 — Deploy + docs | 27–28 | Compose, nginx, gunicorn, backups; these documents |
 
-- Eight pages render from Postgres through Django templates. `assets/` keeps its name and becomes
-  `STATIC_URL`, so `url()` references inside `styles.css` keep resolving untouched.
-- Nav and footer collapse into one `base.html` — the "duplicate across 8 files" rule dies here.
-- Content models: `SiteSettings` (singleton), `Brand`, `Category`, `Product` (17 SKUs), `Article`.
-- Every `[bracket]` placeholder becomes a `SiteSettings` field rather than disappearing.
-- Two lead tables, both notifying a Telegram channel after the row is committed.
-- Admin is Vietnamese end to end and treated as a product surface, since staff are non-technical.
-  Two roles: **Quản trị** (full) and **Biên tập** (content only, no customer data).
+Task 27's files exist and its three locally-runnable checks pass (`check --deploy`, `sh -n` on both
+scripts, and the volume-path cross-check). Its Steps 22–31 are a first-deploy checklist that runs
+on the server: nothing has been deployed, and no certificate has been issued.
 
 The one decision that shaped everything else: **the phone number is the success condition.** The
 dealer form is therefore split in two — name and phone are banked on the first POST, qualification
@@ -36,49 +37,42 @@ questions come after. A visitor who abandons halfway is still a reachable lead. 
 views, extra tests and a UUID4 completion token; it was chosen deliberately over the cheaper
 one-step form and should not be "simplified" back.
 
-### What was written
+### What reading the real markup changed
 
-`docs/superpowers/plans/2026-08-25-django-admin-cms.md` — **Tasks 1–26 of 28**, about 7,300 lines,
-TDD throughout with real code and expected command output in every step.
+Nine gaps between the spec's data model and the actual pages, listed in one block at the top of
+`docs/superpowers/plans/2026-08-25-django-admin-cms.md` and written back into the spec. The
+representative one: `Category` needs two labels, because the filter pill says
+`Bánh mì & bánh ngọt` while the card kicker says `Bánh`.
 
-| Phase | Tasks | Written? |
-|---|---|---|
-| 0 — Foundation | 1–3 | yes |
-| 1 — Data layer | 4–8 | yes |
-| 2 — Templates | 9–17 | yes |
-| 3 — Leads | 18–23 | yes |
-| 4 — Admin | 24–26 | yes |
-| 5 — Deploy + docs | 27–28 | **no** |
+### Two bugs that only exist behind a proxy
 
-Reading the real markup turned up seven data-model gaps the spec did not cover (for example
-`Category` needs two labels — the filter pill says `Bánh mì & bánh ngọt`, the card kicker says
-`Bánh`). All seven are listed in one block at the top of the plan. Two of them are not yet written
-back into the spec.
+Both were found while writing the deployment task, and both would have silently disabled a control
+the spec asked for rather than raising an error:
 
-### Where it stopped
-
-Work was halted during Task 27. Outstanding, in order:
-
-- **Task 27** — Dockerfile, compose, nginx, gunicorn, `.env` template, backups. Docker is not
-  installed on this machine, so this task is unverifiable locally by construction. It also owes
-  two things earlier tasks already promised: nginx serving `/media/` (without it every product
-  image 404s in production) and running `setup_groups` on deploy.
-- **Task 28** — rewrite `PROJECT.md`, refresh `TODO.md` / `README.md`, push the two deviations
-  back into the spec.
-- **The plan's self-review** — spec coverage, placeholder scan, and a check that identifier names
-  match between the task that defines them and the task that calls them.
-
-Details are in the *Status* block at the top of the plan file.
+- `@ratelimit(key="ip")` reads `REMOTE_ADDR`, which behind nginx is the proxy's address for every
+  visitor. All traffic shared one bucket of 15/hour. Fixed with `RealIPMiddleware`, which trusts
+  `X-Real-IP` (nginx overwrites it) and not `X-Forwarded-For` (nginx appends to it, so a client can
+  seed it).
+- No `CACHES` setting meant the default per-process `LocMemCache`, making the same limit 45/hour
+  across three gunicorn workers. Production now uses `DatabaseCache` on the Postgres already there.
 
 ### Environment facts verified before planning
 
 | Fact | Value | Consequence |
 |---|---|---|
-| Python | 3.14.5 (Homebrew) | Django 5.2 does not support 3.14 — plan pins **Django 6.0.8** |
+| Python | 3.14.5 (Homebrew) | Django 5.2 does not support 3.14 — pinned **Django 6.0.8** |
 | PostgreSQL | 17.11 (Homebrew) | dev and tests use real Postgres, not SQLite |
 | Node | v22.22.0 | `tools/check.mjs` survives; Task 12 repoints it at Django |
-| Docker | not installed | Phase 5 cannot be verified here |
-| Pillow | installs fine in a venv | `PROJECT.md`'s "no Pillow" note is about *system* Python only |
+| Docker | not installed | Phase 5's deploy files were reviewed by reading, not by running |
+| Pillow | installs fine in a venv | the old "no Pillow" note was about *system* Python only |
+
+That table describes the machine the plan was written on. Phases 0–5 were implemented on Windows
+with **Python 3.13.14** and a portable PostgreSQL 17, which changed two things: the venv binaries
+live in `.venv/Scripts/`, and the Dockerfile pins `python:3.13.14-slim` rather than the 3.14.5 the
+plan's snippet carried — the point of that pin is that a wheel resolving locally resolves in the
+image, which only holds if the version matches the machine doing the resolving. Django 6.0.8
+supports 3.13 as well as 3.14, so nothing else moved. Tasks 1 and 2 still carry macOS commands
+(`brew services start postgresql@17`, an absolute `/Users/...` path, `.venv/bin/python`).
 
 ## 2026-08-25 — Initial build
 
