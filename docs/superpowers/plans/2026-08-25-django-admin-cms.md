@@ -4430,7 +4430,7 @@ Each model builds its own message, so a dealer application arrives with `loaihin
 - Modify: `apps/leads/models.py` (add the message-building methods)
 - Create: `tests/test_telegram.py`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `tests/test_telegram.py`:
 
@@ -4650,12 +4650,12 @@ def test_an_update_with_no_earlier_message_just_sends_one(api):
     assert [method_of(c) for c in api] == ["sendMessage"]
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Run: `.venv/bin/pytest tests/test_telegram.py -v`
 Expected: FAIL — `ModuleNotFoundError: No module named 'apps.leads.telegram'`.
 
-- [ ] **Step 3: Write `apps/leads/telegram.py`**
+- [x] **Step 3: Write `apps/leads/telegram.py`**
 
 ```python
 import json
@@ -4784,7 +4784,7 @@ connection, a timeout, an HTTP error status and a non-JSON body alike.
 **`_scrub` is not optional.** `telegram_error` is rendered in the admin, so an exception that
 quotes the request URL back would put the bot token on a page any editor can open.
 
-- [ ] **Step 4: Add the message builders to `apps/leads/models.py`**
+- [x] **Step 4: Add the message builders to `apps/leads/models.py`**
 
 Add the import at the top, next to the existing phone import:
 
@@ -4857,7 +4857,7 @@ and the edit at step two adds them.
 `models.py` importing from `telegram.py` is one-directional — `telegram.py` takes a submission
 as an argument and imports no models, so there is no cycle.
 
-- [ ] **Step 5: Run the tests**
+- [x] **Step 5: Run the tests**
 
 Run: `.venv/bin/pytest tests/test_telegram.py -v`
 Expected: PASS, 12 tests.
@@ -4865,7 +4865,7 @@ Expected: PASS, 12 tests.
 Run: `.venv/bin/pytest -q`
 Expected: PASS, no failures.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add apps/leads/telegram.py apps/leads/models.py tests/test_telegram.py
