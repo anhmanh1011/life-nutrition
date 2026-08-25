@@ -1,0 +1,4 @@
+.DS_Store
+
+# Camera originals used to generate assets/img/ — 110 MB, not referenced by the site.
+product_image/
