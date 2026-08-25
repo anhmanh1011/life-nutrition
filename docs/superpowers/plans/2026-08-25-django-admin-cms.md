@@ -7077,7 +7077,7 @@ Two things worth knowing before you write it:
 - Create: `apps/common/management/__init__.py`, `apps/common/management/commands/__init__.py`, `apps/common/management/commands/setup_groups.py`
 - Create: `tests/test_permission_groups.py`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `tests/test_permission_groups.py`:
 
@@ -7176,13 +7176,13 @@ claims and only the second one matters to the person using it. `test_editor_inde
 is the one that would catch the worst-case regression: an editor who can see customer phone
 numbers.
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `.venv/bin/pytest tests/test_permission_groups.py -v`
 Expected: every test ERRORs at the `groups` fixture with
 `CommandError: Unknown command: 'setup_groups'`.
 
-- [ ] **Step 3: Create the package directories**
+- [x] **Step 3: Create the package directories**
 
 ```bash
 mkdir -p apps/common/management/commands
@@ -7193,7 +7193,7 @@ Both `__init__.py` files are required — Django discovers commands by importing
 `<app>.management.commands.<name>`, and a directory without `__init__.py` is not importable as a
 package here.
 
-- [ ] **Step 4: Write `apps/common/management/commands/setup_groups.py`**
+- [x] **Step 4: Write `apps/common/management/commands/setup_groups.py`**
 
 ```python
 from django.contrib.auth.models import Group, Permission
@@ -7264,7 +7264,7 @@ click from the list. `add_sitesettings` is excluded separately: `SiteSettingsAdm
 returns False regardless of the bit, so granting it would create a permission that does nothing —
 and a permission that does nothing is a permission somebody will one day rely on.
 
-- [ ] **Step 5: Run the tests to verify they pass**
+- [x] **Step 5: Run the tests to verify they pass**
 
 Run: `.venv/bin/pytest tests/test_permission_groups.py -v`
 Expected: `7 passed`
@@ -7272,12 +7272,12 @@ Expected: `7 passed`
 If `test_editor_index_does_not_mention_customers` fails, the leak is real — read which app label
 appeared and check it is not in the editor's list. Do not adjust the assertion.
 
-- [ ] **Step 6: Run the whole suite**
+- [x] **Step 6: Run the whole suite**
 
 Run: `.venv/bin/pytest -q`
 Expected: all tests pass, no errors.
 
-- [ ] **Step 7: Create the groups locally and look at the difference**
+- [x] **Step 7: Create the groups locally and look at the difference**
 
 ```bash
 .venv/bin/python manage.py setup_groups
@@ -7286,14 +7286,16 @@ Expected: all tests pass, no errors.
 Expected output:
 
 ```
-Quản trị: 44 quyền
+Quản trị: 39 quyền
 Biên tập: 14 quyền
 Nhớ bật 'Nhân viên' (is_staff) cho tài khoản, nếu không thì không đăng nhập được vào trang quản trị.
 ```
 
 The two counts are load-bearing information, not decoration. If *Biên tập* is not 14 — five models
 times three actions, minus `add_sitesettings` — something in `EDITOR_MODELS` is misspelled, and a
-misspelled model name fails silently as a missing permission rather than as an error.
+misspelled model name fails silently as a missing permission rather than as an error. *Quản trị* is
+39 the same way: four actions each on siteinfo's one model (minus `add_sitesettings`), catalog's
+three, news' one, leads' two and auth's three, so 3 + 12 + 4 + 8 + 12.
 
 Then make an editor account and log in as them:
 
@@ -7328,14 +7330,14 @@ print(User.objects.filter(username='bientap').delete())
 "
 ```
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add apps/common/management tests/test_permission_groups.py
 git commit -m "Add setup_groups so roles are code, not 40 checkboxes on a fresh server"
 ```
 
-- [ ] **Step 9: Close Phase 4**
+- [x] **Step 9: Close Phase 4**
 
 Phase 4 is done when a non-technical member of staff can be handed a URL and a password and get
 useful work done without a developer in the room. Concretely, all of this is now true:
@@ -8284,7 +8286,7 @@ docker compose logs -f web
 ```
 
 Expected, in order: `==> migrate` with a list of `Applying ... OK`, `==> cache table`,
-`==> permission groups` printing `Quản trị: 44 quyền` and `Biên tập: 14 quyền`, `==> collectstatic`,
+`==> permission groups` printing `Quản trị: 39 quyền` and `Biên tập: 14 quyền`, `==> collectstatic`,
 then gunicorn's `Booting worker with pid`. Ctrl-C stops following the log, not the container.
 
 If it stops at `==> migrate` with `connection refused`, the `db` healthcheck has not gone green —
