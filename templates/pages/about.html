@@ -1,7 +1,104 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}Giới thiệu — Dali Foods Việt Nam{% endblock %}
+{% block title %}Giới thiệu Life Nutrition — nhà phân phối được ủy quyền Dali Foods{% endblock %}
+{% block description %}Công ty Cổ phần Xuất nhập khẩu Life Nutrition là nhà phân phối được ủy quyền chính thức của Dali Foods tại Việt Nam — giấy chứng nhận cấp 22/04/2026, hiệu lực đến 30/04/2027.{% endblock %}
 
 {% block content %}
-<section class="section"><h1>Giới thiệu</h1></section>
+<section class="section" style="padding-block: 52px 8px;">
+  <p class="eyebrow">Giới thiệu</p>
+  <h1 style="font-size: 46px; line-height: 1.1; margin: 0 0 18px; max-width: 24ch;">Life Nutrition — đối tác phân phối tin cậy của Dali Foods tại Việt Nam</h1>
+  <p style="margin: 0 0 12px; font-size: 15.5px; line-height: 1.7; max-width: 66ch; color: color-mix(in srgb, var(--color-text) 80%, transparent);">Công ty Cổ phần Xuất nhập khẩu Life Nutrition (đại diện pháp luật: ông Lê Duy) là nhà phân phối được ủy quyền chính thức của Dali Foods tại Việt Nam theo Giấy chứng nhận do Công ty TNHH Thực phẩm Dali Quảng Tây cấp ngày 22/04/2026, hiệu lực đến 30/04/2027.</p>
+  <p style="margin: 0; font-size: 15.5px; line-height: 1.7; max-width: 66ch; color: color-mix(in srgb, var(--color-text) 80%, transparent);">Chúng tôi chịu trách nhiệm kinh doanh toàn kênh, phát triển thị trường và dịch vụ hậu mãi cho các sản phẩm Dali tại Việt Nam — từ nhập khẩu chính ngạch, công bố sản phẩm, kho vận đến chăm sóc đại lý.</p>
+</section>
+
+<section class="section" style="padding-block: 36px 8px;">
+  <div class="grid grid-4" style="gap: 20px;">
+    <div class="card" style="gap: 6px;">
+      <p style="margin: 0; font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: 30px; color: var(--color-accent-700);">{{ site.founded_year }}</p>
+      <p style="margin: 0; font-size: 13px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: color-mix(in srgb, var(--color-text) 60%, transparent);">Năm thành lập</p>
+    </div>
+    <div class="card" style="gap: 6px;">
+      <p style="margin: 0; font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: 30px; color: var(--color-accent-700);">{{ site.warehouse_area }}</p>
+      <p style="margin: 0; font-size: 13px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: color-mix(in srgb, var(--color-text) 60%, transparent);">Kho hàng tại {{ site.facility_location }}</p>
+    </div>
+    <div class="card" style="gap: 6px;">
+      <p style="margin: 0; font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: 30px; color: var(--color-accent-2-700);">{{ site.staff_count }}</p>
+      <p style="margin: 0; font-size: 13px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: color-mix(in srgb, var(--color-text) 60%, transparent);">Nhân sự kinh doanh &amp; kho vận</p>
+    </div>
+    <div class="card" style="gap: 6px;">
+      <p style="margin: 0; font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: 30px; color: var(--color-accent-2-700);">{{ site.retail_points }}</p>
+      <p style="margin: 0; font-size: 13px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: color-mix(in srgb, var(--color-text) 60%, transparent);">Điểm bán &amp; đại lý hợp tác</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-block: 52px 8px;">
+  <div class="grid grid-stack" style="grid-template-columns: 0.9fr 1.1fr; gap: 52px; align-items: center;">
+    <div style="position: relative; background: #fdfbf6; border: 1.5px solid var(--color-neutral-300); border-radius: var(--radius-lg); padding: 36px 34px; box-shadow: var(--shadow-md); overflow: hidden; min-height: 380px;">
+      <p aria-hidden="true" style="position: absolute; inset: 0; display: grid; place-content: center; margin: 0; transform: rotate(-24deg); font-size: 26px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(198, 113, 57, 0.10); white-space: nowrap; pointer-events: none;">Dalifoods.vn · Bản công bố · Dalifoods.vn</p>
+      <p style="margin: 0 0 4px; text-align: center; font-size: 13px; font-weight: 700; color: #555;">达利食品（广西）有限公司</p>
+      <p style="margin: 0 0 18px; text-align: center; font-size: 11.5px; color: #888;">CÔNG TY TNHH THỰC PHẨM DALI QUẢNG TÂY — DALI FOODS GROUP</p>
+      <p style="margin: 0 0 16px; text-align: center; font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: 21px; color: #333;">GIẤY CHỨNG NHẬN<br>NHÀ PHÂN PHỐI ỦY QUYỀN</p>
+      <p style="margin: 0 auto; max-width: 40ch; font-size: 12.5px; line-height: 1.9; color: #444; text-align: center;">Chứng nhận: <strong>Công ty Cổ phần Xuất nhập khẩu Life Nutrition</strong> là nhà phân phối được ủy quyền chính thức các sản phẩm Dali Foods tại thị trường Việt Nam.<br>Hiệu lực: 22/04/2026 — 30/04/2027</p>
+      <span style="position: absolute; right: 34px; bottom: 30px; width: 96px; height: 96px; border-radius: 50%; border: 3.5px solid rgba(179, 45, 32, 0.65); color: rgba(179, 45, 32, 0.75); display: grid; place-content: center; text-align: center; font-size: 9px; font-weight: 800; letter-spacing: 0.06em; line-height: 1.5; transform: rotate(-8deg); padding: 8px; box-sizing: border-box;">达利食品<br>(广西)<br>有限公司<br>★</span>
+      <p style="position: absolute; left: 34px; bottom: 34px; margin: 0; font-size: 10.5px; color: #999;">[Thay bằng bản scan thật — giữ watermark chống sao chép]</p>
+    </div>
+    <div>
+      <p class="eyebrow">Giấy chứng nhận phân phối</p>
+      <h2 style="font-size: 32px; margin: 0 0 18px; max-width: 20ch;">Minh bạch giấy tờ để đối tác yên tâm</h2>
+      <div style="display: flex; flex-direction: column; gap: 14px; font-size: 15px; line-height: 1.65;">
+        <div style="display: flex; gap: 14px; align-items: flex-start;"><span style="width: 13px; height: 13px; border-radius: 50%; background: var(--color-accent); flex: none; margin-top: 6px;"></span><p style="margin: 0;">Bản scan giấy chứng nhận có dấu, đóng watermark chống sao chép — công khai ngay trên website.</p></div>
+        <div style="display: flex; gap: 14px; align-items: flex-start;"><span style="width: 13px; height: 13px; border-radius: 50%; background: var(--color-accent); flex: none; margin-top: 6px;"></span><p style="margin: 0;">Cung cấp bản tự công bố từng SKU và chứng từ nhập khẩu khi đại lý, siêu thị hoặc cơ quan quản lý yêu cầu.</p></div>
+        <div style="display: flex; gap: 14px; align-items: flex-start;"><span style="width: 13px; height: 13px; border-radius: 50%; background: var(--color-accent); flex: none; margin-top: 6px;"></span><p style="margin: 0;">Đầu mối xác minh: hotline <strong>{{ site.hotline_wholesale }}</strong> · email <strong>{{ site.email }}</strong> — phản hồi trong ngày làm việc.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-block: 56px 8px;">
+  <p class="eyebrow" style="color: var(--color-accent-2-700);">Đối tác của chúng tôi</p>
+  <h2 style="font-size: 34px; margin: 0 0 18px;">Dali Foods Group — tập đoàn thực phẩm 37 năm tuổi</h2>
+  <p style="margin: 0 0 28px; font-size: 15px; line-height: 1.7; max-width: 68ch; color: color-mix(in srgb, var(--color-text) 78%, transparent);">Thành lập năm 1989 tại huyện Huệ An, Tuyền Châu, Phúc Kiến (Trung Quốc), Dali Foods nổi tiếng với snack và bánh chất lượng ở mức giá hợp lý, phân phối qua hơn 6.500 nhà phân phối. Tập đoàn niêm yết tại Hồng Kông năm 2015 và được gia đình sáng lập mua lại để tư nhân hóa năm 2023.</p>
+  <div style="display: flex; gap: 0; flex-wrap: wrap; margin-bottom: 30px;">
+    <div style="flex: 1; min-width: 180px; border-top: 3px solid var(--color-accent); padding: 14px 18px 0 0;">
+      <p style="margin: 0; font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: 22px;">1989</p>
+      <p style="margin: 4px 0 0; font-size: 13px; line-height: 1.55; color: color-mix(in srgb, var(--color-text) 65%, transparent);">Thành lập tại Phúc Kiến</p>
+    </div>
+    <div style="flex: 1; min-width: 180px; border-top: 3px solid var(--color-accent-300); padding: 14px 18px 0 0;">
+      <p style="margin: 0; font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: 22px;">2015</p>
+      <p style="margin: 4px 0 0; font-size: 13px; line-height: 1.55; color: color-mix(in srgb, var(--color-text) 65%, transparent);">Niêm yết sàn Hồng Kông</p>
+    </div>
+    <div style="flex: 1; min-width: 180px; border-top: 3px solid var(--color-accent-2-300); padding: 14px 18px 0 0;">
+      <p style="margin: 0; font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: 22px;">2023</p>
+      <p style="margin: 4px 0 0; font-size: 13px; line-height: 1.55; color: color-mix(in srgb, var(--color-text) 65%, transparent);">Tư nhân hóa bởi gia đình sáng lập</p>
+    </div>
+    <div style="flex: 1; min-width: 180px; border-top: 3px solid var(--color-accent-2); padding: 14px 0 0 0;">
+      <p style="margin: 0; font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: 22px;">2026</p>
+      <p style="margin: 4px 0 0; font-size: 13px; line-height: 1.55; color: color-mix(in srgb, var(--color-text) 65%, transparent);">Ủy quyền Life Nutrition phân phối tại Việt Nam</p>
+    </div>
+  </div>
+  <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+    {% for b in brands %}
+      <span class="tag tag-neutral">{{ b.display_name }} — {{ b.description }}</span>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="section" style="padding-block: 52px 0;">
+  <div class="grid grid-2 grid-stack" style="gap: 52px; align-items: center;">
+    <div>
+      <h2 style="font-size: 32px; margin: 0 0 18px; max-width: 18ch;">Kho vận &amp; đội ngũ vận hành</h2>
+      <div style="display: flex; flex-direction: column; gap: 14px; font-size: 15px; line-height: 1.65;">
+        <div style="display: flex; gap: 14px; align-items: flex-start;"><span style="width: 13px; height: 13px; border-radius: 50%; background: var(--color-accent-2); flex: none; margin-top: 6px;"></span><p style="margin: 0;">Kho trung tâm <strong>{{ site.warehouse_area }}</strong> tại <strong>{{ site.facility_location }}</strong>, bảo quản khô thoáng chuẩn FMCG, quản lý date theo lô.</p></div>
+        <div style="display: flex; gap: 14px; align-items: flex-start;"><span style="width: 13px; height: 13px; border-radius: 50%; background: var(--color-accent-2); flex: none; margin-top: 6px;"></span><p style="margin: 0;">Xuất theo lốc / thùng, ghép chuyến giao <strong>{{ site.coverage }}</strong> tỉnh/thành — đối tác vận chuyển {{ site.shipping_partner }}.</p></div>
+        <div style="display: flex; gap: 14px; align-items: flex-start;"><span style="width: 13px; height: 13px; border-radius: 50%; background: var(--color-accent-2); flex: none; margin-top: 6px;"></span><p style="margin: 0;">Đội ngũ <strong>{{ site.staff_count }}</strong> nhân sự kinh doanh — mỗi đại lý có một đầu mối chăm sóc riêng.</p></div>
+      </div>
+    </div>
+    <figure class="washed" style="border-radius: calc(2 * var(--radius-lg)); overflow: hidden;">
+      <img src="{% static 'img/biscuit-cartons-2.jpg' %}" alt="Hàng thùng Haochidian tại kho Life Nutrition — [thay bằng ảnh kho thật]" style="width: 100%; aspect-ratio: 4 / 3; object-fit: cover; object-position: 50% 60%;">
+    </figure>
+  </div>
+  <p style="margin: 14px 0 0; text-align: right; font-size: 12.5px; color: color-mix(in srgb, var(--color-text) 50%, transparent);">[Thay bằng ảnh kho hàng / đội ngũ thật khi có]</p>
+</section>
 {% endblock %}

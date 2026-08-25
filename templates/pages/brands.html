@@ -1,7 +1,111 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}Thương hiệu — Dali Foods Việt Nam{% endblock %}
+{% block title %}{{ brand.display_name }} — thương hiệu bánh của Dali Foods tại Việt Nam{% endblock %}
+{% block description %}Daliyuan 达利园 — bánh mì đóng gói, bánh ngọt, cháo dinh dưỡng và trà trái cây của Dali Foods Group, nhập khẩu chính ngạch và phân phối bởi Life Nutrition.{% endblock %}
 
 {% block content %}
-<section class="section"><h1>Thương hiệu</h1></section>
+<section class="section" style="padding-block: 40px 0;">
+  <p class="eyebrow eyebrow-muted" style="margin-bottom: 12px;">Thương hiệu thuộc Dali Foods Group <span style="text-transform: none; letter-spacing: 0; font-weight: 600;">· trang mẫu — mỗi thương hiệu sẽ có trang riêng theo mẫu này</span></p>
+  <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+    {% for b in brands %}
+      {% if b.pk == brand.pk %}
+        <span style="border-radius: 999px; padding: 9px 18px; background: var(--color-accent); color: var(--color-neutral-100); font-size: 13.5px; font-weight: 700;">{{ b.display_name }}</span>
+      {% else %}
+        <a href="#" style="border-radius: 999px; padding: 9px 18px; background: var(--color-accent-100); color: var(--color-accent-800); font-size: 13.5px; font-weight: 700; text-decoration: none;">{{ b.display_name }}</a>
+      {% endif %}
+    {% endfor %}
+  </div>
+</section>
+
+<section style="position: relative; overflow: hidden;">
+  <div style="position: absolute; left: -160px; bottom: -220px; width: 420px; height: 420px; border-radius: 50%; background: var(--color-accent-100); pointer-events: none;"></div>
+  <div class="section grid grid-stack" style="position: relative; padding-block: 48px 40px; grid-template-columns: 1.1fr 0.9fr; gap: 56px; align-items: center;">
+    <div>
+      <h1 style="font-size: 52px; line-height: 1.1; margin: 0 0 20px;">{{ brand.display_name }} — thương hiệu bánh quốc dân của Trung Quốc</h1>
+      <p style="font-size: 16px; line-height: 1.7; margin: 0 0 16px; max-width: 56ch; color: color-mix(in srgb, var(--color-text) 80%, transparent);">Ra đời cùng Dali Foods Group (thành lập 1989, Phúc Kiến), Daliyuan là thương hiệu bánh mì, bánh bông lan, bánh trứng và bánh pie phủ khắp kênh tạp hóa Trung Quốc qua hơn 6.500 nhà phân phối. Tại Việt Nam, Life Nutrition đưa về các dòng bán chạy nhất — bao bì nội địa Trung, nhãn phụ tiếng Việt đầy đủ.</p>
+      <p style="font-size: 14px; line-height: 1.7; margin: 0 0 26px; max-width: 56ch; color: color-mix(in srgb, var(--color-text) 60%, transparent);">Sản xuất tại nhà máy Dali Quảng Tây (Dali Foods Group) · nhập khẩu chính ngạch bởi Life Nutrition.</p>
+      <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+        <a class="btn btn-primary" href="{% url 'pages:products' %}">Xem SKU Daliyuan</a>
+        <a class="btn btn-ghost" href="{% url 'pages:dealer' %}">Nhập hàng cho điểm bán</a>
+      </div>
+    </div>
+    <figure class="washed" style="border-radius: calc(2 * var(--radius-lg)); overflow: hidden; box-shadow: var(--shadow-md);">
+      <img src="{% static 'img/breakfast-bread-2.jpg' %}" alt="Bánh mì ăn sáng Daliyuan 早餐包" style="width: 100%; aspect-ratio: 4 / 4.4; object-fit: cover; object-position: 50% 72%;">
+    </figure>
+  </div>
+</section>
+
+<section class="section" style="padding-block: 40px 8px;">
+  <p class="eyebrow">Các dòng sản phẩm</p>
+  <h2 style="font-size: 36px; margin: 0 0 30px;">Daliyuan tại Việt Nam có gì?</h2>
+  <div class="grid grid-4">
+    <div class="card" style="padding: 0; overflow: hidden;">
+      <figure class="washed"><img src="{% static 'img/mini-french.jpg' %}" alt="Bánh mì đóng gói Daliyuan" style="width: 100%; aspect-ratio: 4 / 3; object-fit: cover; object-position: 50% 66%;"></figure>
+      <div style="padding: 16px 18px 18px;">
+        <p style="margin: 0 0 6px; font-weight: 800; font-size: 16px;">Bánh mì đóng gói</p>
+        <p style="margin: 0; font-size: 13.5px; line-height: 1.6; color: color-mix(in srgb, var(--color-text) 65%, transparent);">Bánh mì ăn sáng 早餐包, bánh mì Pháp mini, dòng K17 dừa &amp; chà bông — chủ lực kênh tạp hóa.</p>
+      </div>
+    </div>
+    <div class="card" style="padding: 0; overflow: hidden;">
+      <figure class="washed"><img src="{% static 'img/croissant.jpg' %}" alt="Bánh ngọt Daliyuan" style="width: 100%; aspect-ratio: 4 / 3; object-fit: cover; object-position: 50% 68%;"></figure>
+      <div style="padding: 16px 18px 18px;">
+        <p style="margin: 0 0 6px; font-weight: 800; font-size: 16px;">Bánh ngọt &amp; croissant</p>
+        <p style="margin: 0; font-size: 13.5px; line-height: 1.6; color: color-mix(in srgb, var(--color-text) 65%, transparent);">Croissant nhân sốt cam / socola, bánh mì socola Hei Hei Bao — hợp khẩu vị Gen Z.</p>
+      </div>
+    </div>
+    <div class="card" style="padding: 0; overflow: hidden;">
+      <figure class="washed"><img src="{% static 'img/porridge-4.jpg' %}" alt="Cháo dinh dưỡng Daliyuan" style="width: 100%; aspect-ratio: 4 / 3; object-fit: cover; object-position: 50% 78%;"></figure>
+      <div style="padding: 16px 18px 18px;">
+        <p style="margin: 0 0 6px; font-weight: 800; font-size: 16px;">Cháo dinh dưỡng &amp; sữa hạt</p>
+        <p style="margin: 0; font-size: 13.5px; line-height: 1.6; color: color-mix(in srgb, var(--color-text) 65%, transparent);">Cháo Youyican 又一餐, cháo bát bảo, sữa lạc Milk Peanut — lon tiện lợi, ăn liền.</p>
+      </div>
+    </div>
+    <div class="card" style="padding: 0; overflow: hidden;">
+      <figure class="washed"><img src="{% static 'img/tea-trio.jpg' %}" alt="Trà trái cây Daliyuan" style="width: 100%; aspect-ratio: 4 / 3; object-fit: cover; object-position: 50% 76%;"></figure>
+      <div style="padding: 16px 18px 18px;">
+        <p style="margin: 0 0 6px; font-weight: 800; font-size: 16px;">Trà trái cây</p>
+        <p style="margin: 0; font-size: 13.5px; line-height: 1.6; color: color-mix(in srgb, var(--color-text) 65%, transparent);">Đào trắng ô long, nho xanh trà xanh, chanh hồng trà, mơ xanh — chai 500ml.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-block: 56px 8px;">
+  <div class="grid grid-2 grid-stack" style="gap: 56px; align-items: center;">
+    <figure class="washed" style="border-radius: calc(2 * var(--radius-lg)); overflow: hidden;">
+      <img src="{% static 'img/k17-trio-2.jpg' %}" alt="Dòng bánh K17 Daliyuan" style="width: 100%; aspect-ratio: 4 / 3.4; object-fit: cover; object-position: 50% 70%;">
+    </figure>
+    <div>
+      <h2 style="font-size: 34px; margin: 0 0 22px; max-width: 20ch;">Vì sao Daliyuan dễ bán tại điểm bán Việt?</h2>
+      <div style="display: flex; flex-direction: column; gap: 18px;">
+        <div style="display: flex; gap: 14px; align-items: flex-start;">
+          <span style="width: 14px; height: 14px; border-radius: 50%; background: var(--color-accent); flex: none; margin-top: 5px;"></span>
+          <p style="margin: 0; font-size: 15px; line-height: 1.65;"><strong>Giá vốn hợp lý, biên tốt cho tạp hóa</strong> — định vị "ngon, giá phải chăng" đúng khẩu vị khách nội địa Trung đang được ưa chuộng.</p>
+        </div>
+        <div style="display: flex; gap: 14px; align-items: flex-start;">
+          <span style="width: 14px; height: 14px; border-radius: 50%; background: var(--color-accent-2); flex: none; margin-top: 5px;"></span>
+          <p style="margin: 0; font-size: 15px; line-height: 1.65;"><strong>Trend "snack nội địa Trung"</strong> — nhóm 18–30 chủ động tìm mua trên TikTok / Shopee, kéo khách về điểm bán.</p>
+        </div>
+        <div style="display: flex; gap: 14px; align-items: flex-start;">
+          <span style="width: 14px; height: 14px; border-radius: 50%; background: var(--color-accent); flex: none; margin-top: 5px;"></span>
+          <p style="margin: 0; font-size: 15px; line-height: 1.65;"><strong>Đủ giấy tờ để vào siêu thị / CVS</strong> — nhãn phụ tiếng Việt, bản tự công bố từng SKU, hóa đơn VAT từ Life Nutrition.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-block: 56px 0;">
+  <div style="background: var(--color-accent-100); border-radius: calc(2 * var(--radius-lg)); padding: 40px 48px; display: flex; align-items: center; justify-content: space-between; gap: 28px; flex-wrap: wrap;">
+    <div>
+      <h2 style="font-size: 28px; margin: 0 0 8px;">Nhập Daliyuan về kệ của bạn</h2>
+      <p style="margin: 0; font-size: 14.5px; color: color-mix(in srgb, var(--color-text) 72%, transparent);">Bảng giá sỉ theo thùng + chính sách đổi cận date — phản hồi trong 24 giờ làm việc.</p>
+    </div>
+    <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+      <a class="btn btn-primary" href="{% url 'pages:dealer' %}">Đăng ký đại lý</a>
+      <a class="btn btn-ghost" href="{% url 'pages:products' %}">Xem {{ product_count }} SKU {{ brand.name }}</a>
+    </div>
+  </div>
+</section>
 {% endblock %}

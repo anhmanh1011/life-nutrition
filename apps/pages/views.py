@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 
 from apps.catalog.models import Brand, Category, Product
 from apps.news.models import Article, Topic
@@ -13,11 +13,22 @@ def home(request):
 
 
 def about(request):
-    return render(request, "pages/about.html")
+    return render(request, "pages/about.html", {"brands": Brand.objects.active()})
 
 
 def brands(request):
-    return render(request, "pages/brands.html", {"brands": Brand.objects.active()})
+    # Brand, not Brand.objects.active(): switching Daliyuan off should drop it from the
+    # pills and the product grid, not 404 the page that is about Daliyuan.
+    brand = get_object_or_404(Brand, slug="daliyuan")
+    return render(
+        request,
+        "pages/brands.html",
+        {
+            "brand": brand,
+            "brands": Brand.objects.active(),
+            "product_count": brand.products.active().count(),
+        },
+    )
 
 
 def products(request):
