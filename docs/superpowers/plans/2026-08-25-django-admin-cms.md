@@ -665,7 +665,7 @@ MST, hotline or address** — several are legally meaningful and are still waiti
 - Create: `apps/siteinfo/models.py`, `tests/test_siteinfo.py`
 - Modify: `apps/siteinfo/context_processors.py`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `tests/test_siteinfo.py`:
 
@@ -702,12 +702,12 @@ def test_placeholders_are_the_defaults_and_are_not_invented():
     assert settings.moit_notice == "[bổ sung sau khi hoàn tất thông báo tại online.gov.vn]"
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Run: `.venv/bin/pytest tests/test_siteinfo.py -v`
 Expected: FAIL — `ModuleNotFoundError` / `cannot import name 'SiteSettings'`.
 
-- [ ] **Step 3: Write `apps/siteinfo/models.py`**
+- [x] **Step 3: Write `apps/siteinfo/models.py`**
 
 ```python
 from django.db import models
@@ -785,7 +785,7 @@ class SiteSettings(models.Model):
         return obj
 ```
 
-- [ ] **Step 4: Fill in `apps/siteinfo/context_processors.py`**
+- [x] **Step 4: Fill in `apps/siteinfo/context_processors.py`**
 
 Replace the stub written in Task 2 Step 11:
 
@@ -797,7 +797,7 @@ def site_settings(request):
     return {"site": SiteSettings.load()}
 ```
 
-- [ ] **Step 5: Make and apply the migration**
+- [x] **Step 5: Make and apply the migration**
 
 ```bash
 .venv/bin/python manage.py makemigrations siteinfo
@@ -806,12 +806,12 @@ def site_settings(request):
 
 Expected: `Create model SiteSettings`, then `Applying siteinfo.0001_initial... OK`.
 
-- [ ] **Step 6: Run the tests to verify they pass**
+- [x] **Step 6: Run the tests to verify they pass**
 
 Run: `.venv/bin/pytest tests/test_siteinfo.py -v`
 Expected: `3 passed`
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add apps/siteinfo tests/test_siteinfo.py
@@ -827,7 +827,7 @@ Shared by `catalog` and `news`. Holds the ~1.9 MB image budget recorded in `PROJ
 **Files:**
 - Create: `apps/common/images.py`, `tests/test_images.py`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 `tests/test_images.py`:
 
@@ -880,12 +880,12 @@ def test_non_image_is_returned_untouched():
     assert resize_to_max_edge(junk, max_edge=1000) is junk
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Run: `.venv/bin/pytest tests/test_images.py -v`
 Expected: FAIL — `ModuleNotFoundError: No module named 'apps.common.images'`.
 
-- [ ] **Step 3: Write `apps/common/images.py`**
+- [x] **Step 3: Write `apps/common/images.py`**
 
 ```python
 import io
@@ -970,12 +970,12 @@ already within budget. And a PNG under 8 MB can still decode to a few hundred me
 default `MAX_IMAGE_PIXELS` is the backstop there. Uploading is staff-only, behind admin auth and
 the two groups from Task 26.
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 Run: `.venv/bin/pytest tests/test_images.py -v`
 Expected: `6 passed`
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add apps/common/images.py tests/test_images.py
@@ -993,7 +993,7 @@ so both carry `help_text` saying so and Task 15 asserts the rendered attributes.
 **Files:**
 - Create: `apps/catalog/models.py`, `tests/test_catalog.py`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `tests/test_catalog.py`:
 
@@ -1070,12 +1070,12 @@ def test_kicker_joins_brand_and_short_category_name(daliyuan, uong):
     assert product.kicker == "Daliyuan · Đồ uống"
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Run: `.venv/bin/pytest tests/test_catalog.py -v`
 Expected: FAIL — `cannot import name 'Brand' from 'apps.catalog.models'`.
 
-- [ ] **Step 3: Write `apps/catalog/models.py`**
+- [x] **Step 3: Write `apps/catalog/models.py`**
 
 ```python
 from django.conf import settings
@@ -1215,7 +1215,7 @@ class Product(models.Model):
         super().save(*args, **kwargs)
 ```
 
-- [ ] **Step 4: Make and apply the migration**
+- [x] **Step 4: Make and apply the migration**
 
 ```bash
 .venv/bin/python manage.py makemigrations catalog && .venv/bin/python manage.py migrate
@@ -1223,12 +1223,12 @@ class Product(models.Model):
 
 Expected: `Create model Brand`, `Create model Category`, `Create model Product`, then `OK`.
 
-- [ ] **Step 5: Run the tests to verify they pass**
+- [x] **Step 5: Run the tests to verify they pass**
 
 Run: `.venv/bin/pytest tests/test_catalog.py -v`
 Expected: `5 passed`
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add apps/catalog tests/test_catalog.py
@@ -1245,7 +1245,7 @@ sanitized before storage rather than trusted at render time.
 **Files:**
 - Create: `apps/news/models.py`, `tests/test_news.py`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `tests/test_news.py`:
 
@@ -1310,12 +1310,12 @@ def test_published_excludes_drafts_and_future_posts():
     assert [a.slug for a in Article.objects.published()] == ["a"]
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Run: `.venv/bin/pytest tests/test_news.py -v`
 Expected: FAIL — `cannot import name 'Article'`.
 
-- [ ] **Step 3: Write `apps/news/models.py`**
+- [x] **Step 3: Write `apps/news/models.py`**
 
 ```python
 import nh3
@@ -1391,7 +1391,7 @@ class Article(models.Model):
         super().save(*args, **kwargs)
 ```
 
-- [ ] **Step 4: Make and apply the migration**
+- [x] **Step 4: Make and apply the migration**
 
 ```bash
 .venv/bin/python manage.py makemigrations news && .venv/bin/python manage.py migrate
@@ -1399,7 +1399,7 @@ class Article(models.Model):
 
 Expected: `Create model Article`, then `Applying news.0001_initial... OK`.
 
-- [ ] **Step 5: Run the tests**
+- [x] **Step 5: Run the tests**
 
 `get_absolute_url` refers to the `news_detail` route added in Task 15; the tests here never
 call it, so they pass now.
@@ -1407,7 +1407,7 @@ call it, so they pass now.
 Run: `.venv/bin/pytest tests/test_news.py -v`
 Expected: `5 passed`
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add apps/news tests/test_news.py
