@@ -4046,7 +4046,7 @@ Phase 3 leans on, and they are far easier to get right when tested directly.
 - Create: `tests/test_leads_models.py`
 - Create (generated, do not hand-write): `apps/leads/migrations/0001_initial.py`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `tests/test_leads_models.py`:
 
@@ -4202,12 +4202,12 @@ def test_str_shows_the_two_fields_staff_actually_need():
     assert str(lead) == "Nguyễn Văn A — 0987654321"
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Run: `.venv/bin/pytest tests/test_leads_models.py -v`
 Expected: FAIL — `cannot import name 'ContactMessage' from 'apps.leads.models'`.
 
-- [ ] **Step 3: Write `apps/leads/models.py`**
+- [x] **Step 3: Write `apps/leads/models.py`**
 
 Replace the whole stub file:
 
@@ -4387,7 +4387,7 @@ and still pick up `ordering = ["-created_at"]` without repeating it.
 The `sdt` index is declared with `db_index=True` on the field rather than in `Meta.indexes`,
 because an index named in an abstract base collides when a second child inherits it.
 
-- [ ] **Step 4: Generate and apply the migration**
+- [x] **Step 4: Generate and apply the migration**
 
 ```bash
 .venv/bin/python manage.py makemigrations leads
@@ -4397,7 +4397,7 @@ because an index named in an abstract base collides when a second child inherits
 Expected: `Migrations for 'leads':` listing `0001_initial.py` with `Create model ContactMessage`
 and `Create model DealerApplication`, then `Applying leads.0001_initial... OK`.
 
-- [ ] **Step 5: Run the tests**
+- [x] **Step 5: Run the tests**
 
 Run: `.venv/bin/pytest tests/test_leads_models.py -v`
 Expected: PASS, 16 tests.
@@ -4407,7 +4407,7 @@ Then run the whole suite — this is the first migration added since Phase 2 clo
 Run: `.venv/bin/pytest -q`
 Expected: PASS, no failures.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add apps/leads/models.py apps/leads/migrations/0001_initial.py tests/test_leads_models.py
