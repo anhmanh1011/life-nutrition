@@ -2472,7 +2472,7 @@ Converting it first proves the base template, the static pipeline and the teaser
 - Modify: `templates/pages/home.html`
 - Create: `tests/test_home_page.py`
 
-- [ ] **Step 1: Copy the static body across**
+- [x] **Step 1: Copy the static body across**
 
 Replace the stub body of `templates/pages/home.html` with:
 
@@ -2512,7 +2512,7 @@ grep -n 'assets/\|\.html"' templates/pages/home.html
 
 Expected: no output.
 
-- [ ] **Step 2: Append the teaser section as a loop**
+- [x] **Step 2: Append the teaser section as a loop**
 
 Immediately before `{% endblock %}`:
 
@@ -2549,7 +2549,7 @@ The `{% if article.cover %}` guard exists because `Article.cover` is `blank=True
 article added by staff with no cover image renders `<img src="">`, which `check.mjs` reports as
 `BROKEN_IMG`.
 
-- [ ] **Step 3: Write the test**
+- [x] **Step 3: Write the test**
 
 `tests/test_home_page.py`:
 
@@ -2595,12 +2595,12 @@ def test_exactly_one_h1(client, seeded):
     assert body.count("<h1") == 1
 ```
 
-- [ ] **Step 4: Run the tests**
+- [x] **Step 4: Run the tests**
 
 Run: `.venv/bin/pytest tests/test_home_page.py -v`
 Expected: `4 passed`
 
-- [ ] **Step 5: Run the harness against the home page**
+- [x] **Step 5: Run the harness against the home page**
 
 ```bash
 .venv/bin/python manage.py runserver 8000 --noreload &
@@ -2614,7 +2614,7 @@ If `H_OVERFLOW` appears, read `PROJECT.md`'s section *The trap that has bitten t
 touching any selector — the cause is almost certainly an inline `style` that was altered during
 the paste, not a CSS bug.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add templates/pages/home.html tests/test_home_page.py
@@ -2633,7 +2633,7 @@ holds. Six `check.mjs` filter cases verify it.
 - Modify: `templates/pages/products.html`
 - Create: `tests/test_products_page.py`
 
-- [ ] **Step 1: Copy the static frame across**
+- [x] **Step 1: Copy the static frame across**
 
 Replace the stub body with `{% extends %}`/`{% load static %}`/`{% block %}` as in Task 13, then
 paste `san-pham.html` lines 42–96 (the `<h1>` intro section) into the content block, applying
@@ -2645,7 +2645,7 @@ Rule 2.
 `</head>`. Do not lift these rules into `styles.css`: they are page-scoped today, and merging them
 is exactly the kind of adjacent "improvement" Rule 1 forbids.
 
-- [ ] **Step 2: Emit the filter pills from the database**
+- [x] **Step 2: Emit the filter pills from the database**
 
 ```django
 <div class="filters">
@@ -2684,7 +2684,7 @@ the single most breakable line in this task.
 `brands` is `Brand.objects.active().with_active_products()` — four pills, not six. `categories`
 is every category, ordered by `sort_order`.
 
-- [ ] **Step 3: Emit the grid from the database**
+- [x] **Step 3: Emit the grid from the database**
 
 ```django
 <div class="grid grid-4" data-product-grid>
@@ -2712,7 +2712,7 @@ client has not supplied 17 of them.
 Then paste the empty-state block from `san-pham.html` verbatim; `filters.js` toggles its `hidden`
 attribute and expects it present in the DOM at load.
 
-- [ ] **Step 4: Write the test**
+- [x] **Step 4: Write the test**
 
 `tests/test_products_page.py`:
 
@@ -2765,12 +2765,12 @@ def test_every_product_image_has_alt_text(body):
     assert 'alt=""' not in body
 ```
 
-- [ ] **Step 5: Run the tests**
+- [x] **Step 5: Run the tests**
 
 Run: `.venv/bin/pytest tests/test_products_page.py -v`
 Expected: `13 passed`
 
-- [ ] **Step 6: Run the harness — this is the real check**
+- [x] **Step 6: Run the harness — this is the real check**
 
 ```bash
 .venv/bin/python manage.py runserver 8000 --noreload &
@@ -2792,7 +2792,7 @@ PASS [data-filter="brand"][data-value="all"]      expect=17 count=17 visible=17 
 Six simultaneous `count=0` failures mean the `data-brand` suffix bug from Step 2. A single
 wrong number means the seed data drifted — fix `seed_content`, not the expectation.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add templates/pages/products.html tests/test_products_page.py
