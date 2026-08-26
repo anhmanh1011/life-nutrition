@@ -84,10 +84,14 @@ by adding fields nobody can fill in.
       `Article.objects.published()`) already exist.
 - [ ] Analytics (GA4 or similar) — nothing is instrumented.
 - [ ] Complete the online.gov.vn (Bộ Công Thương) notification, then replace the notice text.
-- [ ] Point DNS at the VPS and issue the certificate. The site is not deployed yet: HTTPS, HSTS
-      and the apex/`www` redirect are configured in `deploy/nginx/dalifoods.conf` and
-      `config/settings/production.py`, but Steps 24–27 of Task 27 run on the server and have not
-      been run.
+- [x] ~~Point DNS at the VPS and issue the certificate.~~ Done 2026-08-26 — the site is live at
+      https://dalifoods.vn with HTTPS, HSTS and both redirects verified. See
+      [`docs/deploy.md`](docs/deploy.md).
+- [ ] **Submit the dealer form from a phone on mobile data.** Step 31 of Task 27, and the only
+      check that exercises `RealIPMiddleware`, the Telegram notifier and the two-step flow against
+      a real network at once. Not doable from the VPS or the office wifi, so it is still open.
+- [ ] **Change the `admin` password** created during the first deploy. It was generated on the
+      command line and handed over in chat, which is not where a production password should live.
 
 Already in place: `lang="vi"` and a unique `<meta name="description">` per page.
 
@@ -100,6 +104,14 @@ Already in place: `lang="vi"` and a unique `<meta name="description">` per page.
 - [ ] **Back up `product_image/`.** 110 MB of camera originals, gitignored, still existing only on
       the author's machine. Git LFS or a storage bucket — not plain git.
 - [ ] Decide the retention window. `deploy/backup.sh` defaults to 14 days via `KEEP_DAYS`.
+- [ ] **`deploy/backup.sh` names a custom-format dump `.sql.gz`.** `pg_dump -Fc` output is not
+      gzip, so the name invites exactly the `gunzip |` restore that fails. The restore comment was
+      corrected on 2026-08-26; the extension was not, because renaming it also means editing the
+      two `find` patterns that delete expired backups. Do both or neither.
+- [ ] **Clean up what the mail server left behind on the VPS.** `ufw` still allows `25/tcp` from
+      anywhere with nothing listening, `/etc/letsencrypt/live/mail.private-domain-tth.com` is a
+      dead certificate, and `/var/www/life-nutrition` still holds the old static site. All inert;
+      all noise the next person has to rule out. Details in [`docs/deploy.md`](docs/deploy.md).
 
 ## 4. Housekeeping
 

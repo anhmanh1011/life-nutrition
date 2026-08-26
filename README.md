@@ -53,6 +53,8 @@ CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" node tools
 
 ## Deploy
 
+Live at **https://dalifoods.vn** since 2026-08-26, on a single VPS at `62.72.45.65`.
+
 ```bash
 cp deploy/.env.production.example .env    # fill in, then chmod 600
 docker compose up -d --build
@@ -60,8 +62,11 @@ docker compose up -d --build
 
 nginx terminates TLS and serves `/assets/` and `/media/`; gunicorn runs Django; Postgres holds the
 data. `deploy/entrypoint.sh` migrates, creates the cache table, creates the two permission groups
-and runs `collectstatic` on every start. Full first-deploy checklist, certificates and backups:
-Task 27 of `docs/superpowers/plans/2026-08-25-django-admin-cms.md`.
+and runs `collectstatic` on every start.
+
+What is running on that box, how to restore a backup, and the two steps a `db.sql` restore takes
+(the media volume does not come with it): [`docs/deploy.md`](docs/deploy.md). The design behind it
+is Task 27 of `docs/superpowers/plans/2026-08-25-django-admin-cms.md`.
 
 ## Structure
 
@@ -94,5 +99,6 @@ product_image/       camera originals — gitignored, 110 MB
 | [`TODO.md`](TODO.md) | What blocks launch, chiefly `[bracket]` business data in the admin |
 | [`PROGRESS.md`](PROGRESS.md) | What has been built and decided, newest first |
 | [`docs/admin-theme.md`](docs/admin-theme.md) | The admin's cream-and-brown theme: palette, density budget, Django CSS traps |
+| [`docs/deploy.md`](docs/deploy.md) | The live server: services, cron, restore procedure, host traps |
 | `docs/superpowers/specs/` | Approved designs |
 | `docs/superpowers/plans/` | Implementation plans derived from those designs |

@@ -1,5 +1,41 @@
 # Progress
 
+## 2026-08-26 — First deploy: the site is live on dalifoods.vn
+
+Phase 5's server half, the part Task 27 could only write and not run. Three containers on a
+single VPS at `62.72.45.65`, TLS from Let's Encrypt, content restored from `db.sql`. The box,
+its cron entries and its traps: [`docs/deploy.md`](docs/deploy.md).
+
+Verified after the switch to the real certificate: all 8 public pages plus an article detail
+page return 200, `/assets/` and `/media/` serve, `http://` and `www.` both redirect to the apex,
+HSTS arrives as `max-age=31536000; includeSubDomains; preload`, an admin login round-trip
+succeeds over the domain, and `certbot renew --dry-run` passes against the exact command in cron.
+
+Four things the checklist did not predict:
+
+- **The VPS was already serving something on 80 and 443.** A postfix/dovecot/rspamd mail stack
+  with a Roundcube webmail, plus a host nginx running the old static site. Purged on request,
+  including 1.9 GB of mail. The host nginx package survives but is stopped and disabled — starting
+  it would contend with the nginx container for both ports, so `docs/deploy.md` says not to.
+- **`db.sql` restores rows, not images.** The dump carries the real company details, which is why
+  it was used instead of `seed_content`, but `Product.image` and friends point into a `media`
+  volume that starts empty. Restoring it is two steps and the second one — copying the 24
+  referenced files out of `assets/img/` and `chown`ing them to uid 1001 — is written down because
+  skipping it launches the site with every product photo broken.
+- **DNS arrived after the containers did.** nginx will not start against a certificate path that
+  does not exist, and certbot cannot validate a name that does not resolve, so the stack ran
+  behind a temporary self-signed vhost until the A records landed. Both temporary files are gone.
+- **`deploy/backup.sh` documented a restore that cannot work.** `pg_dump -Fc` writes PostgreSQL's
+  custom format, already compressed and not gzip, under a `.sql.gz` name; the script's own
+  comment piped it through `gunzip` and died with `not in gzip format`. The comment now says to
+  feed `pg_restore` directly, proven by restoring into a throwaway database — 17 products back.
+  The misleading extension is left alone: renaming it means editing the two `find` patterns that
+  expire old files, and that is a change to the thing being trusted at 3am.
+
+Still owed by a human: submit the dealer form from a phone on mobile data (the only way to
+exercise `RealIPMiddleware`, the Telegram notifier and the two-step flow at once), change the
+`admin` password created during the deploy, and get backups off the box.
+
 ## 2026-08-25 — Admin theme (branch `feat/admin-theme`)
 
 The Django admin now renders in the site's own warm cream and brown rather than Django's

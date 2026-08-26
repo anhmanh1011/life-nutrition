@@ -6,8 +6,9 @@
 #
 # RESTORE — read this before you need it:
 #   docker compose stop web
-#   gunzip -c BACKUP_DIR/db-YYYY-MM-DD.sql.gz | \
-#     docker compose exec -T db pg_restore --clean --if-exists -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+#   # -Fc output is already compressed; it is not gzip, so do NOT pipe it through gunzip.
+#   docker compose exec -T db pg_restore --clean --if-exists \
+#     -U "$POSTGRES_USER" -d "$POSTGRES_DB" < BACKUP_DIR/db-YYYY-MM-DD.sql.gz
 #   docker run --rm -v life-nutrition_media:/media -v BACKUP_DIR:/backup alpine \
 #     tar xzf /backup/media-YYYY-MM-DD.tar.gz -C /media
 #   docker compose start web
