@@ -8,7 +8,10 @@ def home(request):
     return render(
         request,
         "pages/home.html",
-        {"teasers": Article.objects.published()[:3]},
+        {
+            "teasers": Article.objects.published()[:3],
+            "product_count": Product.objects.active().count(),
+        },
     )
 
 

@@ -114,7 +114,7 @@
     <div style="display: flex; flex-direction: column; gap: 12px;">
       <span style="width: 52px; height: 52px; border-radius: 50%; background: var(--color-accent-2-100); color: var(--color-accent-2-700); display: grid; place-content: center;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.62l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg></span>
       <p style="margin: 0; font-weight: 800; font-size: 16.5px;">Giao hàng toàn quốc</p>
-      <p style="margin: 0; font-size: 14px; line-height: 1.6; color: color-mix(in srgb, var(--color-text) 70%, transparent);">Kho [diện tích] tại [địa điểm], xuất sỉ theo lốc / thùng, hỗ trợ vận chuyển đến [số] tỉnh/thành.</p>
+      <p style="margin: 0; font-size: 14px; line-height: 1.6; color: color-mix(in srgb, var(--color-text) 70%, transparent);">Kho {{ site.warehouse_area }} tại {{ site.facility_location }}, xuất sỉ theo lốc / thùng, hỗ trợ vận chuyển đến {{ site.coverage }} tỉnh/thành.</p>
     </div>
     <div style="display: flex; flex-direction: column; gap: 12px;">
       <span style="width: 52px; height: 52px; border-radius: 50%; background: var(--color-accent-2-100); color: var(--color-accent-2-700); display: grid; place-content: center;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14v-3a9 9 0 0 1 18 0v3"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3Z"/><path d="M3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3Z"/></svg></span>
@@ -127,22 +127,22 @@
 <section class="section" style="padding-block: 40px 8px;">
   <div style="display: flex; gap: 26px; flex-wrap: wrap; align-items: flex-start;">
     <div style="width: 208px; aspect-ratio: 1; border-radius: 50%; background: var(--color-accent-100); display: grid; place-content: center; text-align: center; padding: 24px;">
-      <p style="margin: 0; font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: 42px; color: var(--color-accent-700);">[số]</p>
+      <p style="margin: 0; font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: 42px; color: var(--color-accent-700);">{{ product_count }}</p>
       <p style="margin: 10px 0 0; font-size: 12.5px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 700; color: color-mix(in srgb, var(--color-text) 70%, transparent); max-width: 15ch;">SKU đang phân phối</p>
     </div>
     <div style="width: 178px; aspect-ratio: 1; border-radius: 50%; background: var(--color-accent-200); display: grid; place-content: center; text-align: center; padding: 22px; margin-top: 56px;">
-      <p style="margin: 0; font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: 38px; color: var(--color-accent-700);">[số]</p>
+      <p style="margin: 0; font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: 38px; color: var(--color-accent-700);">{{ site.retail_points }}</p>
       <p style="margin: 10px 0 0; font-size: 12.5px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 700; color: color-mix(in srgb, var(--color-text) 70%, transparent); max-width: 14ch;">Điểm bán &amp; đại lý</p>
     </div>
     <div style="width: 236px; aspect-ratio: 1; border-radius: 50%; background: var(--color-accent-2-300); display: grid; place-content: center; text-align: center; padding: 26px; margin-left: 24px;">
-      <p style="margin: 0; font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: 46px; color: var(--color-accent-2-800);">[số]</p>
+      <p style="margin: 0; font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: 46px; color: var(--color-accent-2-800);">{{ site.coverage }}</p>
       <p style="margin: 10px 0 0; font-size: 12.5px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 700; color: color-mix(in srgb, var(--color-text) 70%, transparent); max-width: 16ch;">Tỉnh / thành đang phủ</p>
     </div>
     <div style="width: 168px; aspect-ratio: 1; border-radius: 50%; background: var(--color-accent-2-100); display: grid; place-content: center; text-align: center; padding: 22px; margin-top: 72px;">
       <p style="margin: 0; font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: 38px; color: var(--color-accent-2-700);">2026</p>
       <p style="margin: 10px 0 0; font-size: 12.5px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 700; color: color-mix(in srgb, var(--color-text) 70%, transparent); max-width: 14ch;">Năm nhận ủy quyền</p>
     </div>
-    <p style="flex: 1; min-width: 260px; margin: 8px 0 0; font-size: 14px; line-height: 1.7; color: color-mix(in srgb, var(--color-text) 62%, transparent); align-self: center;">Số liệu năng lực ([số điểm bán], [vùng phủ], [nhân sự], [năm thành lập]) sẽ được điền khi doanh nghiệp cung cấp — vị trí và bố cục đã sẵn sàng.</p>
+    <p style="flex: 1; min-width: 260px; margin: 8px 0 0; font-size: 14px; line-height: 1.7; color: color-mix(in srgb, var(--color-text) 62%, transparent); align-self: center;">Đội ngũ {{ site.staff_count }} nhân sự, kho {{ site.warehouse_area }} tại {{ site.facility_location }}, giao hàng cùng {{ site.shipping_partner }}.</p>
   </div>
 </section>
 
