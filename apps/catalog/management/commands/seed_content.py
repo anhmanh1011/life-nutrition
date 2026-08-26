@@ -90,10 +90,10 @@ PRODUCTS = [
 # Day 01 is a stand-in wherever the markup says "[ngày]" — see TODO.md.
 ARTICLES = [
     ("life-nutrition-nha-phan-phoi-uy-quyen-dali-foods",
-     "Life Nutrition chính thức là nhà phân phối được ủy quyền của Dali Foods tại Việt Nam",
+     "Life Nutrition là đơn vị được ủy quyền chính hãng duy nhất của Dali Foods tại Việt Nam",
      Topic.COMPANY, datetime(2026, 4, 22, 9, 0, tzinfo=dt_timezone.utc), "breakfast-bread-2",
      "Life Nutrition nhận ủy quyền phân phối Dali Foods",
-     "Giấy chứng nhận do Công ty TNHH Thực phẩm Dali Quảng Tây cấp, hiệu lực đến 30/04/2027 — "
+     "Giấy chứng nhận do Công ty TNHH Thực phẩm Dali Quảng Tây cấp — "
      "mở đường đưa bánh, snack và đồ uống Dali chính ngạch phủ khắp kênh bán lẻ Việt Nam."),
     ("ra-mat-croissant-daliyuan-cam-socola",
      "Ra mắt croissant Daliyuan vị cam & socola — bổ sung kệ bánh ngọt",

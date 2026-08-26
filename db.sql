@@ -2,10 +2,10 @@
 -- PostgreSQL database dump
 --
 
-\restrict ZRB9kFQ5Lwk0Szn73JdXQ27NhTdAfiU0n4Deqq5LXo6QIqOZpvEjOCv6sipMM1t
+\restrict 7DmnGlYMhOxZZBFqah3pqQbfyC4slFmG0wOGgMqEmfAKuTQK57jMKRy6rprcYxb
 
--- Dumped from database version 17.11 (Homebrew)
--- Dumped by pg_dump version 17.11 (Homebrew)
+-- Dumped from database version 17.11
+-- Dumped by pg_dump version 17.11
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -853,13 +853,13 @@ COPY public.django_migrations (id, app, name, applied) FROM stdin;
 --
 
 COPY public.news_article (id, title, slug, topic, cover, cover_alt, excerpt, body, published_at, is_published) FROM stdin;
-1	Life Nutrition chính thức là nhà phân phối được ủy quyền của Dali Foods tại Việt Nam	life-nutrition-nha-phan-phoi-uy-quyen-dali-foods	Tin công ty	news/breakfast-bread-2.jpg	Life Nutrition nhận ủy quyền phân phối Dali Foods	Giấy chứng nhận do Công ty TNHH Thực phẩm Dali Quảng Tây cấp, hiệu lực đến 30/04/2027 — mở đường đưa bánh, snack và đồ uống Dali chính ngạch phủ khắp kênh bán lẻ Việt Nam.		2026-04-22 16:00:00+07	t
 2	Ra mắt croissant Daliyuan vị cam & socola — bổ sung kệ bánh ngọt	ra-mat-croissant-daliyuan-cam-socola	Tin công ty	news/croissant.jpg	Croissant Daliyuan mới			2026-06-15 16:00:00+07	t
 4	3 cách nhận biết hàng Dali chính hãng qua nhãn phụ tiếng Việt	3-cach-nhan-biet-hang-dali-chinh-hang	Kiến thức sản phẩm	news/heiheibao.jpg	Nhận biết hàng chính hãng			2026-08-01 16:00:00+07	t
 5	Trà trái cây Daliyuan — vì sao thành trend đồ uống hè trên TikTok	tra-trai-cay-daliyuan-trend-mua-he	Kiến thức sản phẩm	news/tea-plum.jpg	Trà trái cây mùa hè			2026-06-01 16:00:00+07	t
 6	Hi-Tiger 乐虎 vào kênh HORECA — combo khai trương cho quán café, phòng gym	hi-tiger-vao-kenh-horeca	Chương trình đại lý	news/hitiger.jpg	Hi-Tiger kênh HORECA			2026-05-01 16:00:00+07	t
 7	Cháo lon Youyican 又一餐 — bữa sáng 1 phút cho dân văn phòng	chao-lon-youyican-bua-sang-1-phut	Kiến thức sản phẩm	news/porridge-3.jpg	Cháo Youyican bữa sáng			2026-05-01 16:00:00+07	t
 3	Chiết khấu quý III cho đơn nguyên thùng Haochidian — đăng ký trước 30/09/2026	chiet-khau-quy-iii-haochidian	Chương trình đại lý	news/biscuit-cartons.jpg	Chương trình chiết khấu thùng			2026-07-01 16:00:00+07	t
+1	Life Nutrition là đơn vị được ủy quyền chính hãng duy nhất của Dali Foods tại Việt Nam	life-nutrition-nha-phan-phoi-uy-quyen-dali-foods	Tin công ty	news/breakfast-bread-2.jpg	Life Nutrition nhận ủy quyền phân phối Dali Foods	Giấy chứng nhận do Công ty TNHH Thực phẩm Dali Quảng Tây cấp — mở đường đưa bánh, snack và đồ uống Dali chính ngạch phủ khắp kênh bán lẻ Việt Nam.		2026-04-22 16:00:00+07	t
 \.
 
 
@@ -897,7 +897,7 @@ SELECT pg_catalog.setval('public.auth_permission_id_seq', 52, true);
 -- Name: auth_user_groups_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.auth_user_groups_id_seq', 1, false);
+SELECT pg_catalog.setval('public.auth_user_groups_id_seq', 1, true);
 
 
 --
@@ -960,14 +960,14 @@ SELECT pg_catalog.setval('public.django_migrations_id_seq', 22, true);
 -- Name: leads_contactmessage_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.leads_contactmessage_id_seq', 1, true);
+SELECT pg_catalog.setval('public.leads_contactmessage_id_seq', 4, true);
 
 
 --
 -- Name: leads_dealerapplication_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.leads_dealerapplication_id_seq', 1, true);
+SELECT pg_catalog.setval('public.leads_dealerapplication_id_seq', 2, true);
 
 
 --
@@ -1498,5 +1498,5 @@ ALTER TABLE ONLY public.django_admin_log
 -- PostgreSQL database dump complete
 --
 
-\unrestrict ZRB9kFQ5Lwk0Szn73JdXQ27NhTdAfiU0n4Deqq5LXo6QIqOZpvEjOCv6sipMM1t
+\unrestrict 7DmnGlYMhOxZZBFqah3pqQbfyC4slFmG0wOGgMqEmfAKuTQK57jMKRy6rprcYxb
 
