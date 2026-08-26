@@ -1,22 +1,33 @@
-// Headless-Chrome regression suite for the static site.
-//   node tools/check.mjs        → exits non-zero if anything fails
+// Headless-Chrome regression suite for the Django site.
+//   node tools/check.mjs                      → all 8 pages, exits non-zero on failure
+//   PAGES=/san-pham/ node tools/check.mjs     → just one page
 //
-// Starts its own static server on PORT_HTTP if one is not already listening,
-// so there is nothing to remember before running it.
+// Starts `manage.py runserver` on PORT_HTTP if nothing is listening, so there is
+// nothing to remember before running it.
 
 import { spawn } from 'node:child_process';
 import net from 'node:net';
+import os from 'node:os';
 
-const CHROME = process.env.CHROME
-  ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+const CHROME = process.env.CHROME ?? {
+  win32: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+  darwin: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+}[process.platform] ?? 'google-chrome';
+const PYTHON = process.env.PYTHON
+  ?? (process.platform === 'win32' ? '.venv/Scripts/python.exe' : '.venv/bin/python');
 const PORT_CDP = 9222;
-const PORT_HTTP = 8765;
+const PORT_HTTP = Number(process.env.PORT_HTTP ?? 8000);
 const BASE = `http://127.0.0.1:${PORT_HTTP}`;
 
-const PAGES = ['/index.html', '/gioi-thieu.html', '/thuong-hieu.html', '/san-pham.html',
-  '/hop-tac-dai-ly.html', '/hang-chinh-hang.html', '/tin-tuc.html', '/lien-he.html'];
+const ALL_PAGES = ['/', '/gioi-thieu/', '/thuong-hieu/', '/san-pham/',
+  '/hop-tac-dai-ly/', '/hang-chinh-hang/', '/tin-tuc/', '/lien-he/'];
 
-// san-pham.html filter cases: [selector, expected visible SKUs]. Sequential —
+// PAGES=/san-pham/,/tin-tuc/ scopes the run while a page is mid-conversion.
+const PAGES = process.env.PAGES
+  ? process.env.PAGES.split(',').map(s => s.trim()).filter(Boolean)
+  : ALL_PAGES;
+
+// san-pham filter cases: [selector, expected visible SKUs]. Sequential —
 // each click layers on the previous state (category and brand are independent axes).
 const FILTER_CASES = [
   ['[data-filter="cat"][data-value="quy"]', 5],
@@ -45,14 +56,16 @@ const waitPort = (port, ms = 15000) => new Promise((res, rej) => {
 
 let server = null;
 if (!(await portOpen(PORT_HTTP))) {
-  server = spawn('python3', ['-m', 'http.server', String(PORT_HTTP)], { stdio: 'ignore' });
+  server = spawn(PYTHON, ['manage.py', 'runserver', String(PORT_HTTP), '--noreload'],
+    { stdio: 'ignore' });
   await waitPort(PORT_HTTP);
 }
 
 const chrome = spawn(CHROME, [
   '--headless=new', `--remote-debugging-port=${PORT_CDP}`,
   '--no-first-run', '--no-default-browser-check',
-  '--user-data-dir=/tmp/ln-chrome-profile', '--window-size=1280,900',
+  // Must be absolute: Chrome exits 21 on a drive-relative path like /tmp/....
+  `--user-data-dir=${os.tmpdir()}/ln-chrome-profile`, '--window-size=1280,900',
   'about:blank',
 ], { stdio: 'ignore' });
 
@@ -89,6 +102,9 @@ const evalJs = async (expression) => {
 };
 
 const goto = async (path) => {
+  const status = (await fetch(`${BASE}${path}`, { redirect: 'manual' })).status;
+  // fail() only counts; log it too or a wrong URL name is silently invisible.
+  if (status !== 200) console.log(fail(`HTTP_${status} ${path}`));
   events.length = 0;
   await send('Page.navigate', { url: `${BASE}${path}` });
   await new Promise(r => setTimeout(r, 900));
@@ -145,8 +161,9 @@ for (const p of PAGES) {
 }
 await send('Emulation.clearDeviceMetricsOverride');
 
+if (PAGES.includes('/san-pham/')) {
 console.log('\n=== san-pham filters ===');
-await goto('/san-pham.html');
+await goto('/san-pham/');
 for (const [sel, expect] of FILTER_CASES) {
   await evalJs(`document.querySelector(${JSON.stringify(sel)}).click()`);
   const r = JSON.parse(await evalJs(`(() => JSON.stringify({
@@ -161,16 +178,19 @@ for (const [sel, expect] of FILTER_CASES) {
   if (!ok) fail(sel);
   console.log(`${ok ? 'PASS' : 'FAIL'} ${sel.padEnd(48)} expect=${expect} count=${r.count} visible=${r.visible} empty=${!r.emptyHidden} [${r.pressed}]`);
 }
+}
 
+if (PAGES.includes('/')) {
 console.log('\n=== nav toggle (390px) ===');
 await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 2, mobile: true });
-await goto('/index.html');
+await goto('/');
 const closed = await evalJs(`getComputedStyle(document.querySelector('.site-nav__links')).display`);
 await evalJs(`document.querySelector('.site-nav__toggle').click()`);
 const opened = JSON.parse(await evalJs(`JSON.stringify({d: getComputedStyle(document.querySelector('.site-nav__links')).display, a: document.querySelector('.site-nav__toggle').getAttribute('aria-expanded')})`));
 const navOk = closed === 'none' && opened.d === 'flex' && opened.a === 'true';
 if (!navOk) fail('nav toggle');
 console.log(`closed=${closed} -> open=${opened.d} aria-expanded=${opened.a} ${navOk ? 'PASS' : 'FAIL'}`);
+}
 
 console.log(`\n${failures === 0 ? 'ALL CHECKS PASSED' : `${failures} CHECK(S) FAILED`}`);
 ws.close();

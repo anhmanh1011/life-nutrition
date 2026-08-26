@@ -1,5 +1,109 @@
 # Progress
 
+## 2026-08-25 — Admin theme (branch `feat/admin-theme`)
+
+The Django admin now renders in the site's own warm cream and brown rather than Django's
+blue-grey, and the dealer changelist shows 15 rows per screen instead of 10. One new stylesheet
+(`assets/css/admin.css`), one template override (`templates/admin/base_site.html`), and two
+columns in `apps/leads/admin.py` switched from an inline `style=` to themeable classes. No
+Django CSS is edited or replaced — the theme layers on top. Full record, palette and traps:
+[`docs/admin-theme.md`](docs/admin-theme.md).
+
+Source was Claude Design project `2c862d7c-ef95-4218-ab87-0fcccdb67112`. Its `admin/index.html`
+is a preview harness — screen-switcher buttons around an `<iframe>` — so it has no Django
+counterpart and was not implemented; the stylesheet is what transferred.
+
+Three findings worth keeping:
+
+- **Django declares its palette on `html[data-theme="light"], :root`.** Overriding `:root`
+  alone is discarded the instant its own ☀ toggle sets the attribute, and the whole admin
+  snaps back to blue. Both selectors have to be declared.
+- **Django reserves width for layout the theme replaces with grid** — four separate
+  reservations (270px, 299px, a 600px `#content`, a 300px `.colMS` gutter), each of which
+  silently narrows a region rather than erroring. All four are zeroed with a comment.
+- **A variable Django sets in `@media (prefers-color-scheme: dark)` survives if the theme
+  doesn't redeclare it**, even while the page renders light. `--message-info-bg` was missed
+  that way, and `message_user()` defaults to `INFO`, so the "Gửi lại thông báo Telegram"
+  banner came out Django blue.
+
+221 tests pass. The changelist still needs 1131px in an 829px column at 1366px, so two columns
+sit off-screen at that width — the tradeoff and the reason it was not closed are in
+[`TODO.md`](TODO.md).
+
+## 2026-08-25 — Django CMS + lead backend (branch `feat/django-admin-cms`)
+
+Eight static HTML files became a Django site rendering from Postgres, with a Vietnamese admin and
+working lead capture. `main` still holds the static version.
+
+### Why the static constraint was reversed
+
+Two problems that have no static answer:
+
+1. Staff cannot change a hotline number or publish an article without editing HTML.
+2. Both forms posted to `action="#"`. Every dealer signup submitted so far was silently discarded.
+
+Fixing (2) requires a server, which removes the main argument for staying static, so (1) got fixed
+in the same move. Django SSR was chosen over Next.js and over a static-export pipeline: one deploy,
+no bundler, no React, and the existing markup survives nearly verbatim.
+
+### What was built
+
+| Phase | Tasks | What it produced |
+|---|---|---|
+| 0 — Foundation | 1–3 | Split settings, `/assets/` as `STATIC_URL`, real Postgres in tests |
+| 1 — Data layer | 4–8 | `SiteSettings`, `Brand`, `Category`, `Product`, `Article`, `seed_content` |
+| 2 — Templates | 9–17 | One `base.html`; all 8 pages converted; `check.mjs` repointed at Django |
+| 3 — Leads | 18–23 | Both forms live, phone normalized, rate-limited, Telegram after commit |
+| 4 — Admin | 24–26 | Vietnamese admin end to end; two permission groups as a command |
+| 5 — Deploy + docs | 27–28 | Compose, nginx, gunicorn, backups; these documents |
+
+Task 27's files exist and its three locally-runnable checks pass (`check --deploy`, `sh -n` on both
+scripts, and the volume-path cross-check). Its Steps 22–31 are a first-deploy checklist that runs
+on the server: nothing has been deployed, and no certificate has been issued.
+
+The one decision that shaped everything else: **the phone number is the success condition.** The
+dealer form is therefore split in two — name and phone are banked on the first POST, qualification
+questions come after. A visitor who abandons halfway is still a reachable lead. This costs extra
+views, extra tests and a UUID4 completion token; it was chosen deliberately over the cheaper
+one-step form and should not be "simplified" back.
+
+### What reading the real markup changed
+
+Nine gaps between the spec's data model and the actual pages, listed in one block at the top of
+`docs/superpowers/plans/2026-08-25-django-admin-cms.md` and written back into the spec. The
+representative one: `Category` needs two labels, because the filter pill says
+`Bánh mì & bánh ngọt` while the card kicker says `Bánh`.
+
+### Two bugs that only exist behind a proxy
+
+Both were found while writing the deployment task, and both would have silently disabled a control
+the spec asked for rather than raising an error:
+
+- `@ratelimit(key="ip")` reads `REMOTE_ADDR`, which behind nginx is the proxy's address for every
+  visitor. All traffic shared one bucket of 15/hour. Fixed with `RealIPMiddleware`, which trusts
+  `X-Real-IP` (nginx overwrites it) and not `X-Forwarded-For` (nginx appends to it, so a client can
+  seed it).
+- No `CACHES` setting meant the default per-process `LocMemCache`, making the same limit 45/hour
+  across three gunicorn workers. Production now uses `DatabaseCache` on the Postgres already there.
+
+### Environment facts verified before planning
+
+| Fact | Value | Consequence |
+|---|---|---|
+| Python | 3.14.5 (Homebrew) | Django 5.2 does not support 3.14 — pinned **Django 6.0.8** |
+| PostgreSQL | 17.11 (Homebrew) | dev and tests use real Postgres, not SQLite |
+| Node | v22.22.0 | `tools/check.mjs` survives; Task 12 repoints it at Django |
+| Docker | not installed | Phase 5's deploy files were reviewed by reading, not by running |
+| Pillow | installs fine in a venv | the old "no Pillow" note was about *system* Python only |
+
+That table describes the machine the plan was written on. Phases 0–5 were implemented on Windows
+with **Python 3.13.14** and a portable PostgreSQL 17, which changed two things: the venv binaries
+live in `.venv/Scripts/`, and the Dockerfile pins `python:3.13.14-slim` rather than the 3.14.5 the
+plan's snippet carried — the point of that pin is that a wheel resolving locally resolves in the
+image, which only holds if the version matches the machine doing the resolving. Django 6.0.8
+supports 3.13 as well as 3.14, so nothing else moved. Tasks 1 and 2 still carry macOS commands
+(`brew services start postgresql@17`, an absolute `/Users/...` path, `.venv/bin/python`).
+
 ## 2026-08-25 — Initial build
 
 ### Conversion from Claude Design

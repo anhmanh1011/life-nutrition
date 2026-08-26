@@ -1,0 +1,38 @@
+{% load static %}
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <div class="site-footer__grid">
+      <div class="site-footer__col" style="gap: 14px;">
+        <span class="site-footer__logo"><img src="{% static 'img/logo.png' %}" alt="Life Nutrition"></span>
+        <p class="site-footer__lede">CÔNG TY CỔ PHẦN XUẤT NHẬP KHẨU LIFE NUTRITION<br>Đơn vị được ủy quyền chính hãng duy nhất của Dali Foods tại Việt Nam.</p>
+        <p class="site-footer__meta">MST: {{ site.tax_code }} · ĐKKD số {{ site.business_license_no }}, cấp {{ site.business_license_date }} tại {{ site.business_license_issuer }}<br>Trụ sở: {{ site.head_office_address }}<br>Kho hàng: {{ site.warehouse_address }}, {{ site.warehouse_area }}</p>
+      </div>
+      <div class="site-footer__col">
+        <p class="site-footer__head">Liên hệ</p>
+        <p class="site-footer__contact">Hotline sỉ: <strong>{{ site.hotline_wholesale }}</strong><br>Hotline lẻ: <strong>{{ site.hotline_retail }}</strong><br>Email: {{ site.email }}<br>Zalo OA: {{ site.zalo_oa }}<br>Giờ làm việc: T2–T7, 8:00–17:30</p>
+      </div>
+      <div class="site-footer__col">
+        <p class="site-footer__head">Chính sách</p>
+        <div class="site-footer__links">
+          <a href="#">Chính sách bảo mật</a>
+          <a href="#">Chính sách giao hàng</a>
+          <a href="#">Chính sách đổi trả</a>
+          <a href="#">Chính sách thanh toán</a>
+          <a href="{% url 'pages:authentic' %}">Nhận biết hàng chính hãng</a>
+        </div>
+      </div>
+      <div class="site-footer__col" style="gap: 12px;">
+        <p class="site-footer__head">Gian hàng chính hãng</p>
+        <div class="site-footer__links">
+          <a href="#">Shopee Mall — {{ site.shopee_url }}</a>
+          <a href="#">LazMall — {{ site.lazada_url }}</a>
+          <a href="#">TikTok Shop — {{ site.tiktok_url }}</a>
+        </div>
+        <div class="site-footer__note">Vị trí logo "Đã thông báo Bộ Công Thương" — {{ site.moit_notice }}</div>
+      </div>
+    </div>
+    <div class="site-footer__divider"></div>
+    <p class="site-footer__legal">Dali Foods cùng các nhãn hiệu Daliyuan, Copico, Haochidian, Heqizheng, Hi-Tiger, Doubendou là nhãn hiệu thuộc sở hữu của Dali Foods Group. Life Nutrition là đơn vị được ủy quyền chính hãng duy nhất tại Việt Nam.</p>
+    <p class="site-footer__copyright">© 2026 Công ty Cổ phần Xuất nhập khẩu Life Nutrition · dalifoods.vn</p>
+  </div>
+</footer>

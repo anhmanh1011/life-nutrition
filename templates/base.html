@@ -1,0 +1,31 @@
+{% load static %}<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Dali Foods Việt Nam — Life Nutrition{% endblock %}</title>
+<meta name="description" content="{% block description %}Life Nutrition nhập khẩu chính ngạch và phân phối toàn kênh các sản phẩm bánh, snack, đồ uống của Dali Foods Group tại Việt Nam.{% endblock %}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+<link rel="icon" href="{% static 'img/logo-mark.png' %}">
+{% block extra_head %}{% endblock %}
+</head>
+<body>
+
+{% include "pages/_nav.html" %}
+
+{% block content %}{% endblock %}
+
+{% include "pages/_footer.html" %}
+
+<div class="floating-actions">
+  <a class="fab fab--zalo" href="#" aria-label="Chat Zalo">Zalo</a>
+  <a class="fab fab--call" href="tel:{{ site.hotline_retail }}" aria-label="Gọi hotline"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/></svg></a>
+</div>
+
+<script src="{% static 'js/site.js' %}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

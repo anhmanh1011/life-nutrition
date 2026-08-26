@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Cảm ơn bạn — Dali Foods Việt Nam{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container" style="max-width: 640px; text-align: center;">
+    <h1>Cảm ơn bạn đã liên hệ</h1>
+    <p style="font-size: 17px; line-height: 1.7;">
+      Chúng tôi đã nhận được thông tin và sẽ phản hồi qua điện thoại hoặc Zalo
+      trong 24 giờ làm việc.
+    </p>
+    <p style="font-size: 15px;">
+      Cần gấp? Gọi hotline sỉ <strong>{{ site.hotline_wholesale }}</strong>.
+    </p>
+    <p style="margin-top: 28px;">
+      <a class="btn btn-primary" href="{% url 'pages:products' %}">Xem danh mục sản phẩm</a>
+    </p>
+  </div>
+</section>
+{% endblock %}

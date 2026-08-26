@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Bổ sung thông tin đại lý — Dali Foods Việt Nam{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container" style="max-width: 620px;">
+    <p class="eyebrow">Bước 2 / 2</p>
+    <h1>Đã nhận thông tin của bạn</h1>
+    <p style="font-size: 16px; line-height: 1.7;">
+      Chúng tôi sẽ gọi <strong>{{ lead.hoten }}</strong> theo số
+      <strong>{{ lead.sdt }}</strong> trong 24 giờ làm việc. Nếu bạn trả lời thêm vài ý
+      dưới đây, cuộc gọi đầu tiên sẽ có sẵn bảng giá đúng ngành hàng của bạn.
+    </p>
+
+    <form class="card elev-md" method="post" style="padding: 28px 28px 26px; display: flex; flex-direction: column; gap: 16px; margin-top: 24px;">
+      {% csrf_token %}
+      {% if form.non_field_errors %}<p class="form-error">{{ form.non_field_errors.0 }}</p>{% endif %}
+      <div class="field"><label for="donvi">Đơn vị / cửa hàng</label>{{ form.donvi }}</div>
+      <div class="field"><label for="khuvuc">Khu vực kinh doanh</label>{{ form.khuvuc }}</div>
+      <div class="field"><label id="lh-label">Loại hình kinh doanh</label>
+        <div style="display: grid; gap: 6px;" role="radiogroup" aria-labelledby="lh-label">
+          {% for value, label in form.fields.loaihinh.choices %}{% if value %}
+          <label class="radio"><input type="radio" name="loaihinh" value="{{ value }}"{% if form.loaihinh.value == value %} checked{% endif %}><span class="dot"></span>{{ label }}</label>
+          {% endif %}{% endfor %}
+        </div>
+      </div>
+      <div class="field"><label id="sl-label">Sản lượng dự kiến / tháng</label>
+        <div class="seg" role="radiogroup" aria-labelledby="sl-label">
+          {% for value, label in form.fields.sanluong.choices %}{% if value %}
+          <label class="seg-opt"><input type="radio" name="sanluong" value="{{ value }}"{% if form.sanluong.value == value %} checked{% endif %}>{{ label }}</label>
+          {% endif %}{% endfor %}
+        </div>
+      </div>
+      <div class="grid grid-2" style="gap: 12px;">
+        <div class="field"><label for="zalo">Zalo</label>{{ form.zalo }}</div>
+        <div class="field"><label for="email">Email</label>{{ form.email }}{% if form.email.errors %}<p class="form-error">{{ form.email.errors.0 }}</p>{% endif %}</div>
+      </div>
+      <button class="btn btn-primary btn-block" type="submit">Hoàn tất đăng ký</button>
+      <p style="margin: 0; text-align: center; font-size: 13px;">
+        <a href="{% url 'pages:thanks' %}">Bỏ qua, gọi cho tôi là được</a>
+      </p>
+    </form>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,744 @@
+/* ============================================================
+   dalifoods.vn — admin.css
+   Toàn bộ thiết kế trang quản trị. CSS thuần, font hệ thống,
+   không tài nguyên ngoài. Sáng: mặc định / data-theme="light".
+   Tối: html[data-theme="dark"].
+
+   Class phụ (đặt qua widget attrs / format_html, tiền tố da-):
+   - .da-tg-sent / .da-tg-wait / .da-tg-error  → cột "Đã báo Telegram"
+   - .da-fill-full / .da-fill-min              → cột mức độ đầy đủ
+   Màu 4 trạng thái đơn đại lý KHÔNG cần class: bám theo
+   tr:has(option[value=…]:checked) trên chính <select> của Django.
+   ============================================================ */
+
+/* Django khai báo bảng màu gốc ở `html[data-theme="light"], :root` (base.css).
+   Chỉ ghi đè `:root` là chưa đủ: ngay khi nút ☀ của Django đặt data-theme="light",
+   nửa selector kia thắng về độ ưu tiên và toàn bộ màu quay lại xanh mặc định. */
+:root,
+html[data-theme="light"] {
+  --primary:                  #4f4733;  /* nền thanh phụ, tiêu đề bảng */
+  --secondary:                #262019;  /* nền thanh tiêu đề trên cùng */
+  --accent:                   #c67139;  /* màu nhấn, gạch chân đang chọn */
+  --primary-fg:               #f5ead8;  /* chữ nằm trên nền --primary */
+
+  --body-fg:                  #2a2624;
+  --body-bg:                  #f6f1e6;
+  --body-quiet-color:         #8a7f70;  /* chữ phụ, mờ */
+  --body-medium-color:        #5c5347;
+  --body-loud-color:          #191614;  /* chữ nhấn mạnh */
+
+  --header-color:             #cdbfa8;
+  --header-branding-color:    #e5a06a;  /* tên công ty trên thanh tiêu đề */
+  --header-bg:                #262019;
+  --header-link-color:        #f5ead8;
+
+  --breadcrumbs-fg:           #7b6d55;
+  --breadcrumbs-link-fg:      #4f4733;
+  --breadcrumbs-bg:           #ebddc5;
+
+  --link-fg:                  #9a5426;
+  --link-hover-color:         #c67139;
+  --link-selected-fg:         #7a4218;
+
+  --hairline-color:           #eadfca;  /* đường kẻ giữa các dòng bảng */
+  --border-color:             #d8cbb0;
+  --error-fg:                 #b3261e;
+
+  --message-success-bg:       #e4ead4;  /* băng thông báo "Đã lưu" */
+  --message-warning-bg:       #f7e6c8;
+  --message-error-bg:         #f3d9d5;
+  /* message_user() mặc định là mức INFO — nút "Gửi lại thông báo Telegram" dùng
+     đúng mức này. Không khai ở đây thì băng info rơi về màu xanh của Django. */
+  --message-info-bg:          #dbe4ea;
+
+  --darkened-bg:              #f4eddd;  /* nền dòng xen kẽ, nền đầu bảng */
+  --selected-bg:              #f5e7d3;  /* nền dòng đang rê chuột */
+  --selected-row:             #eeddb9;  /* nền dòng đang được tick chọn */
+
+  --button-fg:                #fff9ec;
+  --button-bg:                #6a5f49;
+  --button-hover-bg:          #57503c;
+  --default-button-bg:        #b05f2a;  /* nút Lưu */
+  --default-button-hover-bg:  #9a4f1f;
+  --close-button-bg:          #a89b83;
+  --close-button-hover-bg:    #93866d;
+  --delete-button-bg:         #b3261e;  /* nút Xoá */
+  --delete-button-hover-bg:   #8f1d16;
+
+  --object-tools-fg:          #fff9ec;  /* nút "Thêm ..." góc trên phải */
+  --object-tools-bg:          #7a8a5e;
+  --object-tools-hover-bg:    #62714a;
+
+  --font-family-primary:      system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Liberation Sans", sans-serif;
+
+  /* ---- biến riêng, tiền tố da- ---- */
+  --da-surface:        #fffcf5;   /* nền thẻ/bảng */
+  --da-surface-2:      #faf5e9;
+  --da-radius:         12px;
+  --da-radius-sm:      8px;
+  --da-shadow:         0 1px 2px rgba(32,30,29,.06), 0 4px 14px rgba(32,30,29,.05);
+  --da-focus:          #c67139;
+
+  /* 4 trạng thái đơn đại lý */
+  --da-st-new-bg:      #c67139;  --da-st-new-fg:      #fff9ec;
+  --da-st-contact-bg:  #f0e2b6;  --da-st-contact-fg:  #6b5410;
+  --da-st-won-bg:      #dfe6cb;  --da-st-won-fg:      #46522f;
+  --da-st-rej-bg:      #e9e2d5;  --da-st-rej-fg:      #7c7263;
+  --da-row-new-bg:     #fbf2dc;  /* dòng chưa xử lý */
+
+  /* Telegram */
+  --da-tg-sent-fg:     #5f6f43;
+  --da-tg-wait-bg:     #f0e2b6;  --da-tg-wait-fg:     #6b5410;
+  --da-tg-err-bg:      #b3261e;  --da-tg-err-fg:      #fff6f4;
+
+  /* mức độ đầy đủ */
+  --da-fill-min-fg:    #9a5426;
+}
+
+html[data-theme="dark"] {
+  --primary:                  #322c24;
+  --secondary:                #100e0c;
+  --accent:                   #d98d55;
+  --primary-fg:               #eadfc8;
+
+  --body-fg:                  #ede4d3;
+  --body-bg:                  #171412;
+  --body-quiet-color:         #9b8f7d;
+  --body-medium-color:        #c4b8a4;
+  --body-loud-color:          #f7efe0;
+
+  --header-color:             #a89c88;
+  --header-branding-color:    #e0995f;
+  --header-bg:                #100e0c;
+  --header-link-color:        #ede4d3;
+
+  --breadcrumbs-fg:           #a4977f;
+  --breadcrumbs-link-fg:      #d6c9ae;
+  --breadcrumbs-bg:           #221e19;
+
+  --link-fg:                  #d98d55;
+  --link-hover-color:         #e5a06a;
+  --link-selected-fg:         #c67139;
+
+  --hairline-color:           #322c24;
+  --border-color:             #453d31;
+  --error-fg:                 #ef8d80;
+
+  --message-success-bg:       #2b3221;
+  --message-warning-bg:       #3d3013;
+  --message-error-bg:         #431f1a;
+  --message-info-bg:          #23303a;
+
+  --darkened-bg:              #241f1a;
+  --selected-bg:              #2b2118;
+  --selected-row:             #3a2c1c;
+
+  --button-fg:                #f3ecdc;
+  --button-bg:                #4d4535;
+  --button-hover-bg:          #5d5443;
+  --default-button-bg:        #c1662c;
+  --default-button-hover-bg:  #d0763c;
+  --close-button-bg:          #57503f;
+  --close-button-hover-bg:    #665e4b;
+  --delete-button-bg:         #a2342a;
+  --delete-button-hover-bg:   #b74438;
+
+  --object-tools-fg:          #f3f0e4;
+  --object-tools-bg:          #5d6b45;
+  --object-tools-hover-bg:    #6d7d52;
+
+  --da-surface:        #201c18;
+  --da-surface-2:      #262019;
+  --da-shadow:         0 1px 2px rgba(0,0,0,.35), 0 4px 14px rgba(0,0,0,.25);
+
+  --da-st-new-bg:      #c96f33;  --da-st-new-fg:      #1d1510;
+  --da-st-contact-bg:  #3d3416;  --da-st-contact-fg:  #e5cf7c;
+  --da-st-won-bg:      #313a22;  --da-st-won-fg:      #c0d093;
+  --da-st-rej-bg:      #34302a;  --da-st-rej-fg:      #b3a893;
+  --da-row-new-bg:     #2b2318;
+
+  --da-tg-sent-fg:     #a7b884;
+  --da-tg-wait-bg:     #3d3416;  --da-tg-wait-fg:     #e5cf7c;
+  --da-tg-err-bg:      #c14b3d;  --da-tg-err-fg:      #fff6f4;
+
+  --da-fill-min-fg:    #e0995f;
+}
+html[data-theme="dark"] { color-scheme: dark; }
+
+/* ---------- nền tảng ---------- */
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  font-family: var(--font-family-primary);
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--body-fg);
+  background: var(--body-bg);
+}
+a { color: var(--link-fg); text-decoration: none; }
+a:hover { color: var(--link-hover-color); text-decoration: underline; text-underline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--da-focus); outline-offset: 2px; border-radius: 4px; }
+::selection { background: var(--selected-row); }
+input, select, button, textarea { font: inherit; color: inherit; }
+input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); width: 15px; height: 15px; }
+
+.visually-hidden,
+thead.visually-hidden {
+  position: absolute !important; width: 1px; height: 1px;
+  margin: -1px; padding: 0; border: 0; clip-path: inset(50%); overflow: hidden; white-space: nowrap;
+}
+.clear, br.clear { display: none; }
+svg.base-svgs { display: none; }
+.hiddenfields { display: none; }
+
+.skip-to-content-link {
+  position: absolute; left: 12px; top: -48px; z-index: 100;
+  padding: 8px 14px; border-radius: 999px;
+  background: var(--accent); color: #fff9ec; font-weight: 600;
+  transition: top .15s ease;
+}
+.skip-to-content-link:focus { top: 10px; color: #fff9ec; }
+
+/* ---------- thanh tiêu đề ---------- */
+#header {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 10px 28px;
+  background: var(--header-bg); color: var(--header-color);
+}
+#branding { display: flex; align-items: center; gap: 12px; }
+#site-name { margin: 0; font-size: 16.5px; font-weight: 700; letter-spacing: .01em; }
+#site-name a { color: var(--header-branding-color); }
+#site-name a::before {
+  content: ""; display: inline-block; vertical-align: -3px;
+  width: 16px; height: 16px; margin-right: 9px; border-radius: 50%;
+  background: radial-gradient(circle at 34% 30%, #e5a06a 0 38%, #c67139 39% 72%, #9a5426 73%);
+}
+#site-name a:hover { color: var(--header-link-color); text-decoration: none; }
+#user-tools {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 4px 14px;
+  font-size: 12.5px; color: var(--header-color);
+}
+#user-tools a, #logout-form button { color: var(--header-link-color); }
+#user-tools a:hover { color: var(--header-branding-color); }
+#logout-form { display: inline; margin: 0; }
+#logout-form button {
+  background: none; border: 0; padding: 0; cursor: pointer;
+  font-size: 12.5px; text-decoration: none;
+}
+#logout-form button:hover { color: var(--header-branding-color); text-decoration: underline; text-underline-offset: 2px; }
+
+.theme-toggle {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; margin-left: 4px;
+  border: 1px solid color-mix(in oklab, var(--header-color) 35%, transparent);
+  border-radius: 999px; background: none; cursor: pointer; color: var(--header-link-color);
+}
+.theme-toggle:hover { border-color: var(--header-branding-color); color: var(--header-branding-color); }
+.theme-toggle svg { display: none; width: 15px; height: 15px; fill: currentColor; }
+.theme-toggle svg path:first-child { fill: none; }
+html[data-theme="dark"]  .theme-toggle svg.theme-icon-when-dark  { display: block; }
+html[data-theme="light"] .theme-toggle svg.theme-icon-when-light { display: block; }
+html[data-theme="auto"]  .theme-toggle svg.theme-icon-when-auto  { display: block; }
+html:not([data-theme])   .theme-toggle svg.theme-icon-when-auto  { display: block; }
+
+/* ---------- breadcrumbs ---------- */
+.breadcrumbs {
+  padding: 9px 28px;
+  background: var(--breadcrumbs-bg); color: var(--breadcrumbs-fg);
+  font-size: 12.5px;
+  border-bottom: 1px solid var(--border-color);
+}
+.breadcrumbs a { color: var(--breadcrumbs-link-fg); font-weight: 600; }
+.breadcrumbs a:hover { color: var(--link-hover-color); }
+
+/* ---------- khung chính + sidebar ---------- */
+.main { display: flex; align-items: stretch; min-height: calc(100vh - 92px); }
+.content { flex: 1 1 auto; min-width: 0; }
+#content { padding: 20px 28px 56px; }
+#content > h1 {
+  margin: 4px 0 16px; font-size: 21px; font-weight: 750;
+  letter-spacing: -.01em; color: var(--body-loud-color); text-wrap: pretty;
+}
+#content > h2 { margin: -10px 0 16px; font-size: 13px; font-weight: 500; color: var(--body-quiet-color); }
+#footer { min-height: 24px; }
+
+#toggle-nav-sidebar {
+  flex: 0 0 auto; width: 18px; align-self: stretch;
+  border: 0; border-right: 1px solid var(--hairline-color);
+  background: var(--da-surface-2); color: var(--body-quiet-color); cursor: pointer; padding: 0;
+}
+#toggle-nav-sidebar::before { content: "‹"; font-size: 15px; }
+#toggle-nav-sidebar:hover { background: var(--selected-bg); color: var(--body-fg); }
+#toggle-nav-sidebar[aria-expanded="false"]::before { content: "›"; }
+#toggle-nav-sidebar[aria-expanded="false"] + #nav-sidebar { display: none; }
+/* Django reserves 299px beside the sidebar for its own 276px one plus the toggle.
+   This theme's is 242px all in, and flex already keeps the content from
+   overflowing, so the leftover reservation only narrowed the changelist. */
+.main.shifted > #nav-sidebar + .content { max-width: none; }
+
+#nav-sidebar {
+  flex: 0 0 224px; width: 224px; order: -1;
+  padding: 16px 14px 28px;
+  background: var(--da-surface-2);
+  border-right: 1px solid var(--hairline-color);
+  font-size: 12.5px;
+  position: sticky; top: 0; align-self: flex-start;
+  max-height: 100vh; overflow-y: auto;
+}
+#toggle-nav-sidebar { order: -1; }
+#nav-filter {
+  width: 100%; margin-bottom: 14px; padding: 6px 12px;
+  border: 1px solid var(--border-color); border-radius: 999px;
+  background: var(--da-surface); color: var(--body-fg);
+}
+#nav-filter::placeholder { color: var(--body-quiet-color); }
+#nav-sidebar .module { margin: 0 0 16px; }
+#nav-sidebar table { width: 100%; border-collapse: collapse; display: block; }
+#nav-sidebar tbody { display: block; }
+#nav-sidebar tr { display: flex; align-items: center; }
+#nav-sidebar th { flex: 1 1 auto; min-width: 0; }
+#nav-sidebar td { flex: 0 0 auto; }
+#nav-sidebar caption {
+  display: block;
+  /* Django paints this a solid --header-bg band. The design wants a plain label sitting
+     on the sidebar surface — and the quiet colour below was written for a light one,
+     which left the section links at 3.6:1 on the dark band. */
+  background: none;
+  text-align: left; padding: 0 8px 5px;
+  font-size: 10.5px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase;
+  color: var(--body-medium-color);
+}
+#nav-sidebar caption a.section { color: var(--body-medium-color); }
+#nav-sidebar caption a.section:hover { color: var(--accent); text-decoration: none; }
+#nav-sidebar th, #nav-sidebar td { padding: 0; text-align: left; font-weight: 500; }
+#nav-sidebar th a {
+  display: block; padding: 6px 8px; border-radius: var(--da-radius-sm);
+  color: var(--body-medium-color);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+#nav-sidebar th a:hover { background: var(--selected-bg); color: var(--body-loud-color); text-decoration: none; }
+#nav-sidebar td a.addlink { display: block; padding: 2px 8px; color: var(--body-quiet-color); font-size: 0; border-radius: 999px; border: 0; background: none; }
+#nav-sidebar td a.addlink::before { content: "+"; font-size: 14px; font-weight: 700; }
+#nav-sidebar td a.addlink:hover { color: var(--accent); text-decoration: none; background: var(--selected-bg); }
+#nav-sidebar tr.current-model th a {
+  background: var(--da-surface); color: var(--body-loud-color); font-weight: 700;
+  box-shadow: inset 3px 0 0 var(--accent), var(--da-shadow);
+}
+#nav-sidebar .current-app caption a.section { color: var(--accent); }
+
+/* ---------- module chung / trang chủ ---------- */
+.module {
+  background: var(--da-surface);
+  border: 1px solid var(--hairline-color);
+  border-radius: var(--da-radius);
+  box-shadow: var(--da-shadow);
+  overflow: hidden;
+}
+#nav-sidebar .module { background: none; border: 0; box-shadow: none; border-radius: 0; overflow: visible; }
+
+#content.colMS {
+  display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 20px;
+  align-items: start;
+  /* Django pins the dashboard to `.dashboard #content { width: 600px }` for its float
+     layout. Left alone, the grid divides 600px and the app cards collapse to ~104px.
+     `.colMS` then reserves a further 300px gutter for the floated recent-actions box,
+     which the grid above already gives a column of its own. */
+  width: auto; margin-right: 0;
+}
+#content.colMS > h1 { grid-column: 1 / -1; margin-bottom: 4px; }
+
+.app-list { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; align-content: start; align-items: start; }
+.app-list .module { margin: 0; }
+.app-list table { width: 100%; border-collapse: collapse; }
+.app-list caption {
+  text-align: left; padding: 11px 16px;
+  background: var(--primary); color: var(--primary-fg);
+  font-size: 12px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+}
+.app-list caption a.section { color: var(--primary-fg); }
+.app-list caption a.section:hover { color: var(--header-branding-color); text-decoration: none; }
+.app-list tbody tr + tr th, .app-list tbody tr + tr td,
+.app-list tr:not(:first-child) th, .app-list tr:not(:first-child) td { border-top: 1px solid var(--hairline-color); }
+.app-list th[scope="row"] { text-align: left; padding: 11px 16px; font-weight: 600; font-size: 13.5px; }
+.app-list th[scope="row"] a { color: var(--body-fg); }
+.app-list th[scope="row"] a:hover { color: var(--link-hover-color); text-decoration: none; }
+.app-list td { padding: 8px 8px; width: 1%; white-space: nowrap; text-align: right; }
+.app-list td:last-child { padding-right: 14px; }
+a.addlink, a.changelink, a.historylink, a.viewlink {
+  display: inline-block; padding: 3px 11px; border-radius: 999px;
+  font-size: 12px; font-weight: 600; color: var(--body-medium-color);
+  /* Nền phải khác nền thẻ, nếu không viên nút chìm hẳn vào thẻ — ở chế độ tối
+     thì chỉ còn lại đường viền 1px, nhìn như chữ thường chứ không phải nút. */
+  border: 1px solid var(--border-color); background: var(--da-surface-2);
+}
+a.addlink:hover, a.changelink:hover, a.historylink:hover, a.viewlink:hover {
+  border-color: var(--accent); color: var(--accent); text-decoration: none;
+  background: color-mix(in oklab, var(--accent) 8%, var(--da-surface-2));
+}
+a.addlink::before { content: "+ "; font-weight: 700; }
+a.changelink::before { content: "✎ "; }
+a.historylink::before { content: "↺ "; }
+
+/* nhóm Khách hàng: việc hằng ngày — đưa lên đầu và nhấn mạnh */
+.app-list .app-leads { order: -1; grid-column: 1 / -1; border-color: color-mix(in oklab, var(--accent) 45%, var(--hairline-color)); }
+.app-list .app-leads caption { background: var(--accent); color: #fff9ec; }
+.app-list .app-leads caption a.section { color: #fff9ec; }
+.app-list .app-leads caption a.section::after { content: " · việc hằng ngày"; font-weight: 500; text-transform: none; letter-spacing: 0; opacity: .85; }
+.app-list .app-leads th[scope="row"] { padding-block: 13px; }
+
+#content-related .module { padding-bottom: 8px; }
+#content-related h2 {
+  margin: 0; padding: 11px 16px;
+  background: var(--primary); color: var(--primary-fg);
+  font-size: 12px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+}
+#content-related h3 { margin: 12px 16px 4px; font-size: 12px; color: var(--body-quiet-color); font-weight: 600; }
+#content-related p, #content-related ul { margin: 6px 16px 10px; color: var(--body-quiet-color); font-size: 12.5px; }
+#content-related ul { padding-left: 16px; }
+
+/* ---------- object tools ---------- */
+.object-tools { display: flex; justify-content: flex-end; gap: 8px; list-style: none; margin: 0 0 12px; padding: 0; min-height: 0; }
+.object-tools li { display: block; }
+.object-tools a {
+  display: inline-block; padding: 7px 16px; border-radius: 999px;
+  background: var(--object-tools-bg); color: var(--object-tools-fg); font-weight: 600; font-size: 12.5px;
+}
+.object-tools a:hover { background: var(--object-tools-hover-bg); color: var(--object-tools-fg); text-decoration: none; }
+ul.object-tools:empty { display: none; }
+
+/* ---------- đăng nhập ---------- */
+body.login #header { justify-content: center; padding: 26px 20px 6px; background: none; }
+body.login #branding { flex-direction: column; gap: 10px; }
+body.login #site-name { font-size: 24px; }
+body.login #site-name a { color: var(--body-loud-color); }
+body.login #site-name a::before { width: 22px; height: 22px; vertical-align: -4px; }
+body.login .theme-toggle { border-color: var(--border-color); color: var(--body-medium-color); }
+body.login .main { display: block; min-height: 0; }
+body.login #content { padding: 12px 20px 60px; }
+body.login #content-main {
+  width: min(380px, 100%); margin: 4vh auto 0;
+  background: var(--da-surface); border: 1px solid var(--hairline-color);
+  border-radius: 18px; box-shadow: var(--da-shadow);
+  padding: 26px 26px 24px;
+}
+body.login .form-row { margin-bottom: 14px; }
+body.login .form-row label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 12.5px; color: var(--body-medium-color); }
+body.login input[type="text"], body.login input[type="password"] {
+  width: 100%; padding: 9px 14px;
+  border: 1px solid var(--border-color); border-radius: 999px;
+  background: var(--body-bg); color: var(--body-fg);
+}
+body.login input:focus { border-color: var(--accent); outline: 2px solid color-mix(in oklab, var(--accent) 35%, transparent); outline-offset: 0; }
+body.login .submit-row { margin-top: 20px; padding: 0; background: none; border: 0; position: static; box-shadow: none; }
+body.login .submit-row input {
+  width: 100%; padding: 10px 16px; border: 0; border-radius: 999px;
+  background: var(--default-button-bg); color: var(--button-fg);
+  font-weight: 700; font-size: 14px; cursor: pointer;
+}
+body.login .submit-row input:hover { background: var(--default-button-hover-bg); }
+.errornote {
+  margin: 0 0 16px; padding: 10px 14px;
+  background: var(--message-error-bg); color: var(--error-fg);
+  border-radius: var(--da-radius-sm); font-size: 12.5px; font-weight: 600;
+}
+
+/* ---------- băng thông báo ---------- */
+ul.messagelist { list-style: none; margin: 0 0 16px; padding: 0; }
+ul.messagelist li { padding: 10px 16px; border-radius: var(--da-radius-sm); margin-bottom: 6px; font-weight: 600; font-size: 12.5px; }
+ul.messagelist li.success { background: var(--message-success-bg); }
+ul.messagelist li.info    { background: var(--message-info-bg); }
+ul.messagelist li.warning { background: var(--message-warning-bg); }
+ul.messagelist li.error   { background: var(--message-error-bg); color: var(--error-fg); }
+
+/* ---------- changelist ---------- */
+#changelist { background: none; border: 0; box-shadow: none; border-radius: 0; overflow: visible; }
+/* Django already lays this out with flex, and reserves calc(100% - 270px) beside the
+   table for its own 240px + 30px filter column. Swapping in a grid loses — that
+   reservation selector carries two ids — so keep the flex and drop the reservation,
+   because the column below is narrower than the 270px Django set aside for it. */
+#changelist .changelist-form-container { display: flex; align-items: flex-start; gap: 16px; }
+#changelist .changelist-form-container:has(#changelist-filter) > div { max-width: none; }
+
+/* thanh tìm kiếm */
+#toolbar { padding: 0; margin-bottom: 10px; border: 0; background: none; }
+#changelist-search > div { display: flex; align-items: center; gap: 8px; }
+#changelist-search label {
+  width: 30px; height: 30px; flex: 0 0 auto; border-radius: 999px;
+  background-color: var(--body-quiet-color);
+  -webkit-mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2.75" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></svg>') center / 17px 17px no-repeat;
+          mask: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2.75" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.8-3.8"/></svg>') center / 17px 17px no-repeat;
+}
+#changelist-search label img { display: none; }
+#changelist-search > div { flex-wrap: wrap; }
+#searchbar {
+  flex: 1 1 160px; min-width: 0; max-width: 420px; padding: 7px 16px;
+  border: 1px solid var(--border-color); border-radius: 999px;
+  background: var(--da-surface); color: var(--body-fg);
+}
+#searchbar:focus { border-color: var(--accent); outline: 2px solid color-mix(in oklab, var(--accent) 35%, transparent); outline-offset: 0; }
+#changelist-search input[type="submit"] {
+  padding: 7px 16px; border: 0; border-radius: 999px; cursor: pointer;
+  background: var(--button-bg); color: var(--button-fg); font-weight: 600; font-size: 12.5px;
+}
+#changelist-search input[type="submit"]:hover { background: var(--button-hover-bg); }
+
+/* dải lọc theo ngày */
+.toplinks { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.toplinks:empty { display: none; }
+.toplinks a {
+  padding: 4px 13px; border-radius: 999px; font-size: 12px; font-weight: 600;
+  border: 1px solid var(--border-color); color: var(--body-medium-color); background: var(--da-surface);
+}
+.toplinks a:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; }
+.toplinks .this-day, .toplinks a[aria-current] { background: var(--primary); color: var(--primary-fg); border-color: var(--primary); }
+
+/* hành động hàng loạt */
+.actions {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 10px;
+  padding: 8px 12px; margin-bottom: 10px;
+  background: var(--darkened-bg); border: 1px solid var(--hairline-color);
+  border-radius: var(--da-radius-sm); font-size: 12.5px;
+}
+.actions label { display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--body-medium-color); }
+.actions select {
+  padding: 5px 10px; border: 1px solid var(--border-color); border-radius: var(--da-radius-sm);
+  background: var(--da-surface); color: var(--body-fg); max-width: 320px;
+}
+.actions .button {
+  padding: 5px 14px; border: 0; border-radius: 999px; cursor: pointer;
+  background: var(--button-bg); color: var(--button-fg); font-weight: 600; font-size: 12px;
+}
+.actions .button:hover { background: var(--button-hover-bg); }
+.action-counter { color: var(--body-quiet-color); margin-left: auto; }
+
+/* bảng kết quả */
+.results {
+  background: var(--da-surface); border: 1px solid var(--hairline-color);
+  border-radius: var(--da-radius); box-shadow: var(--da-shadow);
+  overflow-x: auto;
+}
+@media (min-width: 1600px) {
+  .results { overflow: visible; }
+  #result_list thead th { position: sticky; top: 0; }
+}
+#result_list { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
+#result_list thead th {
+  z-index: 2;
+  background: var(--primary); color: var(--primary-fg);
+  text-align: left; padding: 0; font-size: 11.5px; font-weight: 700;
+  letter-spacing: .05em; text-transform: uppercase; white-space: nowrap;
+}
+/* Django pins header cells to nowrap, which lets one long verbose_name — "Số lần đã
+   gửi trước đó" — claim a 200px column for a single-digit value. A two-line header
+   costs height once; a wide column costs horizontal room on every row. Needs the
+   extra id to outweigh Django's `#changelist table thead th`. */
+#changelist #result_list thead th { white-space: normal; line-height: 1.25; }
+#result_list thead th .text { padding: 6px 10px; }
+#result_list thead th:first-child { border-top-left-radius: var(--da-radius); }
+#result_list thead th:last-child { border-top-right-radius: var(--da-radius); }
+#result_list thead th a { color: var(--primary-fg); }
+#result_list thead th a:hover { color: var(--header-branding-color); text-decoration: none; }
+#result_list thead th .sortoptions { float: right; display: flex; gap: 2px; padding: 6px 6px 0 0; font-size: 10px; }
+#result_list thead th .sortoptions a { opacity: .8; }
+#result_list thead th .sortpriority { opacity: .6; }
+#result_list thead th a.sortremove::before { content: "✕"; }
+#result_list thead th a.toggle.ascending::before { content: "▲"; }
+#result_list thead th a.toggle.descending::before { content: "▼"; }
+#result_list tbody th, #result_list tbody td {
+  padding: 5px 10px; text-align: left; font-weight: 400;
+  border-top: 1px solid var(--hairline-color); vertical-align: middle;
+}
+#result_list tbody tr:first-child th, #result_list tbody tr:first-child td { border-top: 0; }
+#result_list tbody tr:nth-child(even) { background: var(--darkened-bg); }
+#result_list tbody tr:hover { background: var(--selected-bg); }
+#result_list tbody tr.selected,
+#result_list tbody tr:has(.action-select:checked) { background: var(--selected-row); }
+#result_list tbody th { white-space: nowrap; }
+#result_list tbody th a { font-weight: 650; color: var(--body-loud-color); }
+#result_list tbody th a:hover { color: var(--link-hover-color); text-decoration: none; }
+#result_list .nowrap, #result_list td[class*="field-created"], #result_list td[class*="field-phone"] { white-space: nowrap; }
+#result_list td[class*="field-phone"] { font-variant-numeric: tabular-nums; font-weight: 600; }
+#result_list td[class*="field-created"] { color: var(--body-quiet-color); font-variant-numeric: tabular-nums; font-size: 11.5px; }
+/* The checkbox needs a column, not a 55px one. Header cells are already padding:0. */
+#result_list td.action-checkbox { padding-left: 6px; padding-right: 6px; }
+#result_list td[class*="previous_count"] { text-align: center; color: var(--body-quiet-color); font-variant-numeric: tabular-nums; }
+.field-thumbnail img {
+  width: 40px; height: 40px; object-fit: cover; display: block;
+  border-radius: 10px; background: var(--darkened-bg); color: transparent;
+}
+input.vIntegerField { width: 62px; padding: 4px 8px; border: 1px solid var(--border-color); border-radius: var(--da-radius-sm); background: var(--da-surface); text-align: right; }
+
+/* ô chọn trạng thái ngay trên bảng — màu bám theo option đang chọn */
+#result_list td select {
+  appearance: none; -webkit-appearance: none;
+  /* Chrome sizes a select from its own internals, so line-height alone leaves it
+     30px tall and it — not the text — sets the height of every row. */
+  box-sizing: border-box; height: 22px;
+  padding: 0 22px 0 11px; border: 1px solid transparent; border-radius: 999px;
+  font-size: 12px; line-height: 1.2; font-weight: 700; cursor: pointer;
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23555" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>');
+  background-repeat: no-repeat; background-position: right 8px center; background-size: 11px;
+  background-color: var(--darkened-bg);
+}
+#result_list td select option { font-weight: 400; background: var(--da-surface); color: var(--body-fg); }
+#result_list tr:has(option[value="new"]:checked) td select {
+  background-color: var(--da-st-new-bg); color: var(--da-st-new-fg);
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23fff9ec" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>');
+}
+#result_list tr:has(option[value="contacted"]:checked) td select { background-color: var(--da-st-contact-bg); color: var(--da-st-contact-fg); border-color: color-mix(in oklab, var(--da-st-contact-fg) 30%, transparent); }
+#result_list tr:has(option[value="won"]:checked) td select { background-color: var(--da-st-won-bg); color: var(--da-st-won-fg); border-color: color-mix(in oklab, var(--da-st-won-fg) 30%, transparent); }
+#result_list tr:has(option[value="rejected"]:checked) td select { background-color: var(--da-st-rej-bg); color: var(--da-st-rej-fg); }
+
+/* dòng chưa xử lý (trạng thái Mới) bật lên */
+#result_list tbody tr:has(option[value="new"]:checked) { background: var(--da-row-new-bg); box-shadow: inset 3px 0 0 var(--accent); }
+#result_list tbody tr:has(option[value="new"]:checked):hover { background: var(--selected-bg); }
+#result_list tbody tr:has(option[value="rejected"]:checked) th a,
+#result_list tbody tr:has(option[value="rejected"]:checked) td { color: var(--body-quiet-color); }
+
+/* huy hiệu Telegram + mức độ đầy đủ (class phụ) */
+.da-tg-sent { color: var(--da-tg-sent-fg); font-weight: 600; font-size: 12px; white-space: nowrap; }
+.da-tg-sent::before { content: "✓ "; }
+.da-tg-wait {
+  display: inline-block; padding: 2px 10px; border-radius: 999px;
+  background: var(--da-tg-wait-bg); color: var(--da-tg-wait-fg); font-weight: 700; font-size: 11.5px; white-space: nowrap;
+}
+.da-tg-error {
+  display: inline-block; padding: 2px 10px; border-radius: 999px;
+  background: var(--da-tg-err-bg); color: var(--da-tg-err-fg); font-weight: 800; font-size: 11.5px; white-space: nowrap;
+}
+.da-tg-error::before { content: "⚠ "; }
+.da-fill-full { color: var(--body-quiet-color); font-size: 12px; white-space: nowrap; }
+.da-fill-full::before { content: "● "; color: var(--da-tg-sent-fg); font-size: 9px; vertical-align: 1px; }
+/* One line, never two. This label repeats on every unfinished row, and letting it
+   wrap was costing ~18px of height on each of them. */
+.da-fill-min { display: inline-block; white-space: nowrap; color: var(--da-fill-min-fg); font-weight: 650; font-size: 12px; }
+.da-fill-min::before { content: "◐ "; font-size: 10px; vertical-align: 1px; }
+
+/* chân bảng: phân trang + Lưu, luôn thấy được */
+.changelist-footer {
+  position: sticky; bottom: 0; z-index: 3;
+  display: flex; align-items: center; gap: 12px;
+  margin-top: 10px; padding: 10px 14px;
+  background: var(--da-surface); border: 1px solid var(--hairline-color);
+  border-radius: var(--da-radius); box-shadow: var(--da-shadow);
+}
+.paginator { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; font-size: 12.5px; color: var(--body-quiet-color); }
+.paginator a, .paginator .this-page {
+  display: inline-block; min-width: 27px; padding: 3px 8px; text-align: center;
+  border-radius: 999px; font-weight: 600; font-variant-numeric: tabular-nums;
+}
+.paginator a { border: 1px solid var(--border-color); color: var(--body-medium-color); }
+.paginator a:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; }
+.paginator .this-page { background: var(--primary); color: var(--primary-fg); }
+.changelist-footer input[name="_save"] {
+  margin-left: auto; padding: 8px 22px; border: 0; border-radius: 999px; cursor: pointer;
+  background: var(--default-button-bg); color: var(--button-fg); font-weight: 700; font-size: 13px;
+}
+.changelist-footer input[name="_save"]:hover { background: var(--default-button-hover-bg); }
+
+/* cột lọc bên phải */
+#changelist-filter {
+  flex: 0 0 208px; order: 1; margin: 0;
+  background: var(--da-surface); border: 1px solid var(--hairline-color);
+  border-radius: var(--da-radius); box-shadow: var(--da-shadow);
+  padding: 0 0 8px; font-size: 12.5px;
+  position: sticky; top: 12px; max-height: calc(100vh - 24px); overflow-y: auto;
+}
+#changelist-filter h2 {
+  margin: 0; padding: 11px 16px;
+  background: var(--primary); color: var(--primary-fg);
+  font-size: 12px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+  border-radius: var(--da-radius) var(--da-radius) 0 0;
+  position: sticky; top: 0; z-index: 1;
+}
+#changelist-filter-extra-actions { padding: 8px 16px 0; }
+#changelist-filter-extra-actions h3 { margin: 0; font-size: 12px; font-weight: 500; }
+#changelist-filter details { border-top: 1px solid var(--hairline-color); padding: 8px 0; }
+#changelist-filter details:first-of-type { border-top: 0; margin-top: 8px; }
+#changelist-filter summary {
+  padding: 4px 16px; cursor: pointer; list-style: none;
+  font-weight: 700; color: var(--body-medium-color); font-size: 12px;
+}
+#changelist-filter summary::-webkit-details-marker { display: none; }
+#changelist-filter summary::after { content: "▾"; float: right; color: var(--body-quiet-color); font-size: 10px; }
+#changelist-filter details:not([open]) summary::after { content: "▸"; }
+#changelist-filter summary:hover { color: var(--body-loud-color); }
+#changelist-filter ul { list-style: none; margin: 2px 0 0; padding: 0; }
+#changelist-filter li a { display: block; padding: 4px 16px; color: var(--body-quiet-color); border-left: 3px solid transparent; }
+#changelist-filter li a:hover { color: var(--body-fg); text-decoration: none; background: var(--selected-bg); }
+#changelist-filter li.selected a { color: var(--link-selected-fg); font-weight: 700; border-left-color: var(--accent); background: color-mix(in oklab, var(--accent) 8%, transparent); }
+
+/* ---------- form (change form) ---------- */
+fieldset.module { margin: 0 0 18px; padding: 0 0 10px; border: 1px solid var(--hairline-color); min-width: 0; }
+fieldset.module h2.fieldset-heading {
+  margin: 0; padding: 11px 18px;
+  background: var(--primary); color: var(--primary-fg);
+  font-size: 12.5px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+}
+fieldset.module .description {
+  padding: 9px 18px; margin: 0 0 4px;
+  background: var(--darkened-bg); color: var(--body-quiet-color);
+  font-size: 12px; border-bottom: 1px solid var(--hairline-color);
+}
+.form-row { padding: 9px 18px; border-bottom: 1px solid var(--hairline-color); }
+fieldset .form-row:last-of-type { border-bottom: 0; }
+.aligned .flex-container { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 16px; }
+.aligned label {
+  flex: 0 0 200px; font-weight: 600; font-size: 12.5px; color: var(--body-medium-color);
+  text-align: right;
+}
+.aligned label.required::after { content: " *"; color: var(--accent); }
+input.vTextField, input.vURLField, input.vIntegerField, textarea.vLargeTextField, .form-row select {
+  border: 1px solid var(--border-color); border-radius: 999px;
+  background: var(--body-bg); color: var(--body-fg);
+}
+input.vTextField, input.vURLField {
+  flex: 1 1 260px; max-width: 560px; padding: 7px 14px;
+}
+input.vTextField:focus, input.vURLField:focus { border-color: var(--accent); outline: 2px solid color-mix(in oklab, var(--accent) 35%, transparent); outline-offset: 0; background: var(--da-surface); }
+.form-row .help { margin: 4px 0 0 216px; color: var(--body-quiet-color); font-size: 11.5px; }
+.form-row .help div { display: inline; }
+
+.submit-row {
+  position: sticky; bottom: 12px; z-index: 3;
+  display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+  padding: 12px 16px; margin: 18px 0 0;
+  background: var(--da-surface); border: 1px solid var(--hairline-color);
+  border-radius: var(--da-radius); box-shadow: var(--da-shadow);
+}
+.submit-row input[type="submit"], .submit-row a.button {
+  padding: 8px 20px; border: 0; border-radius: 999px; cursor: pointer;
+  background: var(--button-bg); color: var(--button-fg); font-weight: 600; font-size: 13px;
+}
+.submit-row input[type="submit"]:hover, .submit-row a.button:hover { background: var(--button-hover-bg); }
+.submit-row input.default { order: 9; margin-left: auto; background: var(--default-button-bg); font-weight: 700; }
+.submit-row input.default:hover { background: var(--default-button-hover-bg); }
+.submit-row a.deletelink, .submit-row .deletelink-box a {
+  background: var(--delete-button-bg); color: var(--button-fg);
+  padding: 8px 20px; border-radius: 999px; font-weight: 600; display: inline-block;
+}
+.submit-row a.deletelink:hover { background: var(--delete-button-hover-bg); text-decoration: none; }
+.submit-row a.closelink { background: var(--close-button-bg); }
+.submit-row a.closelink:hover { background: var(--close-button-hover-bg); }
+
+/* ---------- responsive ---------- */
+@media (max-width: 1100px) {
+  #nav-sidebar { flex-basis: 200px; width: 200px; }
+  #changelist-filter { flex-basis: 190px; }
+}
+@media (max-width: 900px) {
+  #content.colMS { grid-template-columns: 1fr; }
+  .app-list { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+  #header, .breadcrumbs, #content { padding-left: 16px; padding-right: 16px; }
+  #nav-sidebar, #toggle-nav-sidebar { display: none; }
+  #changelist .changelist-form-container { display: block; }
+  #changelist-filter { margin-top: 16px; position: static; max-height: none; }
+  .aligned label { flex-basis: 100%; text-align: left; }
+  .form-row .help { margin-left: 0; }
+  .action-counter { flex-basis: 100%; margin-left: 0; }
+  .changelist-footer { flex-wrap: wrap; }
+  #result_list { font-size: 12.5px; }
+}

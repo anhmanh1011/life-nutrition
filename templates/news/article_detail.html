@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ article.title }} — Dali Foods Việt Nam{% endblock %}
+{% block description %}{{ article.excerpt }}{% endblock %}
+
+{% block content %}
+<article class="section" style="padding-block: 52px 10px; max-width: 760px;">
+  <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-accent{% if article.topic == 'Chương trình đại lý' %}-2{% endif %}-700);">{{ article.topic }} · {{ article.published_at|date:"d/m/Y" }}</span>
+  <h1 style="font-size: 38px; line-height: 1.15; margin: 12px 0 18px;">{{ article.title }}</h1>
+  {% if article.excerpt %}<p style="font-size: 17px; line-height: 1.65; margin: 0 0 26px; color: color-mix(in srgb, var(--color-text) 75%, transparent);">{{ article.excerpt }}</p>{% endif %}
+  {% if article.cover %}
+  <figure class="washed" style="margin: 0 0 30px; border-radius: var(--radius-lg); overflow: hidden;">
+    <img src="{{ article.cover.url }}" alt="{{ article.cover_alt }}" style="display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; object-position: 50% 65%;">
+  </figure>
+  {% endif %}
+  <div class="prose">{{ article.body|safe }}</div>
+</article>
+
+{% if related %}
+<section class="section" style="padding-block: 40px 8px;">
+  <div class="section-head"><div><p class="eyebrow">Đọc thêm</p><h2>Bài viết khác</h2></div></div>
+  <div class="grid grid-3">
+    {% for item in related %}
+    <a href="{{ item.get_absolute_url }}" class="card" style="padding: 0; overflow: hidden; text-decoration: none; color: var(--color-text); display: flex; flex-direction: column;">
+      {% if item.cover %}<figure class="washed" style="margin: 0;"><img src="{{ item.cover.url }}" alt="{{ item.cover_alt }}" style="display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; object-position: 50% 65%;"></figure>{% endif %}
+      <div style="padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 8px; flex: 1;">
+        <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-accent{% if item.topic == 'Chương trình đại lý' %}-2{% endif %}-700);">{{ item.topic }} · {{ item.published_at|date:"d/m/Y" }}</span>
+        <p style="margin: 0; font-weight: 700; font-size: 16px; line-height: 1.45;">{{ item.title }}</p>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}
