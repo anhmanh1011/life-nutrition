@@ -9,8 +9,12 @@ import { spawn } from 'node:child_process';
 import net from 'node:net';
 import os from 'node:os';
 
-const CHROME = process.env.CHROME
-  ?? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
+const CHROME = process.env.CHROME ?? {
+  win32: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+  darwin: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+}[process.platform] ?? 'google-chrome';
+const PYTHON = process.env.PYTHON
+  ?? (process.platform === 'win32' ? '.venv/Scripts/python.exe' : '.venv/bin/python');
 const PORT_CDP = 9222;
 const PORT_HTTP = Number(process.env.PORT_HTTP ?? 8000);
 const BASE = `http://127.0.0.1:${PORT_HTTP}`;
@@ -52,7 +56,7 @@ const waitPort = (port, ms = 15000) => new Promise((res, rej) => {
 
 let server = null;
 if (!(await portOpen(PORT_HTTP))) {
-  server = spawn('.venv/Scripts/python.exe', ['manage.py', 'runserver', String(PORT_HTTP), '--noreload'],
+  server = spawn(PYTHON, ['manage.py', 'runserver', String(PORT_HTTP), '--noreload'],
     { stdio: 'ignore' });
   await waitPort(PORT_HTTP);
 }
