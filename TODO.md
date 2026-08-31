@@ -34,6 +34,26 @@ is a single admin edit that updates every page at once.
       admin to staff, or the client will fill a field in and see the home page ignore it. The
       line-145 sentence is copy that describes the gap and disappears with it.
 
+### Legal identity — hardcoded, and no admin field reaches it
+
+Dali Foods Việt Nam is a newly formed entity and `SiteSettings` has no `company_name`, so two
+values live in the templates:
+
+| Placeholder | Where |
+|---|---|
+| `[tên pháp nhân đầy đủ]` | `templates/pages/_footer.html`, `templates/pages/about.html` |
+| `[người đại diện]` | `templates/pages/about.html` |
+
+Filling these is a template edit, not an admin edit. That is fine for values that are set once;
+add fields only if they start changing.
+
+- [ ] **The authorization certificate on the about page names an issuer nobody has verified.**
+      The mock is issued by 达利食品（广西）有限公司 (Dali Quảng Tây), but the company's authority
+      actually comes from its distribution contract with Life Nutrition. Decide whether the
+      certificate keeps that issuer and its seal or shows the party that really signed —
+      the decision has to happen before a real scan replaces the mock, because the mock is
+      currently asserting a relationship that may not exist.
+
 ### *Thương hiệu* — trim to what is actually distributed
 
 The pages list six Dali Foods brands. Untick **Đang phân phối** on any the company does not
@@ -52,7 +72,8 @@ the actual publication dates.
 
 Upload through the admin; the old placeholders were image captions, not text fields.
 
-- The authorization letter — currently `[Thay bằng bản scan thật — giữ watermark chống sao chép]`.
+- The authorization letter — currently
+  `[Thay bằng bản scan hợp đồng / giấy ủy quyền phân phối thật — giữ watermark chống sao chép]`.
 - Real warehouse and team photos — currently product shots standing in
   (`templates/pages/about.html` line 99 still carries the `[thay bằng ảnh kho thật]` caption).
 

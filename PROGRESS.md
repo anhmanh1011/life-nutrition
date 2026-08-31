@@ -1,5 +1,48 @@
 # Progress
 
+## 2026-08-31 — Rebrand to Dali Foods Việt Nam, and a new logo (`main`)
+
+A separate contract now covers this distribution channel, so the site speaks as **Dali Foods
+Việt Nam**, a new legal entity, rather than Life Nutrition. Eleven templates, the seed command,
+`db.sql`, two test fixtures and the docs changed; 221 tests and `check.mjs` pass.
+
+Life Nutrition survives in exactly one place: the Vietnamese sub-label mock in `authentic.html`,
+where it is named as the importer of record. That mention is deliberate. `PROJECT.md` carries a
+note so nobody removes it as a leftover.
+
+### The wording is narrower than the original request
+
+The brief said "phân phối độc quyền … trên nền tảng số". Both halves were dropped on the client's
+instruction once the options were put to them: the approved line is **"Dali Foods Việt Nam — phân
+phối chính hãng sản phẩm Dali Foods Group tại Việt Nam."** No exclusivity claim, and no limit to
+digital channels. The home page card that read *Ủy quyền chính hãng duy nhất* became *Phân phối
+chính hãng* for the same reason. The dealer page still recruits **offline** dealers — also a
+client decision, not an oversight.
+
+### Business data was reset rather than carried across
+
+MST, ĐKKD, the head-office and warehouse addresses, the Zalo OA name and the three marketplace
+links in `db.sql` belonged to the old entity, so they went back to the `[bracket]` defaults. The
+same reasoning removed the named legal representative from the about page. Carrying a former
+entity's registration numbers under a new company name would have been a fabrication, not a
+migration. What stayed: hotlines, email, warehouse size and the operating figures, none of which
+are entity-specific.
+
+The about page's authorization certificate is the open question — it is issued by Dali Quảng Tây,
+while the real authority comes from the Life Nutrition contract. The certified party is now a
+placeholder and the issuer is untouched, pending a decision recorded in [`TODO.md`](TODO.md).
+
+### The logo could not be dropped in as supplied
+
+The artwork is a square stacked lockup on a white matte. The nav renders it at `height: 42px`,
+which puts the wordmark near 7px, and the nav has no room to grow — mobile is 64px against the
+72px ceiling `check.mjs` enforces. So `logo.png` was recomposed with Pillow into a 676×240
+horizontal lockup and un-matted to transparency, because the nav sits on cream. `logo-mark.png`
+is the emblem alone for the favicon. Method and pixel budget: [`PROJECT.md`](PROJECT.md).
+
+Worth keeping: **Pillow is installed in `.venv`.** An older note claiming this machine has neither
+Pillow nor ImageMagick was about the system Python and cost time before it was checked.
+
 ## 2026-08-25 — Admin theme (branch `feat/admin-theme`)
 
 The Django admin now renders in the site's own warm cream and brown rather than Django's
