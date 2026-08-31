@@ -43,7 +43,7 @@ def above_the_footer(response):
 
     _footer.html carries a trademark notice — "Dali Foods cùng các nhãn hiệu Daliyuan,
     Copico, … là nhãn hiệu thuộc sở hữu của Dali Foods Group" — that names all six marks
-    on every page. It says who owns the marks, not which ones Life Nutrition stocks, so
+    on every page. It says who owns the marks, not which ones we stock, so
     switching a brand off must leave it alone. The two brand-list tests below are about
     the page body only.
     """

@@ -1,9 +1,12 @@
 # PROJECT.md — working notes for this repo
 
-Marketing site for **dalifoods.vn**. Life Nutrition is the authorized Vietnam distributor of
-Dali Foods Group (Daliyuan 达利园, Copico 可比克, Haochidian 好吃点, Heqizheng 和其正,
+Marketing site for **dalifoods.vn**. Dali Foods Việt Nam distributes Dali Foods Group products
+in Vietnam (Daliyuan 达利园, Copico 可比克, Haochidian 好吃点, Heqizheng 和其正,
 Hi-Tiger 乐虎, Doubendou 豆本豆). Audience: Vietnamese B2B dealers and B2C retail buyers,
 overwhelmingly on phones.
+
+Life Nutrition remains the importer of record and is named only on the Vietnamese
+sub-label mock in `authentic.html`. It must not appear anywhere else in the copy.
 
 Django renders eight pages server-side from Postgres. Staff edit everything through a Vietnamese
 admin; both lead forms write to the database and notify a Telegram channel.
@@ -174,9 +177,17 @@ site) and exists only on the author's machine.
 Gotcha: `sips --cropOffset` measures from the **center**, not the top-left. To isolate a region
 it is usually easier to re-render at a small viewport than to fight the crop offsets.
 
-`assets/img/logo.png` is a tight 500×122 wordmark; `logo-mark.png` is the 256×256 swoosh used
-as the favicon, because a 4.1:1 wordmark is illegible at 16px. The original asset was ~39%
-whitespace — if the logo ever looks small, measure the ink bounding box before changing CSS.
+`assets/img/logo.png` is a 676×240 horizontal lockup — emblem left, "DALI FOODS" right — and
+`logo-mark.png` is the 256×256 emblem alone, used as the favicon because a 2.8:1 lockup is
+illegible at 16px. Both are transparent RGBA: the nav sits on cream `#f5ead8`, so an opaque
+image shows as a white box.
+
+**The supplied artwork is square and stacked, and must not be used as-is.** `.site-nav__brand img`
+is `height: 42px`, which would leave the wordmark around 7px, and the nav cannot grow to
+compensate — see the layout budget above. The horizontal lockup was recomposed from
+`media/products/Dali-foods-logo.jpg` with Pillow: un-matte from white (`a = 255 - min(r,g,b)`,
+then unpremultiply `C = (observed - 255*(1-a))/a`), crop the emblem and wordmark separately,
+composite side by side. Regenerate the same way if the source artwork is ever reissued.
 
 Product photography is cropped with `object-position: 50% 65%` throughout, standardised so that
 labels sit in frame across the whole set rather than tuned per image.

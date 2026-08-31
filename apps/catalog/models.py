@@ -35,7 +35,7 @@ class Brand(models.Model):
     is_active = models.BooleanField(
         "Đang phân phối",
         default=True,
-        help_text="Bỏ chọn nếu Life Nutrition chưa phân phối thương hiệu này.",
+        help_text="Bỏ chọn nếu chưa phân phối thương hiệu này.",
     )
     sort_order = models.PositiveIntegerField("Thứ tự", default=0)
 

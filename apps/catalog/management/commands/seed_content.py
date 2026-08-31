@@ -89,12 +89,12 @@ PRODUCTS = [
 # slug, title, topic, published date, image stem, cover alt, excerpt
 # Day 01 is a stand-in wherever the markup says "[ngày]" — see TODO.md.
 ARTICLES = [
-    ("life-nutrition-nha-phan-phoi-uy-quyen-dali-foods",
-     "Life Nutrition là đơn vị được ủy quyền chính hãng duy nhất của Dali Foods tại Việt Nam",
+    ("dali-foods-viet-nam-nha-phan-phoi-chinh-hang",
+     "Dali Foods Việt Nam là đơn vị phân phối chính hãng sản phẩm Dali Foods tại Việt Nam",
      Topic.COMPANY, datetime(2026, 4, 22, 9, 0, tzinfo=dt_timezone.utc), "breakfast-bread-2",
-     "Life Nutrition nhận ủy quyền phân phối Dali Foods",
-     "Giấy chứng nhận do Công ty TNHH Thực phẩm Dali Quảng Tây cấp — "
-     "mở đường đưa bánh, snack và đồ uống Dali chính ngạch phủ khắp kênh bán lẻ Việt Nam."),
+     "Dali Foods Việt Nam phân phối sản phẩm Dali Foods",
+     "Hợp đồng phân phối đã ký kết — mở đường đưa bánh, snack và đồ uống Dali "
+     "chính ngạch phủ khắp kênh bán lẻ Việt Nam."),
     ("ra-mat-croissant-daliyuan-cam-socola",
      "Ra mắt croissant Daliyuan vị cam & socola — bổ sung kệ bánh ngọt",
      Topic.COMPANY, datetime(2026, 6, 15, 9, 0, tzinfo=dt_timezone.utc), "croissant",
