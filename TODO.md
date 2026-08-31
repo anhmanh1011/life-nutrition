@@ -36,16 +36,14 @@ is a single admin edit that updates every page at once.
 
 ### Legal identity — hardcoded, and no admin field reaches it
 
-Dali Foods Việt Nam is a newly formed entity and `SiteSettings` has no `company_name`, so two
-values live in the templates:
+Dali Foods Việt Nam is a newly formed entity and `SiteSettings` has no `company_name`, so the
+legal name and the representative live in the templates, not the admin. Both were filled in on
+2026-08-31 with **ĐÀO ĐỨC MẠNH**, on the client's instruction, in three places in
+`templates/pages/_footer.html` and `templates/pages/about.html`.
 
-| Placeholder | Where |
-|---|---|
-| `[tên pháp nhân đầy đủ]` | `templates/pages/_footer.html`, `templates/pages/about.html` |
-| `[người đại diện]` | `templates/pages/about.html` |
-
-Filling these is a template edit, not an admin edit. That is fine for values that are set once;
-add fields only if they start changing.
+- [ ] **Confirm that is the registered name.** It is a personal name sitting directly above the
+      MST / ĐKKD line in the footer, which reads as a hộ kinh doanh rather than a company. If the
+      registration carries a fuller name, it is a template edit in those same three places.
 
 - [ ] **The authorization certificate on the about page names an issuer nobody has verified.**
       The mock is issued by 达利食品（广西）有限公司 (Dali Quảng Tây), but the company's authority
