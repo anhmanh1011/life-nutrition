@@ -1,9 +1,12 @@
 # PROJECT.md — working notes for this repo
 
-Marketing site for **dalifoods.vn**. Life Nutrition is the authorized Vietnam distributor of
-Dali Foods Group (Daliyuan 达利园, Copico 可比克, Haochidian 好吃点, Heqizheng 和其正,
+Marketing site for **dalifoods.vn**. Dali Foods Việt Nam distributes Dali Foods Group products
+in Vietnam (Daliyuan 达利园, Copico 可比克, Haochidian 好吃点, Heqizheng 和其正,
 Hi-Tiger 乐虎, Doubendou 豆本豆). Audience: Vietnamese B2B dealers and B2C retail buyers,
 overwhelmingly on phones.
+
+Life Nutrition remains the importer of record and is named only on the Vietnamese
+sub-label mock in `authentic.html`. It must not appear anywhere else in the copy.
 
 Django renders eight pages server-side from Postgres. Staff edit everything through a Vietnamese
 admin; both lead forms write to the database and notify a Telegram channel.

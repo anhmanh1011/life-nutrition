@@ -1,7 +1,7 @@
-# Life Nutrition — dalifoods.vn
+# Dali Foods Việt Nam — dalifoods.vn
 
-Marketing site for **Life Nutrition**, authorized Vietnam distributor of Dali Foods Group
-(Daliyuan, Copico, Haochidian, Heqizheng, Hi-Tiger, Doubendou).
+Marketing site for **Dali Foods Việt Nam**, authentic Vietnam distributor of Dali Foods Group
+products (Daliyuan, Copico, Haochidian, Heqizheng, Hi-Tiger, Doubendou).
 
 Django 6, server-rendered from PostgreSQL. Eight public pages, a Vietnamese admin, and two lead
 forms that notify a Telegram channel. No client framework and no bundler.

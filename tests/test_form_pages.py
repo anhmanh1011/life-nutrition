@@ -16,7 +16,7 @@ def filled(seeded):
     row.hotline_wholesale = "1900 1234"
     row.hotline_retail = "1900 6789"
     row.email = "sales@dalifoods.vn"
-    row.zalo_oa = "Life Nutrition Official"
+    row.zalo_oa = "Dali Foods VN Official"
     row.head_office_address = "12 Nguyễn Huệ, Quận 1, TP.HCM"
     row.save()
     return row
@@ -27,7 +27,7 @@ def test_contact_page_shows_all_four_contact_channels(client, filled):
     assert "1900 1234" in body
     assert "1900 6789" in body
     assert "sales@dalifoods.vn" in body
-    assert "Life Nutrition Official" in body
+    assert "Dali Foods VN Official" in body
 
 
 def test_contact_map_placeholder_carries_the_real_address(client, filled):
@@ -39,7 +39,7 @@ def test_contact_map_placeholder_carries_the_real_address(client, filled):
 def test_dealer_page_shows_the_wholesale_hotline_not_the_retail_one(client, filled):
     body = client.get(reverse("pages:dealer")).content.decode()
     assert "1900 1234" in body
-    assert "Life Nutrition Official" in body
+    assert "Dali Foods VN Official" in body
 
 
 def test_dealer_page_keeps_its_page_specific_stylesheet(client, seeded):

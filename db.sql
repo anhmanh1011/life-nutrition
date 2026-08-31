@@ -859,7 +859,7 @@ COPY public.news_article (id, title, slug, topic, cover, cover_alt, excerpt, bod
 6	Hi-Tiger 乐虎 vào kênh HORECA — combo khai trương cho quán café, phòng gym	hi-tiger-vao-kenh-horeca	Chương trình đại lý	news/hitiger.jpg	Hi-Tiger kênh HORECA			2026-05-01 16:00:00+07	t
 7	Cháo lon Youyican 又一餐 — bữa sáng 1 phút cho dân văn phòng	chao-lon-youyican-bua-sang-1-phut	Kiến thức sản phẩm	news/porridge-3.jpg	Cháo Youyican bữa sáng			2026-05-01 16:00:00+07	t
 3	Chiết khấu quý III cho đơn nguyên thùng Haochidian — đăng ký trước 30/09/2026	chiet-khau-quy-iii-haochidian	Chương trình đại lý	news/biscuit-cartons.jpg	Chương trình chiết khấu thùng			2026-07-01 16:00:00+07	t
-1	Life Nutrition là đơn vị được ủy quyền chính hãng duy nhất của Dali Foods tại Việt Nam	life-nutrition-nha-phan-phoi-uy-quyen-dali-foods	Tin công ty	news/breakfast-bread-2.jpg	Life Nutrition nhận ủy quyền phân phối Dali Foods	Giấy chứng nhận do Công ty TNHH Thực phẩm Dali Quảng Tây cấp — mở đường đưa bánh, snack và đồ uống Dali chính ngạch phủ khắp kênh bán lẻ Việt Nam.		2026-04-22 16:00:00+07	t
+1	Dali Foods Việt Nam là đơn vị phân phối chính hãng sản phẩm Dali Foods tại Việt Nam	dali-foods-viet-nam-nha-phan-phoi-chinh-hang	Tin công ty	news/breakfast-bread-2.jpg	Dali Foods Việt Nam phân phối sản phẩm Dali Foods	Hợp đồng phân phối đã ký kết — mở đường đưa bánh, snack và đồ uống Dali chính ngạch phủ khắp kênh bán lẻ Việt Nam.		2026-04-22 16:00:00+07	t
 \.
 
 
@@ -868,7 +868,7 @@ COPY public.news_article (id, title, slug, topic, cover, cover_alt, excerpt, bod
 --
 
 COPY public.siteinfo_sitesettings (id, hotline_wholesale, hotline_retail, email, zalo_oa, tax_code, business_license_no, business_license_date, business_license_issuer, head_office_address, warehouse_address, warehouse_area, shopee_url, lazada_url, tiktok_url, moit_notice, founded_year, retail_points, staff_count, coverage, shipping_partner, facility_location) FROM stdin;
-1	1900 8386	0938 246 810	kinhdoanh@dalifoods.vn	Life Nutrition – Dali Foods VN	0109729369	0109729369	05/03/2024	Phòng Đăng ký kinh doanh - Sở Kế hoạch và Đầu tư TP Hà Nội	Số 08, ngõ 163/23 đường Phạm Văn Đồng, tổ 2, phường Mai Dịch, quận Cầu Giấy, TP Hà Nội	Số 2, ngõ 75 đường La Phù, xã An Khánh, TP Hà Nội	1.200 m²	https://shopee.vn/lifenutrition_official	https://www.lazada.vn/shop/life-nutrition	https://www.tiktok.com/@lifenutrition.vn	(dữ liệu demo — chưa thông báo tại online.gov.vn)	2024	1.200+	45	38	Giao Hàng Nhanh & Viettel Post	Hà Nội
+1	1900 8386	0938 246 810	kinhdoanh@dalifoods.vn	[tên Zalo OA]	[MST]	[số]	[ngày]	[nơi cấp]	[địa chỉ trụ sở]	[địa chỉ kho]	1.200 m²	[link]	[link]	[link]	(dữ liệu demo — chưa thông báo tại online.gov.vn)	2024	1.200+	45	38	Giao Hàng Nhanh & Viettel Post	Hà Nội
 \.
 
 
