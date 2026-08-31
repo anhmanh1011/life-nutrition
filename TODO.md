@@ -118,6 +118,11 @@ Already in place: `lang="vi"` and a unique `<meta name="description">` per page.
 
 ## 3. Operations
 
+- [ ] **The live box may still hold the previous entity's data.** `dalifoods.vn` was restored from
+      `db.sql` on 2026-08-26; the rebrand landed on 2026-08-31 and changed rows as well as
+      templates. Unless it has been restored since, the site settings and article 1 there still
+      name Life Nutrition, and deploying the new code does not touch them. Correct through the
+      admin — a fresh restore drops the leads table. See [`docs/deploy.md`](docs/deploy.md).
 - [ ] **Copy backups off the box.** `deploy/backup.sh` writes `pg_dump` and a `media/` tar to
       `/var/backups/dalifoods` on the same disk as the database. That is a snapshot, not a backup —
       one failed disk takes both. Pick a destination (`rclone` to object storage, `scp` to another

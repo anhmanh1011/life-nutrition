@@ -35,9 +35,15 @@ listens on any more.
 
 ## Content came from `db.sql`, not `seed_content`
 
-The checklist assumes a fresh database seeded by `manage.py seed_content`. This deploy restored
-the committed snapshot instead, because it carries the real company details rather than
-`[bracket]` placeholders.
+The checklist assumes a fresh database seeded by `manage.py seed_content`, which only calls
+`SiteSettings.load()` and so leaves every company field on its `[bracket]` default. The committed
+snapshot carries real hotlines, email, warehouse size and operating figures, and is still the
+better restore source.
+
+It is no longer the source for the legal identity. The 2026-08-31 rebrand to Dali Foods Việt Nam
+reset the tax code, both ĐKKD fields, the two addresses, the Zalo OA name and the three
+marketplace links in `db.sql` back to `[bracket]` — they belonged to the previous entity.
+Filling them in is an admin edit, tracked in [`TODO.md`](../TODO.md), not a redeploy.
 
 `db.sql` holds rows, not files. `Product.image`, `Article.cover` and `Brand.logo` are
 `ImageField`s whose paths point into `MEDIA_ROOT`, and the `media` volume starts empty — restore
@@ -67,6 +73,13 @@ by nginx but not writable by Django, which surfaces later as an admin upload fai
 an image rather than as an error now.
 
 The snapshot contains **no user rows** — `createsuperuser` is a separate step after every restore.
+
+**Deploying code does not update rows that are already in the database.** The rebrand changed the
+templates and `db.sql` in the same commits, but `docker compose up -d --build web` ships only the
+templates. A box restored before 2026-08-31 still serves the previous entity's site settings, and
+article 1 under its old slug `life-nutrition-nha-phan-phoi-uy-quyen-dali-foods`. Correct both
+through the admin: re-running the restore is a `--clean` dump that drops every table, taking the
+leads and the superuser with it.
 
 ## Routine operations
 
