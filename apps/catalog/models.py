@@ -149,6 +149,11 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
+    def get_absolute_url(self):
+        from django.urls import reverse
+
+        return reverse("product_detail", kwargs={"slug": self.slug})
+
     @property
     def kicker(self):
         return f"{self.brand.name} · {self.category.short_name}"

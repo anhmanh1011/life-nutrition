@@ -453,3 +453,31 @@ select.input { appearance: none; cursor: pointer; }
   line-height: 1.5;
   color: var(--color-danger);
 }
+
+/* ---------- Trang chi tiết sản phẩm (/san-pham/<slug>/) ---------- */
+.breadcrumb {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  font-size: 13px; margin-bottom: 26px;
+  color: color-mix(in srgb, var(--color-text) 60%, transparent);
+}
+.breadcrumb a { color: inherit; text-decoration: none; }
+.breadcrumb a:hover { color: var(--color-accent-700); text-decoration: underline; }
+.breadcrumb [aria-current] { font-weight: 600; color: var(--color-text); }
+
+.product-hero { display: grid; grid-template-columns: 5fr 7fr; gap: 34px; align-items: start; }
+.product-hero__img { margin: 0; border-radius: var(--radius-lg); overflow: hidden; }
+.product-hero__img img { display: block; width: 100%; aspect-ratio: 1 / 1; object-fit: cover; object-position: 50% 74%; }
+
+.spec-table { border-collapse: collapse; font-size: 14.5px; }
+.spec-table th {
+  text-align: left; white-space: nowrap; padding: 7px 22px 7px 0;
+  font-weight: 700; color: color-mix(in srgb, var(--color-text) 55%, transparent);
+}
+.spec-table td { padding: 7px 0; }
+
+/* Ảnh chèn tự do trong bài không được phá khung mobile. */
+.prose img { max-width: 100%; height: auto; border-radius: var(--radius-lg); }
+
+@media (max-width: 860px) {
+  .product-hero { grid-template-columns: 1fr; gap: 22px; }
+}

@@ -3,6 +3,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
+from apps.catalog import views as catalog_views
 from apps.common import views as common_views
 from apps.news import views as news_views
 
@@ -16,6 +17,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("tinymce/", include("tinymce.urls")),
     path("tin-tuc/<slug:slug>/", news_views.article_detail, name="news_detail"),
+    path("san-pham/<slug:slug>/", catalog_views.product_detail, name="product_detail"),
     path("", include("apps.pages.urls")),
 ]
 

@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ product.meta_title }}{% endblock %}
+{% block description %}{{ product.meta_description }}{% endblock %}
+
+{% block content %}
+<article class="section" style="padding-block: 44px 10px;">
+  <nav class="breadcrumb" aria-label="Đường dẫn">
+    <a href="{% url 'pages:home' %}">Trang chủ</a><span aria-hidden="true">›</span>
+    <a href="{% url 'pages:products' %}">Sản phẩm</a><span aria-hidden="true">›</span>
+    <span aria-current="page">{{ product.name }}</span>
+  </nav>
+
+  <div class="product-hero">
+    <figure class="washed product-hero__img">
+      <img src="{{ product.image.url }}" alt="{{ product.image_alt }}">
+    </figure>
+    <div>
+      <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-accent-700);">{{ product.kicker }}</span>
+      <h1 style="font-size: 38px; line-height: 1.15; margin: 12px 0 14px;">{{ product.name }}</h1>
+      {% if product.description %}<p style="font-size: 16px; line-height: 1.6; margin: 0 0 20px; color: color-mix(in srgb, var(--color-text) 72%, transparent);">{{ product.description }}</p>{% endif %}
+      <table class="spec-table">
+        <tbody>
+          {% if product.packaging %}<tr><th>Quy cách</th><td>{{ product.packaging }}</td></tr>{% endif %}
+          <tr><th>Thương hiệu</th><td>{{ product.brand.display_name }}</td></tr>
+          <tr><th>Ngành hàng</th><td>{{ product.category.name }}</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top: 24px; display: flex; gap: 12px; flex-wrap: wrap;">
+        <a class="btn btn-primary" href="{% url 'pages:dealer' %}">Báo giá sỉ</a>
+        <a class="btn btn-ghost" href="{% url 'pages:contact' %}">Liên hệ tư vấn</a>
+      </div>
+    </div>
+  </div>
+
+  {% if product.body %}
+  <div class="prose" style="max-width: 760px; margin-top: 40px;">{{ product.body|safe }}</div>
+  {% endif %}
+</article>
+
+{% if related %}
+<section class="section" style="padding-block: 40px 8px;">
+  <div class="section-head"><div><p class="eyebrow">Có thể bạn quan tâm</p><h2>Sản phẩm cùng dòng</h2></div></div>
+  <div class="grid grid-4">
+    {% for item in related %}
+    <a href="{{ item.get_absolute_url }}" class="card" style="padding: 0; overflow: hidden; text-decoration: none; color: var(--color-text); display: flex; flex-direction: column;">
+      <figure class="washed" style="margin: 0;"><img src="{{ item.image.url }}" alt="{{ item.image_alt }}" style="display: block; width: 100%; aspect-ratio: 1 / 1; object-fit: cover; object-position: 50% 74%;"></figure>
+      <div style="padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 6px; flex: 1;">
+        <span style="font-size: 11.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-accent-700);">{{ item.kicker }}</span>
+        <p style="margin: 0; font-weight: 700; font-size: 15px; line-height: 1.4;">{{ item.name }}</p>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section class="section" style="padding-block: 8px 56px;">
+  <div class="card" style="padding: 28px 30px; display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap;">
+    <div>
+      <h2 style="margin: 0 0 6px; font-size: 22px;">Cần giá sỉ cho sản phẩm này?</h2>
+      <p style="margin: 0; color: color-mix(in srgb, var(--color-text) 70%, transparent);">Để lại thông tin, đội ngũ Dali Foods Việt Nam sẽ gửi bảng giá và chính sách đại lý trong 24 giờ làm việc.</p>
+    </div>
+    <a class="btn btn-primary" href="{% url 'pages:dealer' %}">Nhận báo giá sỉ</a>
+  </div>
+</section>
+{% endblock %}
