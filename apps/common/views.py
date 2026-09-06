@@ -11,6 +11,8 @@ from PIL import Image, UnidentifiedImageError
 
 from apps.common.images import resize_to_max_edge, validate_upload_size
 
+ALLOWED_UPLOAD_SUFFIXES = {".png", ".jpg", ".jpeg", ".gif", ".webp"}
+
 
 @require_POST  # ngoài cùng: GET nặc danh nhận 405, không bị redirect sang login
 @staff_member_required
@@ -24,6 +26,12 @@ def tinymce_upload(request):
         validate_upload_size(uploaded)
     except ValidationError as exc:
         return JsonResponse({"error": exc.messages[0]}, status=400)
+
+    if Path(uploaded.name).suffix.lower() not in ALLOWED_UPLOAD_SUFFIXES:
+        return JsonResponse(
+            {"error": "Chỉ chấp nhận tệp ảnh .png, .jpg, .jpeg, .gif hoặc .webp."},
+            status=400,
+        )
 
     # Khác với ImageField, ở đây không có tầng form nào kiểm tra hộ — phải tự
     # chứng minh tệp decode được thành ảnh trước khi cho chạm vào storage.

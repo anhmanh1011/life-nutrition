@@ -82,3 +82,14 @@ def test_post_without_csrf_token_is_a_403(db, media_tmp):
     csrf_client.login(username="staff2", password="pw")
     response = csrf_client.post(reverse("tinymce_upload"), {"file": png_file()})
     assert response.status_code == 403
+
+
+def test_a_valid_image_with_a_non_image_extension_is_rejected(staff_client, media_tmp):
+    response = staff_client.post(
+        reverse("tinymce_upload"), {"file": png_file(name="evil.html")}
+    )
+    assert response.status_code == 400
+    assert response.json()["error"] == (
+        "Chỉ chấp nhận tệp ảnh .png, .jpg, .jpeg, .gif hoặc .webp."
+    )
+    assert not list(media_tmp.rglob("*"))
