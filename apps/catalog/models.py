@@ -1,7 +1,10 @@
 from django.conf import settings
 from django.db import models
+from django.utils.text import Truncator
+from tinymce.models import HTMLField
 
 from apps.common.images import resize_to_max_edge, validate_upload_size
+from apps.common.richtext import clean_html
 
 _SLUG_WARNING = (
     "Đang được dùng để lọc sản phẩm trên trang. Đổi giá trị này sẽ làm bộ lọc ngừng hoạt động."
@@ -114,6 +117,24 @@ class Product(models.Model):
     packaging = models.CharField(
         "Quy cách", max_length=160, blank=True, help_text="Ví dụ: Chai 500ml · thùng 15 chai."
     )
+    body = HTMLField(
+        "Nội dung chi tiết",
+        blank=True,
+        help_text="Bài giới thiệu dài trên trang chi tiết sản phẩm. Có thể chèn ảnh trực tiếp vào bài.",
+    )
+    seo_title = models.CharField(
+        "Tiêu đề SEO",
+        max_length=70,
+        blank=True,
+        help_text="Tối đa 70 ký tự. Bỏ trống để dùng: Tên sản phẩm — Thương hiệu | Dali Foods Việt Nam.",
+    )
+    seo_description = models.CharField(
+        "Mô tả SEO",
+        max_length=160,
+        blank=True,
+        help_text="Tối đa 160 ký tự. Bỏ trống để tự ghép từ hai dòng chữ trên thẻ sản phẩm.",
+    )
+    updated_at = models.DateTimeField("Cập nhật lúc", auto_now=True)
     is_active = models.BooleanField("Đang bán", default=True)
     sort_order = models.PositiveIntegerField("Thứ tự", default=0)
 
@@ -132,7 +153,24 @@ class Product(models.Model):
     def kicker(self):
         return f"{self.brand.name} · {self.category.short_name}"
 
+    @property
+    def meta_title(self):
+        return self.seo_title or f"{self.name} — {self.brand.name} | Dali Foods Việt Nam"
+
+    @property
+    def meta_description(self):
+        if self.seo_description:
+            return self.seo_description
+        joined = " · ".join(part for part in (self.description, self.packaging) if part)
+        if not joined:
+            joined = (
+                f"{self.name} — sản phẩm {self.brand.name} chính hãng "
+                "do Dali Foods Việt Nam phân phối."
+            )
+        return Truncator(joined).chars(160)
+
     def save(self, *args, **kwargs):
+        self.body = clean_html(self.body, allow_images=True)
         if self.image and not self.image._committed:
             self.image = resize_to_max_edge(self.image, settings.IMAGE_MAX_EDGE)
         super().save(*args, **kwargs)
