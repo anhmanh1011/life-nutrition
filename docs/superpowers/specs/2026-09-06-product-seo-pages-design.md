@@ -89,6 +89,8 @@ Fallbacks live on the model so templates stay dumb and tests can pin them:
 - `meta_description` → `seo_description`, else `description` and `packaging` joined with
   `" · "` (skipping empties), else
   `"{name} — sản phẩm {brand.name} chính hãng do Dali Foods Việt Nam phân phối."`.
+  The computed fallbacks are cut to 160 characters with `Truncator.chars` —
+  `description` alone may hold 255.
 - `get_absolute_url()` → `reverse("product_detail", kwargs={"slug": self.slug})`. This
   also lights up the admin's "View on site" button for free.
 
@@ -130,7 +132,9 @@ so the admin catch-all does not shadow it.
 TinyMCE's stock uploader sends neither the CSRF header nor the form token, so a new file
 `assets/js/tinymce-upload.js` (loaded via `TINYMCE_EXTRA_MEDIA`) registers an
 `images_upload_handler` that POSTs `FormData` with header `X-CSRFToken` read from the
-`csrftoken` cookie (`CSRF_COOKIE_HTTPONLY` is not set, so the cookie is readable). The
+`csrftoken` cookie (`CSRF_COOKIE_HTTPONLY` is not set, so the cookie is readable).
+django-tinymce 5.0.0 bundles TinyMCE 7, so the handler uses the promise-based signature
+`(blobInfo, progress) => Promise<location>`, not the TinyMCE-5 callback style. The
 handler is installed with `tinymce.overrideDefaults(...)`; if django-tinymce's init order
 makes that unreliable, the fallback is passing the handler through the per-field widget
 config — the acceptance test below decides, not hope.
@@ -167,19 +171,23 @@ succeeds, and the same POST without the header is rejected with 403.
 
 ## 5. List-page card links
 
-In `templates/pages/products.html`, the card's `<figure>` + name wrap in one
-`<a href="{{ product.get_absolute_url }}">` (color inherited, no underline on the block).
-The filter data attributes stay on the card `<div>`, so `filters.js` is untouched. The
-"Báo giá sỉ" link stays; "Mua lẻ trên sàn" stays a placeholder (TODO inventory item).
-Each active product is linked exactly once — same invariant the news list tests enforce.
+In `templates/pages/products.html`, the card interior is restructured so the image and
+the product name sit inside one `<a href="{{ product.get_absolute_url }}">` (today the
+`<figure>` and `.sku__name` are not adjacent, so this is a restructure, not a literal
+wrap — color inherited, no underline on the block). The `card sku` classes and the
+filter data attributes stay on the outer `<div>`, so `filters.js` and the test counting
+`class="card sku"` are untouched. The "Báo giá sỉ" link stays; "Mua lẻ trên sàn" stays a
+placeholder (TODO inventory item). Each active product is linked exactly once — same
+invariant the news list tests enforce.
 
 ## 6. `base.html` head plumbing
 
 - Canonical on every page:
   `<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">`
   — deliberately drops the query string. `SECURE_PROXY_SSL_HEADER` is already set in
-  production, so `request.scheme` is `https` behind nginx, and nginx already redirects
-  www → apex, so host is canonical too.
+  production, so `request.scheme` is `https` behind nginx, and the nginx config in
+  `deploy/` pins www → apex (target state — the server-side deploy has not run yet), so
+  host is canonical too.
 - New `{% block og %}` whose **default deliberately omits `og:title`/`og:description`**:
   Facebook and Zalo scrapers fall back to `<title>` and the meta description, which every
   page already sets correctly — duplicating them into OG tags per page would be pure
@@ -219,10 +227,11 @@ Each active product is linked exactly once — same invariant the news list test
 
 ## 8. JSON-LD
 
-- Serialization: the view builds plain dicts; a shared helper escapes `<`, `>`, `&` to
-  `\uXXXX` (the same escaping `json_script` applies) and the template embeds the result in
-  `<script type="application/ld+json">`. Django's `json_script` filter itself is not
-  usable — it hardcodes `type="application/json"`.
+- Serialization: the view builds plain dicts; `apps/common/jsonld.py::json_ld(data)`
+  escapes `<`, `>`, `&` to `\uXXXX` (the same escaping `json_script` applies) and the
+  template embeds the result in `<script type="application/ld+json">`. Django's
+  `json_script` filter itself is not usable — it hardcodes `type="application/json"`.
+  One helper, so the two emitting templates cannot drift.
 - `product_detail` emits two objects:
   - `Product`: `name`, `image` (absolute), `description` = `meta_description`,
     `brand` = `{"@type": "Brand", "name": ...}`, `url` = canonical. No `offers` — see
