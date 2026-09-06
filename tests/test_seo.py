@@ -55,3 +55,27 @@ def test_default_og_block_has_site_name_but_no_title(client, seeded):
     assert 'property="og:site_name"' in body
     assert 'property="og:type" content="website"' in body
     assert 'property="og:title"' not in body
+
+
+def test_product_og_overrides_with_full_tags(client, seeded):
+    product = Product.objects.active().first()
+    body = client.get(product.get_absolute_url()).content.decode()
+    assert 'property="og:type" content="product"' in body
+    assert 'property="og:title"' in body
+    assert f'property="og:image" content="http://testserver{product.image.url}"' in body
+    assert (
+        f'<link rel="canonical" href="http://testserver{product.get_absolute_url()}">'
+        in body
+    )
+
+
+def test_product_page_carries_product_and_breadcrumb_ld(client, seeded):
+    product = Product.objects.active().first()
+    body = client.get(product.get_absolute_url()).content.decode()
+    by_type = {block["@type"]: block for block in extract_ld_blocks(body)}
+    assert by_type["Product"]["name"] == product.name
+    assert by_type["Product"]["brand"] == {"@type": "Brand", "name": product.brand.name}
+    assert "offers" not in by_type["Product"]
+    crumbs = by_type["BreadcrumbList"]["itemListElement"]
+    assert [c["position"] for c in crumbs] == [1, 2, 3]
+    assert crumbs[2]["name"] == product.name

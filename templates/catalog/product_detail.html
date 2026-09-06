@@ -4,6 +4,21 @@
 {% block title %}{{ product.meta_title }}{% endblock %}
 {% block description %}{{ product.meta_description }}{% endblock %}
 
+{% block og %}
+<meta property="og:type" content="product">
+<meta property="og:title" content="{{ product.meta_title }}">
+<meta property="og:description" content="{{ product.meta_description }}">
+<meta property="og:url" content="{{ canonical }}">
+<meta property="og:image" content="{{ og_image }}">
+<meta property="og:site_name" content="Dali Foods Việt Nam">
+<meta property="og:locale" content="vi_VN">
+{% endblock %}
+
+{% block extra_head %}
+<script type="application/ld+json">{{ product_ld }}</script>
+<script type="application/ld+json">{{ breadcrumb_ld }}</script>
+{% endblock %}
+
 {% block content %}
 <article class="section" style="padding-block: 44px 10px;">
   <nav class="breadcrumb" aria-label="Đường dẫn">
