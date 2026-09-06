@@ -103,10 +103,23 @@ IMAGE_MAX_UPLOAD_BYTES = 8 * 1024 * 1024
 TINYMCE_DEFAULT_CONFIG = {
     "height": 500,
     "menubar": False,
-    "plugins": "link lists table code paste",
-    "toolbar": "undo redo | bold italic | bullist numlist | link | removeformat | code",
+    "plugins": "link lists table code paste image",
+    "toolbar": "undo redo | bold italic | bullist numlist | link image | removeformat | code",
     "language": "vi",
+    "automatic_uploads": True,
+    "images_upload_url": "/admin/tinymce-upload/",
+    # Tên hàm trên window — init_tinymce.js của django-tinymce resolve chuỗi
+    # này thành hàm thật trước khi init (hàm nằm trong js/tinymce-upload.js).
+    "images_upload_handler": "dalifoodsTinymceUpload",
+    "paste_data_images": True,
+    # Giữ src dạng đường dẫn tuyệt đối /media/... để nội dung không gãy khi đổi host.
+    "relative_urls": False,
+    "remove_script_host": True,
 }
+
+# Nạp giữa tinymce.min.js và script init của django-tinymce, để hàm upload đã
+# có trên `window` trước khi editor khởi tạo.
+TINYMCE_EXTRA_MEDIA = {"js": ["js/tinymce-upload.js"]}
 
 LOGGING = {
     "version": 1,
