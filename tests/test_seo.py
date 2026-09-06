@@ -37,3 +37,21 @@ def test_json_ld_escapes_html_sensitive_characters():
 
 def test_json_ld_keeps_vietnamese_readable():
     assert "Bánh" in json_ld({"name": "Bánh"})
+
+
+def test_every_page_has_exactly_one_canonical(client, seeded):
+    for name in ["pages:home", "pages:products", "pages:contact"]:
+        body = client.get(reverse(name)).content.decode()
+        assert body.count('<link rel="canonical"') == 1
+
+
+def test_canonical_reflects_the_request_path(client, seeded):
+    body = client.get(reverse("pages:products")).content.decode()
+    assert '<link rel="canonical" href="http://testserver/san-pham/">' in body
+
+
+def test_default_og_block_has_site_name_but_no_title(client, seeded):
+    body = client.get(reverse("pages:home")).content.decode()
+    assert 'property="og:site_name"' in body
+    assert 'property="og:type" content="website"' in body
+    assert 'property="og:title"' not in body

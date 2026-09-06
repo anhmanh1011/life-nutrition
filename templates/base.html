@@ -10,6 +10,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 <link rel="icon" href="{% static 'img/logo-mark.png' %}">
+<link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+{% block og %}
+{# Mặc định không có og:title/og:description: scraper fallback về <title> và meta description. Trang chi tiết override cả khối. #}
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Dali Foods Việt Nam">
+<meta property="og:locale" content="vi_VN">
+<meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/logo-mark.png' %}">
+{% endblock %}
 {% block extra_head %}{% endblock %}
 </head>
 <body>
