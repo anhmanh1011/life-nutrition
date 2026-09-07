@@ -86,3 +86,12 @@ def test_article_og_type_is_article(client, seeded):
     body = client.get(article.get_absolute_url()).content.decode()
     assert 'property="og:type" content="article"' in body
     assert 'property="og:title"' in body
+
+
+def test_home_page_carries_organization_ld(client, seeded):
+    body = client.get(reverse("pages:home")).content.decode()
+    org = {b["@type"]: b for b in extract_ld_blocks(body)}["Organization"]
+    assert org["name"] == "Dali Foods Việt Nam"
+    assert org["url"] == "http://testserver/"
+    assert org["logo"].startswith("http://testserver/assets/")
+    assert "contactPoint" not in org
