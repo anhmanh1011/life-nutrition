@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 
 from apps.catalog.models import Brand, Category, Product
@@ -61,3 +62,16 @@ def news(request):
             "topics": Topic.choices,
         },
     )
+
+
+def robots(request):
+    lines = [
+        "User-agent: *",
+        "Disallow: /admin/",
+        "Disallow: /tinymce/",
+        "Disallow: /cam-on/",
+        "Disallow: /hop-tac-dai-ly/bo-sung/",
+        f"Sitemap: {request.scheme}://{request.get_host()}/sitemap.xml",
+        "",
+    ]
+    return HttpResponse("\n".join(lines), content_type="text/plain")

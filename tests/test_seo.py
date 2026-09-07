@@ -95,3 +95,34 @@ def test_home_page_carries_organization_ld(client, seeded):
     assert org["url"] == "http://testserver/"
     assert org["logo"].startswith("http://testserver/assets/")
     assert "contactPoint" not in org
+
+
+def test_sitemap_lists_static_products_and_articles(client, seeded):
+    response = client.get("/sitemap.xml")
+    body = response.content.decode()
+    product = Product.objects.active().first()
+    article = Article.objects.published().first()
+    assert response.status_code == 200
+    assert f"http://testserver{product.get_absolute_url()}" in body
+    assert f"http://testserver{article.get_absolute_url()}" in body
+    # <loc>...</loc> đầy đủ: "http://testserver/san-pham/" trần sẽ khớp cả URL chi tiết sản phẩm.
+    assert "<loc>http://testserver/san-pham/</loc>" in body
+    assert "/cam-on/" not in body
+
+
+def test_inactive_products_stay_out_of_the_sitemap(client, seeded):
+    product = Product.objects.active().first()
+    product.is_active = False
+    product.save()
+    body = client.get("/sitemap.xml").content.decode()
+    assert product.get_absolute_url() not in body
+
+
+def test_robots_txt_points_at_the_sitemap(client, db):
+    response = client.get("/robots.txt")
+    body = response.content.decode()
+    assert response.status_code == 200
+    assert response["Content-Type"].startswith("text/plain")
+    assert "Sitemap: http://testserver/sitemap.xml" in body
+    assert "Disallow: /admin/" in body
+    assert "Disallow: /cam-on/" in body
