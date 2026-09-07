@@ -79,3 +79,10 @@ def test_product_page_carries_product_and_breadcrumb_ld(client, seeded):
     crumbs = by_type["BreadcrumbList"]["itemListElement"]
     assert [c["position"] for c in crumbs] == [1, 2, 3]
     assert crumbs[2]["name"] == product.name
+
+
+def test_article_og_type_is_article(client, seeded):
+    article = Article.objects.published().first()
+    body = client.get(article.get_absolute_url()).content.decode()
+    assert 'property="og:type" content="article"' in body
+    assert 'property="og:title"' in body
