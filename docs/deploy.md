@@ -62,11 +62,15 @@ docker compose exec -T db psql -At -U dalifoods -d dalifoods -c \
 docker run --rm -v life-nutrition_media:/media \
   -v /root/dalifoodsvn/life-nutrition/assets/img:/src:ro \
   -v /tmp/media-list.txt:/list.txt:ro alpine sh -c \
-  'while read -r p; do mkdir -p "/media/$(dirname "$p")"; cp "/src/$(basename "$p")" "/media/$p"; done < /list.txt
+  'while read -r p; do mkdir -p "/media/$(dirname "$p")"
+     cp "/src/$p" "/media/$p" 2>/dev/null || cp "/src/$(basename "$p")" "/media/$p"
+   done < /list.txt
    chown -R 1001:1001 /media'
 
 docker compose start web
 ```
+
+The two `cp` forms are not redundant. Product shots live at `assets/img/products/<slug>.jpg`, matching the `products/<slug>.jpg` the rows store, so the first form finds them. Article covers store `news/<file>.jpg` but the file sits flat in `assets/img/`, so those fall through to the basename form.
 
 `1001` is the `app` user the Dockerfile creates. Files owned by root in that volume are readable
 by nginx but not writable by Django, which surfaces later as an admin upload failing to replace

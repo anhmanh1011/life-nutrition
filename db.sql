@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict 7DmnGlYMhOxZZBFqah3pqQbfyC4slFmG0wOGgMqEmfAKuTQK57jMKRy6rprcYxb
+\restrict q3UGxHLPxEeaRO8sEZUJp1FbXmipHqxkkp9nxR1tb50MJ3WEk6t7Dgw7IQUs1kE
 
 -- Dumped from database version 17.11
 -- Dumped by pg_dump version 17.11
@@ -340,6 +340,10 @@ CREATE TABLE public.catalog_product (
     sort_order integer NOT NULL,
     brand_id bigint NOT NULL,
     category_id bigint NOT NULL,
+    body text NOT NULL,
+    seo_description character varying(160) NOT NULL,
+    seo_title character varying(70) NOT NULL,
+    updated_at timestamp with time zone NOT NULL,
     CONSTRAINT catalog_product_sort_order_check CHECK ((sort_order >= 0))
 );
 
@@ -752,11 +756,11 @@ COPY public.auth_permission (id, name, content_type_id, codename) FROM stdin;
 
 COPY public.catalog_brand (id, name, name_cn, slug, logo, description, is_active, sort_order) FROM stdin;
 1	Daliyuan	达利园	daliyuan		bánh & bánh ngọt	t	1
-2	Copico	可比克	copico		snack khoai tây	f	2
 3	Haochidian	好吃点	haochidian		bánh quy	t	3
 4	Heqizheng	和其正	heqizheng		trà thảo mộc	t	4
 5	Hi-Tiger	乐虎	hi-tiger		nước tăng lực	t	5
 6	Doubendou	豆本豆	doubendou		sữa đậu nành	f	6
+2	Copico	可比克	copico		snack khoai tây	t	2
 \.
 
 
@@ -776,24 +780,28 @@ COPY public.catalog_category (id, name, short_name, slug, sort_order) FROM stdin
 -- Data for Name: catalog_product; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-COPY public.catalog_product (id, name, slug, image, image_alt, description, packaging, is_active, sort_order, brand_id, category_id) FROM stdin;
-1	Trà trái cây Daliyuan 500ml (3 vị)	tea-trio	products/tea-trio.jpg	Trà trái cây Daliyuan 500ml	果味茶 · đào trắng ô long / nho xanh trà xanh / chanh hồng trà	Chai 500ml · thùng 15 chai	t	1	1	3
-2	Trà xanh mơ xanh Daliyuan 500ml	tea-plum	products/tea-plum.jpg	Trà xanh mơ xanh Daliyuan 500ml	青梅绿茶	Chai 500ml · thùng 15 chai	t	2	1	3
-3	Nước tăng lực Hi-Tiger 250ml	hitiger	products/hitiger.jpg	Nước tăng lực Hi-Tiger 250ml	乐虎 氨基酸维生素功能饮料	Lon 250ml · thùng 24 lon	t	3	5	3
-4	Trà thảo mộc Heqizheng 310ml	heqizheng	products/heqizheng.jpg	Trà thảo mộc Heqizheng 310ml	和其正 凉茶	Lon 310ml · thùng 24 lon	t	4	4	3
-5	Cháo Youyican đậu đỏ ý dĩ 360g	porridge-3	products/porridge-3.jpg	Cháo Youyican đậu đỏ ý dĩ 360g	又一餐 红豆薏仁粥	Lon 360g · thùng 12 lon	t	5	1	4
-6	Cháo bát bảo long nhãn hạt sen 360g	porridge-4	products/porridge-4.jpg	Cháo bát bảo long nhãn hạt sen 360g	桂圆莲子八宝粥	Lon 360g · thùng 12 lon	t	6	1	4
-7	Sữa lạc Milk Peanut 370g	milk-peanut	products/milk-peanut.jpg	Sữa lạc Milk Peanut 370g	牛奶花生	Lon 370g · thùng 12 lon	t	7	1	4
-8	Bánh mì ăn sáng 200g (5 cái)	breakfast-bread	products/breakfast-bread.jpg	Bánh mì ăn sáng Daliyuan 200g	早餐包	Gói 200g · thùng [số] gói	t	8	1	1
-9	Bánh mì Pháp mini 200g (10 cái)	mini-french	products/mini-french.jpg	Bánh mì Pháp mini Daliyuan 200g	法式小面包 香奶味	Gói 200g · thùng [số] gói	t	9	1	1
-10	Bánh mì K17 — dừa / chà bông / rong biển	k17-trio	products/k17-trio.jpg	Bánh mì K17 Daliyuan ba vị	K17 大椰蓉面包 · 肉松芝麻 · 肉松海苔吐司	Gói lẻ · thùng [số] gói	t	10	1	1
-11	Bánh mì socola Hei Hei Bao 80g	heiheibao	products/heiheibao.jpg	Bánh mì socola Hei Hei Bao 80g	黑黑包 浓醇巧克力味	Gói 80g · thùng [số] gói	t	11	1	1
-12	Croissant vị cam / socola 100g (4 cái)	croissant	products/croissant.jpg	Croissant Daliyuan vị cam và socola 100g	羊角面包 香橙味 · 巧克力味	Gói 100g · thùng [số] gói	t	12	1	1
-13	Bánh quy óc chó giòn 108g	biscuit-walnut	products/biscuit-walnut.jpg	Bánh quy óc chó giòn Haochidian 108g	好吃点 香脆核桃饼	Gói 108g · lốc 10 · thùng 800g	t	13	3	2
-14	Bánh quy hạt điều giòn 108g	biscuit-pair	products/biscuit-pair.jpg	Bánh quy hạt điều giòn Haochidian 108g	好吃点 香脆腰果饼	Gói 108g · lốc 10 · thùng 800g	t	14	3	2
-15	Thùng bánh quy hạt 800g (óc chó / hạt điều)	biscuit-cartons	products/biscuit-cartons.jpg	Thùng bánh quy hạt Haochidian 800g	好吃点 800克 量贩装	Thùng 800g gói lẻ bên trong	t	15	3	2
-16	Bánh quy ngũ cốc cao xơ Guye 110g	guye	products/guye.jpg	Bánh quy ngũ cốc cao xơ Guye 110g	谷野 高纤煎麸饼 · 粗粮饼 · 蔬菜饼	Gói 110g · thùng [số] gói	t	16	3	2
-17	Bánh quy kẹp mỏng giòn Cookico 90g	cookico	products/cookico.jpg	Bánh quy kẹp mỏng giòn Cookico 90g	Landy Castle 薄脆夹心曲奇 · bơ / chanh	Gói 90g · thùng [số] gói	t	17	1	2
+COPY public.catalog_product (id, name, slug, image, image_alt, description, packaging, is_active, sort_order, brand_id, category_id, body, seo_description, seo_title, updated_at) FROM stdin;
+2	Trà xanh mơ xanh Daliyuan 500ml	tea-plum	products/tea-plum.jpg	Trà xanh mơ xanh Daliyuan 500ml	青梅绿茶	Chai 500ml · thùng 15 chai	t	2	1	3	<h2>Giới thiệu</h2><p>青梅绿茶 là vị bán chạy lâu năm của Daliyuan: nền trà xanh kết hợp thanh mai cho vị chua thanh, ít gắt, hợp khẩu vị người Việt và đặc biệt chạy tốt vào mùa nóng.</p><h2>Quy cách &amp; bảo quản</h2><ul><li>Chai PET 500ml, nhãn phụ tiếng Việt dán sẵn khi xuất kho.</li><li>Thùng 15 chai.</li><li>Hạn dùng 12 tháng kể từ ngày sản xuất.</li><li>Bảo quản nơi thoáng mát; ngon hơn khi uống lạnh.</li></ul><h2>Vì sao nên nhập về bán</h2><ul><li>Vị đơn, dễ giới thiệu — khách mua lại nhiều.</li><li>Giá vốn thấp, biên lợi nhuận ổn ở kênh tạp hóa.</li><li>Đi kèm được với dòng trà trái cây ba vị để làm đầy kệ đồ uống.</li></ul><h2>Hồ sơ kèm theo mỗi lô</h2><p>Mỗi lô xuất kho của Dali Foods Việt Nam đi kèm nhãn phụ tiếng Việt, bản tự công bố sản phẩm và hóa đơn VAT — đủ hồ sơ chào hàng vào siêu thị, chuỗi cửa hàng tiện lợi và kênh HORECA.</p>	Trà xanh thanh mai 青梅绿茶 Daliyuan chai 500ml, thùng 15 chai. Vị chua thanh dễ uống, nhập sỉ chính hãng qua Dali Foods Việt Nam.	Trà xanh Thanh mai Daliyuan 500ml — giá sỉ nguyên thùng	2026-09-08 09:46:51.864287+00
+12	Croissant vị cam / socola 100g (4 cái)	croissant	products/croissant.jpg	Croissant Daliyuan vị cam và socola 100g	羊角面包 香橙味 · 巧克力味	Gói 100g (25g × 4 bánh) · thùng 32 gói	t	14	1	1	<h2>Giới thiệu</h2><p>羊角面包 của Daliyuan làm theo kiểu croissant nhiều lớp, nhân kem cam 香橙味 hoặc kem socola 巧克力味, tỷ lệ nhân trên 19%. Mỗi gói 100g có 4 bánh nhỏ 25g, thích hợp làm đồ ăn nhẹ giữa buổi.</p><h2>Quy cách &amp; bảo quản</h2><ul><li>Gói 100g gồm 4 bánh 25g, mỗi bánh bọc riêng.</li><li>Thùng 32 gói, hai vị đặt riêng hoặc trộn thùng.</li><li>Hạn dùng 6 tháng kể từ ngày sản xuất.</li><li>Bảo quản nơi khô ráo, thoáng mát, tránh ánh nắng trực tiếp.</li></ul><h2>Vì sao nên nhập về bán</h2><ul><li>Mã mới ra mắt, đang được đẩy truyền thông — thời điểm tốt để lên kệ.</li><li>Hai vị cam và socola bổ sung cho nhau, dễ chốt combo.</li><li>Kết cấu nhiều lớp tạo khác biệt so với bánh mì ngọt thông thường.</li></ul><h2>Hồ sơ kèm theo mỗi lô</h2><p>Mỗi lô xuất kho của Dali Foods Việt Nam đi kèm nhãn phụ tiếng Việt, bản tự công bố sản phẩm và hóa đơn VAT — đủ hồ sơ chào hàng vào siêu thị, chuỗi cửa hàng tiện lợi và kênh HORECA.</p>	Bánh sừng bò 羊角面包 Daliyuan vị cam và socola, gói 100g gồm 4 bánh 25g, thùng 32 gói. Nhập sỉ chính hãng qua Dali Foods Việt Nam.	Bánh sừng bò Daliyuan vị cam / socola 100g — giá sỉ	2026-09-08 09:46:52.059062+00
+5	Cháo Youyican đậu đỏ ý dĩ 360g	porridge-3	products/porridge-3.jpg	Cháo Youyican đậu đỏ ý dĩ 360g	又一餐 红豆薏仁粥	Lon 360g · thùng 12 lon	t	5	1	4	<h2>Giới thiệu</h2><p>又一餐 红豆薏仁粥 nấu sẵn trong lon, mở nắp là ăn được, hâm nóng một phút là có bữa sáng đủ ấm. Đậu đỏ và ý dĩ cho vị bùi nhẹ, ít ngọt — nhóm khách văn phòng và sinh viên mua lại đều.</p><h2>Quy cách &amp; bảo quản</h2><ul><li>Lon 360g, nắp giật, không cần dụng cụ mở.</li><li>Thùng 12 lon.</li><li>Hạn dùng 18 tháng kể từ ngày sản xuất.</li><li>Bảo quản nơi khô ráo, thoáng mát, tránh ánh nắng trực tiếp.</li></ul><h2>Vì sao nên nhập về bán</h2><ul><li>Ngành hàng cháo lon còn mới ở Việt Nam, ít cạnh tranh trực tiếp.</li><li>Bán tốt ở kênh cửa hàng tiện lợi, ký túc xá và văn phòng.</li><li>Hạn dùng dài 18 tháng — rủi ro cận date thấp.</li></ul><h2>Hồ sơ kèm theo mỗi lô</h2><p>Mỗi lô xuất kho của Dali Foods Việt Nam đi kèm nhãn phụ tiếng Việt, bản tự công bố sản phẩm và hóa đơn VAT — đủ hồ sơ chào hàng vào siêu thị, chuỗi cửa hàng tiện lợi và kênh HORECA.</p>	Cháo ăn liền Youyican 又一餐 đậu đỏ ý dĩ, lon 360g, thùng 12 lon. Bữa sáng 1 phút, giá sỉ từ Dali Foods Việt Nam.	Cháo Youyican đậu đỏ 360g — nhập sỉ thùng 12 lon	2026-09-08 09:46:51.89823+00
+4	Trà thảo mộc Heqizheng 310ml	heqizheng	products/heqizheng.jpg	Trà thảo mộc Heqizheng 310ml	和其正 凉茶	Lon 310ml · thùng 24 lon	t	4	4	3	<h2>Giới thiệu</h2><p>和其正 凉茶 là dòng trà thảo mộc đóng lon quen thuộc của Dali Foods Group, nấu từ công thức thảo mộc truyền thống, vị ngọt thanh, uống mát. Đây là lựa chọn thay thế nước ngọt có ga cho nhóm khách quan tâm đồ uống nhẹ.</p><h2>Quy cách &amp; bảo quản</h2><ul><li>Lon 310ml.</li><li>Thùng 24 lon.</li><li>Hạn dùng 12 tháng kể từ ngày sản xuất.</li><li>Bảo quản nơi thoáng mát; ngon hơn khi uống lạnh.</li></ul><h2>Vì sao nên nhập về bán</h2><ul><li>Ngách trà thảo mộc ít đối thủ ở kênh tạp hóa miền Bắc.</li><li>Bán tốt kèm đồ ăn nhiều dầu mỡ — hợp quán ăn và lẩu nướng.</li><li>Bao bì lon dễ trưng bày theo tháp tại quầy.</li></ul><h2>Hồ sơ kèm theo mỗi lô</h2><p>Mỗi lô xuất kho của Dali Foods Việt Nam đi kèm nhãn phụ tiếng Việt, bản tự công bố sản phẩm và hóa đơn VAT — đủ hồ sơ chào hàng vào siêu thị, chuỗi cửa hàng tiện lợi và kênh HORECA.</p>	Trà thảo mộc Heqizheng 和其正 lon 310ml, thùng 24 lon. Vị thanh mát truyền thống, nhập sỉ chính hãng qua Dali Foods Việt Nam.	Trà thảo mộc Heqizheng 和其正 310ml — sỉ 24 lon/thùng	2026-09-08 09:46:51.887055+00
+6	Cháo bát bảo long nhãn hạt sen 360g	porridge-4	products/porridge-4.jpg	Cháo bát bảo long nhãn hạt sen 360g	桂圆莲子八宝粥	Lon 360g · thùng 12 lon	t	6	1	4	<h2>Giới thiệu</h2><p>桂圆莲子八宝粥 là công thức cháo bát bảo cổ điển với long nhãn và hạt sen, hạt còn nguyên, nước cháo sánh. Ăn nóng hay lạnh đều được nên bán được quanh năm.</p><h2>Quy cách &amp; bảo quản</h2><ul><li>Lon 360g, nắp giật.</li><li>Thùng 12 lon.</li><li>Hạn dùng 18 tháng kể từ ngày sản xuất.</li><li>Bảo quản nơi khô ráo, thoáng mát, tránh ánh nắng trực tiếp.</li></ul><h2>Vì sao nên nhập về bán</h2><ul><li>Vị quen thuộc với người Việt — không cần giáo dục thị trường.</li><li>Hay được mua làm quà biếu theo thùng vào dịp lễ Tết.</li><li>Đi cặp với cháo đậu đỏ để làm đủ dải cháo lon trên kệ.</li></ul><h2>Hồ sơ kèm theo mỗi lô</h2><p>Mỗi lô xuất kho của Dali Foods Việt Nam đi kèm nhãn phụ tiếng Việt, bản tự công bố sản phẩm và hóa đơn VAT — đủ hồ sơ chào hàng vào siêu thị, chuỗi cửa hàng tiện lợi và kênh HORECA.</p>	Cháo bát bảo 桂圆莲子八宝粥 long nhãn hạt sen, lon 360g, thùng 12 lon. Nhập sỉ chính hãng qua Dali Foods Việt Nam.	Cháo bát bảo long nhãn hạt sen 360g — sỉ 12 lon/thùng	2026-09-08 09:46:51.909965+00
+7	Sữa lạc Milk Peanut 370g	milk-peanut	products/milk-peanut.jpg	Sữa lạc Milk Peanut 370g	牛奶花生	Lon 370g · thùng 12 lon	t	9	1	4	<h2>Giới thiệu</h2><p>牛奶花生 là sữa lạc đóng lon — đậu phộng xay mịn hòa với sữa, vị béo bùi, không quá ngọt. Đây là dòng đồ uống dinh dưỡng bán tốt ở kênh trường học và các quán ăn sáng.</p><h2>Quy cách &amp; bảo quản</h2><ul><li>Lon 370g.</li><li>Thùng 12 lon.</li><li>Hạn dùng 18 tháng kể từ ngày sản xuất.</li><li>Lắc đều trước khi uống; ngon hơn khi uống lạnh.</li></ul><h2>Vì sao nên nhập về bán</h2><ul><li>Đồ uống dinh dưỡng, dễ bán kèm bánh mì và cháo lon.</li><li>Lon 370g định lượng lớn hơn mặt bằng chung cùng tầm giá.</li><li>Hạn dùng dài, phù hợp đại lý gom hàng theo quý.</li></ul><h2>Hồ sơ kèm theo mỗi lô</h2><p>Mỗi lô xuất kho của Dali Foods Việt Nam đi kèm nhãn phụ tiếng Việt, bản tự công bố sản phẩm và hóa đơn VAT — đủ hồ sơ chào hàng vào siêu thị, chuỗi cửa hàng tiện lợi và kênh HORECA.</p>	Sữa lạc Daliyuan 牛奶花生 lon 370g, thùng 12 lon. Sữa đậu phộng vị béo bùi, giá sỉ và chính sách đại lý từ Dali Foods Việt Nam.	Sữa lạc Milk Peanut 牛奶花生 370g — nhập sỉ	2026-09-08 09:46:51.972272+00
+8	Bánh mì ăn sáng 200g (5 cái)	breakfast-bread	products/breakfast-bread.jpg	Bánh mì ăn sáng Daliyuan 200g	早餐包	Gói 200g (40g × 5 bánh) · thùng 20 túi	t	10	1	1	<h2>Giới thiệu</h2><p>早餐包 là dòng bánh mì mềm ăn sáng bán chạy nhất của Daliyuan. Mỗi túi 200g có 5 bánh 40g bọc riêng, ruột xốp, vị sữa nhẹ — ăn liền hoặc hâm nóng đều được.</p><h2>Quy cách &amp; bảo quản</h2><ul><li>Túi 200g gồm 5 bánh 40g, mỗi bánh bọc riêng.</li><li>Thùng 20 túi.</li><li>Hạn dùng 6 tháng kể từ ngày sản xuất.</li><li>Bảo quản nơi khô ráo, thoáng mát, tránh ánh nắng trực tiếp.</li></ul><h2>Vì sao nên nhập về bán</h2><ul><li>SKU dẫn dắt cả dòng bánh mì — kéo theo các mã còn lại lên kệ.</li><li>Định lượng 5 bánh mỗi túi hợp túi tiền, quay vòng nhanh ở tạp hóa.</li><li>Đóng gói lẻ từng bánh, tiện bán xé lẻ tại quầy.</li></ul><h2>Hồ sơ kèm theo mỗi lô</h2><p>Mỗi lô xuất kho của Dali Foods Việt Nam đi kèm nhãn phụ tiếng Việt, bản tự công bố sản phẩm và hóa đơn VAT — đủ hồ sơ chào hàng vào siêu thị, chuỗi cửa hàng tiện lợi và kênh HORECA.</p>	Bánh mì ăn sáng Daliyuan 早餐包 gói 200g gồm 5 bánh 40g, thùng 20 túi. Nhập sỉ chính hãng qua Dali Foods Việt Nam.	Bánh mì ăn sáng Daliyuan 早餐包 200g — giá sỉ	2026-09-08 09:46:51.996926+00
+11	Bánh mì socola Hei Hei Bao 80g	heiheibao	products/heiheibao.jpg	Bánh mì socola Hei Hei Bao 80g	黑黑包 浓醇巧克力味	Gói 80g · thùng 24 gói	t	13	1	1	<h2>Giới thiệu</h2><p>黑黑包 nổi bật nhờ vỏ bánh màu đen từ bột cacao và nhân socola đậm bên trong. Ngoại hình khác lạ khiến mã này rất dễ lên nội dung mạng xã hội và bán chạy theo trend.</p><h2>Quy cách &amp; bảo quản</h2><ul><li>Gói 80g, một chiếc.</li><li>Thùng 24 gói.</li><li>Hạn dùng 6 tháng kể từ ngày sản xuất.</li><li>Bảo quản nơi khô ráo, thoáng mát, tránh ánh nắng trực tiếp.</li></ul><h2>Vì sao nên nhập về bán</h2><ul><li>Ngoại hình bắt mắt — SKU tốt để chạy nội dung TikTok, Facebook.</li><li>Giá lẻ vừa tầm ăn vặt, khách trẻ mua lại nhiều.</li><li>Cùng thùng 24 gói với dòng K17, gộp đơn bánh mì rất gọn.</li></ul><h2>Hồ sơ kèm theo mỗi lô</h2><p>Mỗi lô xuất kho của Dali Foods Việt Nam đi kèm nhãn phụ tiếng Việt, bản tự công bố sản phẩm và hóa đơn VAT — đủ hồ sơ chào hàng vào siêu thị, chuỗi cửa hàng tiện lợi và kênh HORECA.</p>	Bánh bao socola Hei Hei Bao 黑黑包 K17 gói 80g, thùng 24 gói. Vỏ bánh cacao, nhân socola đậm, giá sỉ từ Dali Foods Việt Nam.	Bánh bao K17 socola Hei Hei Bao 80g — nhập sỉ	2026-09-08 09:46:52.046301+00
+13	Bánh quy óc chó giòn 108g	biscuit-walnut	products/biscuit-walnut.jpg	Bánh quy óc chó giòn Haochidian 108g	好吃点 香脆核桃饼	Gói 108g · thùng 40 gói	t	15	3	2	<h2>Giới thiệu</h2><p>香脆核桃饼 là mã bánh quy chủ lực của Haochidian: bánh giòn, thơm mùi óc chó rang, ít ngọt. Đây là dòng bánh quy hạt bán chạy nhất trong danh mục 好吃点.</p><h2>Quy cách &amp; bảo quản</h2><ul><li>Gói 108g.</li><li>Thùng 40 gói.</li><li>Hạn dùng 12 tháng kể từ ngày sản xuất.</li><li>Bảo quản nơi khô ráo, thoáng mát, tránh ánh nắng trực tiếp.</li></ul><h2>Vì sao nên nhập về bán</h2><ul><li>Thương hiệu 好吃点 đã có nhận diện sẵn với khách quen hàng nhập.</li><li>Còn quy cách hộp 800g cho đại lý muốn giá vốn thấp hơn trên mỗi gói.</li><li>Hạn dùng 12 tháng, an toàn cho đại lý trữ hàng theo quý.</li></ul><h2>Hồ sơ kèm theo mỗi lô</h2><p>Mỗi lô xuất kho của Dali Foods Việt Nam đi kèm nhãn phụ tiếng Việt, bản tự công bố sản phẩm và hóa đơn VAT — đủ hồ sơ chào hàng vào siêu thị, chuỗi cửa hàng tiện lợi và kênh HORECA.</p>	Bánh quy óc chó giòn Haochidian 香脆核桃饼 gói 108g, thùng 40 gói. Giá sỉ nguyên thùng từ Dali Foods Việt Nam.	Bánh quy óc chó Haochidian 好吃点 108g — nhập sỉ	2026-09-08 09:46:52.070667+00
+14	Bánh quy hạt điều giòn 108g	biscuit-pair	products/biscuit-pair.jpg	Bánh quy hạt điều giòn Haochidian 108g	好吃点 香脆腰果饼	Gói 108g · thùng 40 gói	t	16	3	2	<h2>Giới thiệu</h2><p>香脆腰果饼 dùng hạt điều thay óc chó, vị bùi và ngọt nhẹ hơn. Mã này thường được đặt cùng bánh quy óc chó để khách có hai lựa chọn trên cùng một kệ.</p><h2>Quy cách &amp; bảo quản</h2><ul><li>Gói 108g.</li><li>Thùng 40 gói.</li><li>Hạn dùng 12 tháng kể từ ngày sản xuất.</li><li>Bảo quản nơi khô ráo, thoáng mát, tránh ánh nắng trực tiếp.</li></ul><h2>Vì sao nên nhập về bán</h2><ul><li>Đi cặp với mã óc chó — tăng giá trị mỗi đơn mà không tăng số lần giao.</li><li>Hạt điều là nguyên liệu quen thuộc, dễ bán cho khách Việt.</li><li>Cùng thùng 40 gói với mã óc chó, tính đơn rất gọn.</li></ul><h2>Hồ sơ kèm theo mỗi lô</h2><p>Mỗi lô xuất kho của Dali Foods Việt Nam đi kèm nhãn phụ tiếng Việt, bản tự công bố sản phẩm và hóa đơn VAT — đủ hồ sơ chào hàng vào siêu thị, chuỗi cửa hàng tiện lợi và kênh HORECA.</p>	Bánh quy hạt điều giòn Haochidian 香脆腰果饼 gói 108g, thùng 40 gói. Nhập sỉ chính hãng qua Dali Foods Việt Nam.	Bánh quy hạt điều Haochidian 好吃点 108g — giá sỉ	2026-09-08 09:46:52.081865+00
+9	Bánh mì Pháp mini 200g (10 cái)	mini-french	products/mini-french.jpg	Bánh mì Pháp mini Daliyuan 200g	法式小面包 香奶味	Gói 200g (20g × 10 bánh) · thùng 15 túi	t	11	1	1	<h2>Giới thiệu</h2><p>法式小面包 香奶味 — bánh mì Pháp cỡ mini nhân kem sữa, mỗi túi 10 bánh 20g vừa một miếng. Đây là mã bán chạy ở kênh trường học và các cửa hàng bán đồ ăn vặt.</p><h2>Quy cách &amp; bảo quản</h2><ul><li>Túi 200g gồm 10 bánh 20g, mỗi bánh bọc riêng.</li><li>Thùng 15 túi.</li><li>Hạn dùng 6 tháng kể từ ngày sản xuất.</li><li>Bảo quản nơi khô ráo, thoáng mát, tránh ánh nắng trực tiếp.</li></ul><h2>Vì sao nên nhập về bán</h2><ul><li>Cỡ mini hợp khách nhỏ tuổi — bán mạnh quanh khu vực trường học.</li><li>10 bánh mỗi túi, dễ làm combo ăn vặt với sữa lạc và trà trái cây.</li><li>Giá lẻ thấp, khách quyết định mua nhanh.</li></ul><h2>Hồ sơ kèm theo mỗi lô</h2><p>Mỗi lô xuất kho của Dali Foods Việt Nam đi kèm nhãn phụ tiếng Việt, bản tự công bố sản phẩm và hóa đơn VAT — đủ hồ sơ chào hàng vào siêu thị, chuỗi cửa hàng tiện lợi và kênh HORECA.</p>	Bánh mì Pháp mini 法式小面包 vị sữa, túi 200g gồm 10 bánh 20g, thùng 15 túi. Giá sỉ nguyên thùng từ Dali Foods Việt Nam.	Bánh mì Pháp mini Daliyuan 200g — sỉ 15 túi/thùng	2026-09-08 09:46:52.02243+00
+15	Hộp bánh quy hạt Haochidian 800g (óc chó / hạt điều)	biscuit-cartons	products/biscuit-cartons.jpg	Thùng bánh quy hạt Haochidian 800g	好吃点 800克 量贩装	Hộp 800g (22g × 36 gói) · thùng 12 hộp	t	17	3	2	<h2>Giới thiệu</h2><p>好吃点 800克 量贩装 là quy cách hộp lượng lớn dành cho đại lý và kênh bán sỉ: 36 gói nhỏ 22g xếp sẵn trong hộp 800g, chọn nguyên vị óc chó hoặc nguyên vị hạt điều tùy nhu cầu điểm bán.</p><h2>Quy cách &amp; bảo quản</h2><ul><li>Hộp 800g gồm 36 gói nhỏ 22g.</li><li>Thùng 12 hộp.</li><li>Chọn nguyên vị óc chó hoặc nguyên vị hạt điều khi đặt hàng.</li><li>Hạn dùng 12 tháng kể từ ngày sản xuất.</li><li>Bảo quản nơi khô ráo, thoáng mát, tránh ánh nắng trực tiếp.</li></ul><h2>Vì sao nên nhập về bán</h2><ul><li>Giá vốn trên mỗi gói thấp nhất trong dải bánh quy Haochidian.</li><li>Gói nhỏ 22g hợp làm hàng khuyến mãi, quà kèm đơn và suất ăn nhẹ văn phòng.</li><li>Quy cách chuẩn cho đơn mở đại lý và các chương trình xả hàng.</li></ul><h2>Hồ sơ kèm theo mỗi lô</h2><p>Mỗi lô xuất kho của Dali Foods Việt Nam đi kèm nhãn phụ tiếng Việt, bản tự công bố sản phẩm và hóa đơn VAT — đủ hồ sơ chào hàng vào siêu thị, chuỗi cửa hàng tiện lợi và kênh HORECA.</p>	Hộp bánh quy Haochidian 800g 量贩装 gồm 36 gói nhỏ 22g, thùng 12 hộp, vị óc chó hoặc hạt điều. Giá sỉ từ Dali Foods Việt Nam.	Hộp bánh quy hạt Haochidian 800g — sỉ 12 hộp/thùng	2026-09-08 09:46:52.091862+00
+16	Bánh quy ngũ cốc cao xơ Guye 110g (3 vị)	guye	products/guye.jpg	Bánh quy ngũ cốc cao xơ Guye 110g	谷野 高纤煎麸饼 · 高纤粗粮饼 · 高纤蔬菜饼	Gói 110g · thùng 40 gói	t	18	3	2	<h2>Giới thiệu</h2><p>谷野 là dòng bánh quy cao xơ của Haochidian, gồm 高纤煎麸饼 ngũ cốc canxi yến mạch, 高纤粗粮饼 ngũ cốc canxi và 高纤蔬菜饼 rau củ hành cà chua. Ít ngọt, nhiều chất xơ — nhắm vào nhóm khách ăn kiêng và dân văn phòng.</p><h2>Quy cách &amp; bảo quản</h2><ul><li>Gói 110g.</li><li>Thùng 40 gói, ba vị đặt riêng hoặc trộn thùng.</li><li>Hạn dùng 12 tháng kể từ ngày sản xuất.</li><li>Bảo quản nơi khô ráo, thoáng mát, tránh ánh nắng trực tiếp.</li></ul><h2>Vì sao nên nhập về bán</h2><ul><li>Ngách bánh quy healthy đang tăng, ít hàng nhập cạnh tranh trực tiếp.</li><li>Ba vị cho phép điểm bán thử phản ứng thị trường trong một lần đặt.</li><li>Bán tốt kèm trà thảo mộc và sữa lạc ở kênh văn phòng.</li></ul><h2>Hồ sơ kèm theo mỗi lô</h2><p>Mỗi lô xuất kho của Dali Foods Việt Nam đi kèm nhãn phụ tiếng Việt, bản tự công bố sản phẩm và hóa đơn VAT — đủ hồ sơ chào hàng vào siêu thị, chuỗi cửa hàng tiện lợi và kênh HORECA.</p>	Bánh quy cao xơ Guye 谷野 110g ba vị: canxi yến mạch, ngũ cốc canxi, rau củ hành cà chua. Thùng 40 gói, giá sỉ từ Dali Foods Việt Nam.	Bánh quy ngũ cốc cao xơ Guye 谷野 110g — nhập sỉ	2026-09-08 09:46:52.102362+00
+17	Bánh quy kẹp mỏng giòn Cookico 90g	cookico	products/cookico.jpg	Bánh quy kẹp mỏng giòn Cookico 90g	Landy Castle 薄脆夹心曲奇 · bơ / chanh	Gói 90g · thùng 32 gói	t	20	1	2	<h2>Giới thiệu</h2><p>Landy Castle 薄脆夹心曲奇 — bánh quy mỏng 3mm kẹp kem, giòn tan, ít đường, có hai vị bơ và chanh. Bao bì nhỏ gọn, định vị đồ ăn vặt tiện mang theo.</p><h2>Quy cách &amp; bảo quản</h2><ul><li>Gói 90g.</li><li>Thùng 32 gói, hai vị đặt riêng hoặc trộn thùng.</li><li>Hạn dùng 12 tháng kể từ ngày sản xuất.</li><li>Bảo quản nơi khô ráo, thoáng mát, tránh ánh nắng trực tiếp.</li></ul><h2>Vì sao nên nhập về bán</h2><ul><li>Bao bì trẻ trung, hợp kệ đồ ăn vặt ở cửa hàng tiện lợi.</li><li>Định vị ít đường — bán được cho nhóm khách ngại bánh ngọt.</li><li>Giá lẻ thấp, phù hợp làm hàng dùng thử kèm đơn lớn.</li></ul><h2>Hồ sơ kèm theo mỗi lô</h2><p>Mỗi lô xuất kho của Dali Foods Việt Nam đi kèm nhãn phụ tiếng Việt, bản tự công bố sản phẩm và hóa đơn VAT — đủ hồ sơ chào hàng vào siêu thị, chuỗi cửa hàng tiện lợi và kênh HORECA.</p>	Bánh quy kẹp mỏng giòn Cookico Landy Castle 90g, vị bơ và chanh. Thùng 32 gói, nhập sỉ chính hãng qua Dali Foods Việt Nam.	Bánh quy kẹp Cookico 90g vị bơ / chanh — giá sỉ	2026-09-08 09:46:52.142029+00
+1	Trà trái cây Daliyuan 500ml (3 vị)	tea-trio	products/tea-trio.jpg	Trà trái cây Daliyuan 500ml	果味茶 · đào trắng ô long / nho xanh trà xanh / chanh hồng trà	Chai 500ml · thùng 15 chai	t	1	1	3	<h2>Giới thiệu</h2><p>Dòng trà trái cây 果味茶 của Daliyuan pha nền trà thật với nước ép cô đặc, vị ngọt vừa và hậu trà rõ nên uống được cả ngày. Catalogue 2026 gồm ba vị: ô long đào trắng (白桃乌龙茶), nho xanh trà xanh (青提绿茶) và trà đen vị chanh (柠檬红茶) — chia đều trong cùng một thùng để điểm bán mới thử thị trường trước khi chốt vị bán chạy.</p><h2>Quy cách &amp; bảo quản</h2><ul><li>Chai PET 500ml, nhãn tiếng Trung kèm nhãn phụ tiếng Việt.</li><li>Thùng 15 chai, chia đều ba vị theo yêu cầu đặt hàng.</li><li>Hạn dùng 12 tháng kể từ ngày sản xuất.</li><li>Bảo quản nơi thoáng mát; ngon hơn khi uống lạnh.</li></ul><h2>Vì sao nên nhập về bán</h2><ul><li>Ba vị trong một SKU — giảm rủi ro tồn kho khi mở điểm bán mới.</li><li>Phân khúc giá phổ thông, xoay vòng nhanh ở kênh trường học và văn phòng.</li><li>Chai 500ml vừa tay, phù hợp cả bán lẻ lẫn combo giao hàng.</li></ul><h2>Hồ sơ kèm theo mỗi lô</h2><p>Mỗi lô xuất kho của Dali Foods Việt Nam đi kèm nhãn phụ tiếng Việt, bản tự công bố sản phẩm và hóa đơn VAT — đủ hồ sơ chào hàng vào siêu thị, chuỗi cửa hàng tiện lợi và kênh HORECA.</p>	Trà trái cây Daliyuan 500ml: ô long đào trắng, nho xanh trà xanh, đen vị chanh. Thùng 15 chai, giá sỉ từ Dali Foods Việt Nam.	Trà trái cây Daliyuan 500ml 3 vị — giá sỉ thùng 15 chai	2026-09-08 09:46:51.833614+00
+3	Nước tăng lực Hi-Tiger 250ml	hitiger	products/hitiger.jpg	Nước tăng lực Hi-Tiger 250ml	乐虎 氨基酸维生素功能饮料	Lon 250ml · thùng 24 lon · có chai 380ml	t	3	5	3	<h2>Giới thiệu</h2><p>Hi-Tiger 乐虎 là thương hiệu nước tăng lực chủ lực của Dali Foods Group, công thức bổ sung taurine, axit amin và vitamin nhóm B. Catalogue có hai quy cách: lon thiếc 250ml và chai 380ml — lon chạy mạnh ở kênh HORECA, quán ăn đêm và trạm xăng, chai hợp khách mang theo.</p><h2>Quy cách &amp; bảo quản</h2><ul><li>Lon thiếc 250ml, thùng 24 lon.</li><li>Chai 380ml — đặt riêng theo nhu cầu.</li><li>Hạn dùng 12 tháng kể từ ngày sản xuất.</li><li>Bảo quản nơi khô ráo, thoáng mát, tránh ánh nắng trực tiếp.</li></ul><h2>Vì sao nên nhập về bán</h2><ul><li>Ngành hàng tăng lực quay vòng nhanh, khách mua theo lốc và theo thùng.</li><li>Hai quy cách cho hai kênh bán khác nhau mà chỉ cần làm việc với một nhà cung cấp.</li><li>Định vị giá cạnh tranh so với các thương hiệu tăng lực cùng dung tích.</li></ul><h2>Hồ sơ kèm theo mỗi lô</h2><p>Mỗi lô xuất kho của Dali Foods Việt Nam đi kèm nhãn phụ tiếng Việt, bản tự công bố sản phẩm và hóa đơn VAT — đủ hồ sơ chào hàng vào siêu thị, chuỗi cửa hàng tiện lợi và kênh HORECA.</p>	Hi-Tiger 乐虎 lon 250ml, thùng 24 lon; còn quy cách chai 380ml. Giá sỉ và chính sách đại lý từ Dali Foods Việt Nam.	Nước tăng lực Hi-Tiger 乐虎 250ml — sỉ thùng 24 lon	2026-09-08 09:46:51.875396+00
+18	Cháo Youyican gạo lứt khoai tím 360g	porridge-purple	products/porridge-purple.jpg	Cháo Youyican gạo lứt khoai tím 360g	又一餐 燕麦紫薯粥	Lon 360g · thùng 12 lon	t	7	1	4	<h2>Giới thiệu</h2><p>又一餐 燕麦紫薯粥 là vị mới trong dòng cháo lon Youyican: yến mạch nấu cùng khoai tím, màu tím tự nhiên, ít ngọt và nhiều chất xơ hơn các vị cháo truyền thống.</p><h2>Quy cách &amp; bảo quản</h2><ul><li>Lon 360g, nắp giật.</li><li>Thùng 12 lon.</li><li>Hạn dùng 18 tháng kể từ ngày sản xuất.</li><li>Bảo quản nơi khô ráo, thoáng mát, tránh ánh nắng trực tiếp.</li></ul><h2>Vì sao nên nhập về bán</h2><ul><li>Màu sắc và định vị 'ngũ cốc nguyên hạt' hợp nhóm khách trẻ quan tâm ăn uống lành mạnh.</li><li>Vị mới, chưa bị bão hòa ở kênh cửa hàng tiện lợi.</li><li>Cùng quy cách thùng với hai vị cháo còn lại — gộp đơn không phát sinh chuyến giao.</li></ul><h2>Hồ sơ kèm theo mỗi lô</h2><p>Mỗi lô xuất kho của Dali Foods Việt Nam đi kèm nhãn phụ tiếng Việt, bản tự công bố sản phẩm và hóa đơn VAT — đủ hồ sơ chào hàng vào siêu thị, chuỗi cửa hàng tiện lợi và kênh HORECA.</p>	Cháo Youyican 又一餐 燕麦紫薯粥 gạo lứt khoai tím, lon 360g, thùng 12 lon. Nhập sỉ chính hãng qua Dali Foods Việt Nam.	Cháo gạo lứt khoai tím Youyican 360g — nhập sỉ	2026-09-08 09:46:51.932643+00
+19	Chè khoai môn yến mạch Ovici 360g	che-khoai-mon	products/che-khoai-mon.jpg	Chè khoai môn yến mạch Ovici 360g	谷吨吨 牛乳香芋燕麦	Lon 360g · thùng 12 lon	t	8	1	4	<h2>Giới thiệu</h2><p>谷吨吨 牛乳香芋燕麦 là món chè đóng lon: khoai môn và yến mạch nấu với sữa, có cả miếng khoai nguyên. Ngọt vừa, ăn lạnh ngon hơn — đây là mã đồ ăn vặt hơn là bữa sáng.</p><h2>Quy cách &amp; bảo quản</h2><ul><li>Lon 360g, nắp giật.</li><li>Thùng 12 lon.</li><li>Hạn dùng 18 tháng kể từ ngày sản xuất.</li><li>Bảo quản nơi khô ráo; ngon hơn khi để lạnh trước khi ăn.</li></ul><h2>Vì sao nên nhập về bán</h2><ul><li>Khác biệt với cả kệ cháo lẫn kệ sữa — dễ tạo điểm nhấn trưng bày.</li><li>Vị khoai môn sữa đang là trend đồ uống, kéo theo nhu cầu cho món chè cùng vị.</li><li>Chung thùng 12 lon với dòng cháo, thuận tiện khi gom đơn.</li></ul><h2>Hồ sơ kèm theo mỗi lô</h2><p>Mỗi lô xuất kho của Dali Foods Việt Nam đi kèm nhãn phụ tiếng Việt, bản tự công bố sản phẩm và hóa đơn VAT — đủ hồ sơ chào hàng vào siêu thị, chuỗi cửa hàng tiện lợi và kênh HORECA.</p>	Chè khoai môn yến mạch Ovici 谷吨吨 牛乳香芋燕麦, lon 360g, thùng 12 lon. Nhập sỉ chính hãng qua Dali Foods Việt Nam.	Chè khoai môn yến mạch Ovici 360g — nhập sỉ thùng 12 lon	2026-09-08 09:46:51.957311+00
+10	Bánh mì K17 — dừa / chà bông / rong biển	k17-trio	products/k17-trio.jpg	Bánh mì K17 Daliyuan ba vị	K17 大椰蓉面包 · 肉松芝麻 · 肉松海苔吐司	Gói lẻ · thùng 24 gói	t	12	1	1	<h2>Giới thiệu</h2><p>Dòng K17 gồm ba vị mặn — ngọt xen kẽ: 大椰蓉面包 nhân dừa, 肉松芝麻面包 chà bông vừng và 肉松海苔吐司 chà bông rong biển. Bộ ba này phủ được cả nhóm khách thích vị ngọt lẫn nhóm thích vị mặn, nên hiếm khi bị tồn một vị.</p><h2>Quy cách &amp; bảo quản</h2><ul><li>Gói lẻ từng chiếc, bán xé lẻ hoặc theo lốc.</li><li>Thùng 24 gói, chia vị theo yêu cầu đặt hàng.</li><li>Hạn dùng 6 tháng kể từ ngày sản xuất.</li><li>Bảo quản nơi khô ráo, thoáng mát, tránh ánh nắng trực tiếp.</li></ul><h2>Vì sao nên nhập về bán</h2><ul><li>Ba vị trong một dòng — dễ lấp đầy kệ bánh mì chỉ với một mã đặt.</li><li>Vị chà bông hợp khẩu vị Việt, khác biệt so với bánh mì ngọt thông thường.</li><li>Gói lẻ tiện bán tại quầy thu ngân, kích thích mua ngẫu hứng.</li></ul><h2>Hồ sơ kèm theo mỗi lô</h2><p>Mỗi lô xuất kho của Dali Foods Việt Nam đi kèm nhãn phụ tiếng Việt, bản tự công bố sản phẩm và hóa đơn VAT — đủ hồ sơ chào hàng vào siêu thị, chuỗi cửa hàng tiện lợi và kênh HORECA.</p>	Bánh mì K17 Daliyuan ba vị: dừa, chà bông vừng, chà bông rong biển. Gói lẻ, thùng 24 gói, nhập sỉ qua Dali Foods Việt Nam.	Bánh mì K17 dừa / chà bông vừng / rong biển — giá sỉ	2026-09-08 09:46:52.034683+00
+20	Bánh quy mặn lá hẹ Daliyuan 130g	banh-la-he	products/banh-la-he.jpg	Bánh quy mặn lá hẹ Daliyuan 130g	达利园 香葱咸饼	Gói 130g · thùng 40 gói	t	19	1	2	<h2>Giới thiệu</h2><p>香葱咸饼 là bánh quy mặn rắc lá hẹ và hành lá, giòn xốp, vị mặn nhẹ. Đây là mã hiếm trong kệ bánh quy Việt vốn thiên về vị ngọt, nên rất dễ tạo khác biệt cho điểm bán.</p><h2>Quy cách &amp; bảo quản</h2><ul><li>Gói 130g dạng thanh dài.</li><li>Thùng 40 gói.</li><li>Hạn dùng 12 tháng kể từ ngày sản xuất.</li><li>Bảo quản nơi khô ráo, thoáng mát, tránh ánh nắng trực tiếp.</li></ul><h2>Vì sao nên nhập về bán</h2><ul><li>Vị mặn — lấp đúng khoảng trống trên kệ bánh quy vốn toàn vị ngọt.</li><li>Ăn kèm trà và cà phê, dễ bán ở quán nước và văn phòng.</li><li>Cùng thùng 40 gói với dòng Guye, gộp đơn bánh quy rất gọn.</li></ul><h2>Hồ sơ kèm theo mỗi lô</h2><p>Mỗi lô xuất kho của Dali Foods Việt Nam đi kèm nhãn phụ tiếng Việt, bản tự công bố sản phẩm và hóa đơn VAT — đủ hồ sơ chào hàng vào siêu thị, chuỗi cửa hàng tiện lợi và kênh HORECA.</p>	Bánh quy mặn lá hẹ 香葱咸饼 Daliyuan gói 130g, thùng 40 gói. Vị mặn nhẹ thơm hành lá, nhập sỉ qua Dali Foods Việt Nam.	Bánh quy mặn lá hẹ Daliyuan 130g — sỉ 40 gói/thùng	2026-09-08 09:46:52.11972+00
+21	Snack khoai tây Copico 45g (5 vị)	snack-copico	products/snack-copico.jpg	Snack khoai tây Copico 45g năm vị	可比克 薯片 · nguyên bản / cà chua / BBQ / cay / dưa leo	Lon 45g · thùng 48 lon	t	21	2	2	<h2>Giới thiệu</h2><p>可比克 薯片 là thương hiệu snack khoai tây của Dali Foods Group, đóng lon giấy giữ bánh nguyên miếng thay vì vụn như bao mềm. Catalogue 2026 có năm vị: nguyên bản (原滋味), cà chua (番茄味), BBQ (烧烤味), cay (香辣味) và dưa leo thanh mát (爽口青瓜味).</p><h2>Quy cách &amp; bảo quản</h2><ul><li>Lon giấy 45g.</li><li>Thùng 48 lon, năm vị đặt riêng hoặc trộn thùng.</li><li>Hạn dùng 12 tháng kể từ ngày sản xuất.</li><li>Bảo quản nơi khô ráo, thoáng mát, tránh ánh nắng trực tiếp.</li></ul><h2>Vì sao nên nhập về bán</h2><ul><li>Lon giấy chống vỡ — tỷ lệ hàng hỏng khi vận chuyển thấp hơn snack bao mềm.</li><li>Năm vị phủ rộng khẩu vị, dễ bày thành một dải màu bắt mắt trên kệ.</li><li>Thùng 48 lon, giá vốn mỗi lon thấp khi nhập nguyên thùng.</li></ul><h2>Hồ sơ kèm theo mỗi lô</h2><p>Mỗi lô xuất kho của Dali Foods Việt Nam đi kèm nhãn phụ tiếng Việt, bản tự công bố sản phẩm và hóa đơn VAT — đủ hồ sơ chào hàng vào siêu thị, chuỗi cửa hàng tiện lợi và kênh HORECA.</p>	Snack khoai tây Copico 可比克 lon 45g, 5 vị: nguyên bản, cà chua, BBQ, cay, dưa leo. Thùng 48 lon, giá sỉ từ Dali Foods Việt Nam.	Snack khoai tây Copico 45g — sỉ thùng 48 lon	2026-09-08 09:46:52.16126+00
 \.
 
 
@@ -823,28 +831,30 @@ COPY public.django_content_type (id, app_label, model) FROM stdin;
 --
 
 COPY public.django_migrations (id, app, name, applied) FROM stdin;
-1	contenttypes	0001_initial	2026-08-26 14:09:21.563625+07
-2	auth	0001_initial	2026-08-26 14:09:21.604473+07
-3	admin	0001_initial	2026-08-26 14:09:21.617367+07
-4	admin	0002_logentry_remove_auto_add	2026-08-26 14:09:21.622317+07
-5	admin	0003_logentry_add_action_flag_choices	2026-08-26 14:09:21.625822+07
-6	contenttypes	0002_remove_content_type_name	2026-08-26 14:09:21.634704+07
-7	auth	0002_alter_permission_name_max_length	2026-08-26 14:09:21.639195+07
-8	auth	0003_alter_user_email_max_length	2026-08-26 14:09:21.643215+07
-9	auth	0004_alter_user_username_opts	2026-08-26 14:09:21.646972+07
-10	auth	0005_alter_user_last_login_null	2026-08-26 14:09:21.650743+07
-11	auth	0006_require_contenttypes_0002	2026-08-26 14:09:21.651272+07
-12	auth	0007_alter_validators_add_error_messages	2026-08-26 14:09:21.654415+07
-13	auth	0008_alter_user_username_max_length	2026-08-26 14:09:21.660641+07
-14	auth	0009_alter_user_last_name_max_length	2026-08-26 14:09:21.664838+07
-15	auth	0010_alter_group_name_max_length	2026-08-26 14:09:21.669571+07
-16	auth	0011_update_proxy_permissions	2026-08-26 14:09:21.672687+07
-17	auth	0012_alter_user_first_name_max_length	2026-08-26 14:09:21.676577+07
-18	catalog	0001_initial	2026-08-26 14:09:21.70541+07
-19	leads	0001_initial	2026-08-26 14:09:21.717483+07
-20	news	0001_initial	2026-08-26 14:09:21.728961+07
-21	sessions	0001_initial	2026-08-26 14:09:21.734809+07
-22	siteinfo	0001_initial	2026-08-26 14:09:21.746737+07
+1	contenttypes	0001_initial	2026-08-26 07:09:21.563625+00
+2	auth	0001_initial	2026-08-26 07:09:21.604473+00
+3	admin	0001_initial	2026-08-26 07:09:21.617367+00
+4	admin	0002_logentry_remove_auto_add	2026-08-26 07:09:21.622317+00
+5	admin	0003_logentry_add_action_flag_choices	2026-08-26 07:09:21.625822+00
+6	contenttypes	0002_remove_content_type_name	2026-08-26 07:09:21.634704+00
+7	auth	0002_alter_permission_name_max_length	2026-08-26 07:09:21.639195+00
+8	auth	0003_alter_user_email_max_length	2026-08-26 07:09:21.643215+00
+9	auth	0004_alter_user_username_opts	2026-08-26 07:09:21.646972+00
+10	auth	0005_alter_user_last_login_null	2026-08-26 07:09:21.650743+00
+11	auth	0006_require_contenttypes_0002	2026-08-26 07:09:21.651272+00
+12	auth	0007_alter_validators_add_error_messages	2026-08-26 07:09:21.654415+00
+13	auth	0008_alter_user_username_max_length	2026-08-26 07:09:21.660641+00
+14	auth	0009_alter_user_last_name_max_length	2026-08-26 07:09:21.664838+00
+15	auth	0010_alter_group_name_max_length	2026-08-26 07:09:21.669571+00
+16	auth	0011_update_proxy_permissions	2026-08-26 07:09:21.672687+00
+17	auth	0012_alter_user_first_name_max_length	2026-08-26 07:09:21.676577+00
+18	catalog	0001_initial	2026-08-26 07:09:21.70541+00
+19	leads	0001_initial	2026-08-26 07:09:21.717483+00
+20	news	0001_initial	2026-08-26 07:09:21.728961+00
+21	sessions	0001_initial	2026-08-26 07:09:21.734809+00
+22	siteinfo	0001_initial	2026-08-26 07:09:21.746737+00
+23	catalog	0002_alter_brand_is_active	2026-08-31 09:56:27.222706+00
+24	catalog	0003_product_body_product_seo_description_and_more	2026-09-08 08:59:47.470448+00
 \.
 
 
@@ -853,13 +863,13 @@ COPY public.django_migrations (id, app, name, applied) FROM stdin;
 --
 
 COPY public.news_article (id, title, slug, topic, cover, cover_alt, excerpt, body, published_at, is_published) FROM stdin;
-2	Ra mắt croissant Daliyuan vị cam & socola — bổ sung kệ bánh ngọt	ra-mat-croissant-daliyuan-cam-socola	Tin công ty	news/croissant.jpg	Croissant Daliyuan mới			2026-06-15 16:00:00+07	t
-4	3 cách nhận biết hàng Dali chính hãng qua nhãn phụ tiếng Việt	3-cach-nhan-biet-hang-dali-chinh-hang	Kiến thức sản phẩm	news/heiheibao.jpg	Nhận biết hàng chính hãng			2026-08-01 16:00:00+07	t
-5	Trà trái cây Daliyuan — vì sao thành trend đồ uống hè trên TikTok	tra-trai-cay-daliyuan-trend-mua-he	Kiến thức sản phẩm	news/tea-plum.jpg	Trà trái cây mùa hè			2026-06-01 16:00:00+07	t
-6	Hi-Tiger 乐虎 vào kênh HORECA — combo khai trương cho quán café, phòng gym	hi-tiger-vao-kenh-horeca	Chương trình đại lý	news/hitiger.jpg	Hi-Tiger kênh HORECA			2026-05-01 16:00:00+07	t
-7	Cháo lon Youyican 又一餐 — bữa sáng 1 phút cho dân văn phòng	chao-lon-youyican-bua-sang-1-phut	Kiến thức sản phẩm	news/porridge-3.jpg	Cháo Youyican bữa sáng			2026-05-01 16:00:00+07	t
-3	Chiết khấu quý III cho đơn nguyên thùng Haochidian — đăng ký trước 30/09/2026	chiet-khau-quy-iii-haochidian	Chương trình đại lý	news/biscuit-cartons.jpg	Chương trình chiết khấu thùng			2026-07-01 16:00:00+07	t
-1	Dali Foods Việt Nam là đơn vị phân phối chính hãng sản phẩm Dali Foods tại Việt Nam	dali-foods-viet-nam-nha-phan-phoi-chinh-hang	Tin công ty	news/breakfast-bread-2.jpg	Dali Foods Việt Nam phân phối sản phẩm Dali Foods	Hợp đồng phân phối đã ký kết — mở đường đưa bánh, snack và đồ uống Dali chính ngạch phủ khắp kênh bán lẻ Việt Nam.		2026-04-22 16:00:00+07	t
+2	Ra mắt croissant Daliyuan vị cam & socola — bổ sung kệ bánh ngọt	ra-mat-croissant-daliyuan-cam-socola	Tin công ty	news/croissant.jpg	Croissant Daliyuan mới			2026-06-15 09:00:00+00	t
+4	3 cách nhận biết hàng Dali chính hãng qua nhãn phụ tiếng Việt	3-cach-nhan-biet-hang-dali-chinh-hang	Kiến thức sản phẩm	news/heiheibao.jpg	Nhận biết hàng chính hãng			2026-08-01 09:00:00+00	t
+5	Trà trái cây Daliyuan — vì sao thành trend đồ uống hè trên TikTok	tra-trai-cay-daliyuan-trend-mua-he	Kiến thức sản phẩm	news/tea-plum.jpg	Trà trái cây mùa hè			2026-06-01 09:00:00+00	t
+6	Hi-Tiger 乐虎 vào kênh HORECA — combo khai trương cho quán café, phòng gym	hi-tiger-vao-kenh-horeca	Chương trình đại lý	news/hitiger.jpg	Hi-Tiger kênh HORECA			2026-05-01 09:00:00+00	t
+7	Cháo lon Youyican 又一餐 — bữa sáng 1 phút cho dân văn phòng	chao-lon-youyican-bua-sang-1-phut	Kiến thức sản phẩm	news/porridge-3.jpg	Cháo Youyican bữa sáng			2026-05-01 09:00:00+00	t
+3	Chiết khấu quý III cho đơn nguyên thùng Haochidian — đăng ký trước 30/09/2026	chiet-khau-quy-iii-haochidian	Chương trình đại lý	news/biscuit-cartons.jpg	Chương trình chiết khấu thùng			2026-07-01 09:00:00+00	t
+1	Dali Foods Việt Nam là đơn vị phân phối chính hãng sản phẩm Dali Foods tại Việt Nam	dali-foods-viet-nam-nha-phan-phoi-chinh-hang	Tin công ty	news/breakfast-bread-2.jpg	Dali Foods Việt Nam phân phối sản phẩm Dali Foods	Hợp đồng phân phối đã ký kết — mở đường đưa bánh, snack và đồ uống Dali chính ngạch phủ khắp kênh bán lẻ Việt Nam.		2026-04-22 09:00:00+00	t
 \.
 
 
@@ -904,7 +914,7 @@ SELECT pg_catalog.setval('public.auth_user_groups_id_seq', 1, true);
 -- Name: auth_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.auth_user_id_seq', 1, true);
+SELECT pg_catalog.setval('public.auth_user_id_seq', 2, true);
 
 
 --
@@ -932,7 +942,7 @@ SELECT pg_catalog.setval('public.catalog_category_id_seq', 4, true);
 -- Name: catalog_product_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.catalog_product_id_seq', 17, true);
+SELECT pg_catalog.setval('public.catalog_product_id_seq', 21, true);
 
 
 --
@@ -953,21 +963,21 @@ SELECT pg_catalog.setval('public.django_content_type_id_seq', 13, true);
 -- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.django_migrations_id_seq', 22, true);
+SELECT pg_catalog.setval('public.django_migrations_id_seq', 24, true);
 
 
 --
 -- Name: leads_contactmessage_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.leads_contactmessage_id_seq', 4, true);
+SELECT pg_catalog.setval('public.leads_contactmessage_id_seq', 5, true);
 
 
 --
 -- Name: leads_dealerapplication_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.leads_dealerapplication_id_seq', 2, true);
+SELECT pg_catalog.setval('public.leads_dealerapplication_id_seq', 4, true);
 
 
 --
@@ -1498,5 +1508,5 @@ ALTER TABLE ONLY public.django_admin_log
 -- PostgreSQL database dump complete
 --
 
-\unrestrict 7DmnGlYMhOxZZBFqah3pqQbfyC4slFmG0wOGgMqEmfAKuTQK57jMKRy6rprcYxb
+\unrestrict q3UGxHLPxEeaRO8sEZUJp1FbXmipHqxkkp9nxR1tb50MJ3WEk6t7Dgw7IQUs1kE
 
