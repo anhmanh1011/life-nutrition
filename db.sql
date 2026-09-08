@@ -868,7 +868,7 @@ COPY public.news_article (id, title, slug, topic, cover, cover_alt, excerpt, bod
 --
 
 COPY public.siteinfo_sitesettings (id, hotline_wholesale, hotline_retail, email, zalo_oa, tax_code, business_license_no, business_license_date, business_license_issuer, head_office_address, warehouse_address, warehouse_area, shopee_url, lazada_url, tiktok_url, moit_notice, founded_year, retail_points, staff_count, coverage, shipping_partner, facility_location) FROM stdin;
-1	1900 8386	0938 246 810	kinhdoanh@dalifoods.vn	[tên Zalo OA]	[MST]	[số]	[ngày]	[nơi cấp]	[địa chỉ trụ sở]	[địa chỉ kho]	1.200 m²	[link]	[link]	[link]	(dữ liệu demo — chưa thông báo tại online.gov.vn)	2024	1.200+	45	38	Giao Hàng Nhanh & Viettel Post	Hà Nội
+1	0845880000	0845880000	kinhdoanh@dalifoods.vn	Dali Foods Việt Nam	[MST]	[số]	[ngày]	[nơi cấp]	Số 27, ngõ 84 đường Trần Thái Tông, phường Dịch Vọng Hậu, quận Cầu Giấy, TP Hà Nội	Lô B4, Cụm công nghiệp An Khánh, xã An Khánh, huyện Hoài Đức, TP Hà Nội	1.200 m²	https://shopee.vn/dalifoods_vn	https://www.lazada.vn/shop/dali-foods-viet-nam	https://www.tiktok.com/@dalifoods.vn	(dữ liệu demo — chưa thông báo tại online.gov.vn)	2024	1.200+	45	38	Giao Hàng Nhanh & Viettel Post	Hà Nội
 \.
 
 
