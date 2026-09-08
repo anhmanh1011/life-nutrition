@@ -1,18 +1,10 @@
-import nh3
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
 from tinymce.models import HTMLField
 
 from apps.common.images import resize_to_max_edge, validate_upload_size
-
-_ALLOWED_TAGS = {
-    "p", "br", "strong", "em", "u", "ul", "ol", "li", "a",
-    "h2", "h3", "h4", "blockquote", "table", "thead", "tbody", "tr", "th", "td",
-}
-# No "rel": nh3 manages it and rejects the tag being in both places. It stamps
-# rel="noopener noreferrer" on every link, which is what target="_blank" needs.
-_ALLOWED_ATTRIBUTES = {"a": {"href", "title", "target"}}
+from apps.common.richtext import clean_html
 
 
 class ArticleQuerySet(models.QuerySet):
@@ -65,9 +57,7 @@ class Article(models.Model):
         return reverse("news_detail", kwargs={"slug": self.slug})
 
     def save(self, *args, **kwargs):
-        self.body = nh3.clean(
-            self.body or "", tags=_ALLOWED_TAGS, attributes=_ALLOWED_ATTRIBUTES
-        )
+        self.body = clean_html(self.body)
         if self.cover and not self.cover._committed:
             self.cover = resize_to_max_edge(self.cover, settings.IMAGE_MAX_EDGE)
         super().save(*args, **kwargs)

@@ -4,6 +4,16 @@
 {% block title %}{{ article.title }} — Dali Foods Việt Nam{% endblock %}
 {% block description %}{{ article.excerpt }}{% endblock %}
 
+{% block og %}
+<meta property="og:type" content="article">
+<meta property="og:title" content="{{ article.title }}">
+<meta property="og:description" content="{{ article.excerpt }}">
+<meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+{% if article.cover %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ article.cover.url }}">{% else %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/logo-mark.png' %}">{% endif %}
+<meta property="og:site_name" content="Dali Foods Việt Nam">
+<meta property="og:locale" content="vi_VN">
+{% endblock %}
+
 {% block content %}
 <article class="section" style="padding-block: 52px 10px; max-width: 760px;">
   <span style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-accent{% if article.topic == 'Chương trình đại lý' %}-2{% endif %}-700);">{{ article.topic }} · {{ article.published_at|date:"d/m/Y" }}</span>

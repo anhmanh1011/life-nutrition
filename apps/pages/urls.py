@@ -21,4 +21,5 @@ urlpatterns = [
     path("tin-tuc/", views.news, name="news"),
     path("lien-he/", lead_views.contact, name="contact"),
     path("cam-on/", lead_views.thanks, name="thanks"),
+    path("robots.txt", views.robots, name="robots"),
 ]

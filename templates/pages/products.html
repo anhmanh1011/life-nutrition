@@ -26,7 +26,7 @@
 .pill--brand { background: var(--color-accent-2-100); color: var(--color-accent-2-800); }
 .pill--brand[aria-pressed='true'] { background: var(--color-accent-2); color: var(--color-neutral-100); }
 
-.sku { padding: 0; overflow: hidden; }
+.sku { padding: 0; overflow: hidden; position: relative; }
 .sku figure { margin: 0; }
 .sku img { display: block; width: 100%; aspect-ratio: 1 / 1; object-fit: cover; object-position: 50% 74%; }
 .sku__body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 7px; flex: 1; }
@@ -35,11 +35,17 @@
   color: var(--color-accent-700);
 }
 .sku__name { margin: 0; font-weight: 700; font-size: 15px; line-height: 1.4; }
+/* Stretched link: một anchor quanh tên, ::after phủ cả thẻ nên ảnh cũng bấm được. */
+.sku__link { color: inherit; text-decoration: none; }
+.sku__link::after { content: ""; position: absolute; inset: 0; }
+.sku__link:hover { text-decoration: underline; }
 .sku__cn { margin: 0; font-size: 12.5px; color: color-mix(in srgb, var(--color-text) 52%, transparent); }
 .sku__pack { margin: 0; font-size: 12.5px; font-weight: 600; color: color-mix(in srgb, var(--color-text) 62%, transparent); }
 .sku__actions {
   margin-top: auto; padding-top: 8px; display: flex;
   align-items: center; justify-content: space-between; gap: 10px;
+  /* Nổi trên lớp phủ stretched-link để hai nút CTA vẫn bấm riêng được. */
+  position: relative; z-index: 1;
 }
 .sku__quote { font-size: 13px; font-weight: 700; }
 .sku__retail { font-size: 12.5px; font-weight: 600; color: var(--color-accent-2-700); }
@@ -99,7 +105,7 @@
       <figure class="washed"><img src="{{ product.image.url }}" alt="{{ product.image_alt }}"></figure>
       <div class="sku__body">
         <span class="sku__kicker">{{ product.kicker }}</span>
-        <p class="sku__name">{{ product.name }}</p>
+        <p class="sku__name"><a class="sku__link" href="{{ product.get_absolute_url }}">{{ product.name }}</a></p>
         <p class="sku__cn">{{ product.description }}</p>
         <p class="sku__pack">{{ product.packaging }}</p>
         <div class="sku__actions">

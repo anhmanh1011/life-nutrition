@@ -76,6 +76,16 @@ class ProductAdmin(admin.ModelAdmin):
             },
         ),
         (
+            "Nội dung chi tiết & SEO",
+            {
+                "description": (
+                    "Hiện trên trang /san-pham/&lt;đường-dẫn&gt;/. Tiêu đề SEO nên dưới 60 ký tự, "
+                    "mô tả SEO nên dưới 160 ký tự; bỏ trống sẽ tự sinh từ tên và thẻ sản phẩm."
+                ),
+                "fields": ("body", "seo_title", "seo_description"),
+            },
+        ),
+        (
             "Hiển thị",
             {
                 "description": "Bỏ chọn “Đang bán” để ẩn sản phẩm mà không xoá dữ liệu.",

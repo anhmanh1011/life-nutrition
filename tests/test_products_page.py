@@ -2,6 +2,8 @@ import pytest
 from django.core.management import call_command
 from django.urls import reverse
 
+from apps.catalog.models import Product
+
 
 @pytest.fixture
 def body(client, db):
@@ -44,3 +46,8 @@ def test_only_brands_with_stock_get_a_pill(body):
 
 def test_every_product_image_has_alt_text(body):
     assert 'alt=""' not in body
+
+
+def test_each_product_links_to_its_detail_page_exactly_once(body):
+    for product in Product.objects.active():
+        assert body.count(f'href="{product.get_absolute_url()}"') == 1

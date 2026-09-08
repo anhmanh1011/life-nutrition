@@ -1,5 +1,5 @@
 // Headless-Chrome regression suite for the Django site.
-//   node tools/check.mjs                      → all 8 pages, exits non-zero on failure
+//   node tools/check.mjs                      → every page, exits non-zero on failure
 //   PAGES=/san-pham/ node tools/check.mjs     → just one page
 //
 // Starts `manage.py runserver` on PORT_HTTP if nothing is listening, so there is
@@ -20,7 +20,8 @@ const PORT_HTTP = Number(process.env.PORT_HTTP ?? 8000);
 const BASE = `http://127.0.0.1:${PORT_HTTP}`;
 
 const ALL_PAGES = ['/', '/gioi-thieu/', '/thuong-hieu/', '/san-pham/',
-  '/hop-tac-dai-ly/', '/hang-chinh-hang/', '/tin-tuc/', '/lien-he/'];
+  '/hop-tac-dai-ly/', '/hang-chinh-hang/', '/tin-tuc/', '/lien-he/',
+  '/san-pham/tea-trio/'];
 
 // PAGES=/san-pham/,/tin-tuc/ scopes the run while a page is mid-conversion.
 const PAGES = process.env.PAGES
